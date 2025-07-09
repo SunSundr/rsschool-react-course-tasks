@@ -16,6 +16,12 @@ class SearchBar extends Component<SearchBarProps, SearchBarState> {
     this.setState({ query: event.target.value });
   };
 
+  handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && this.state.query.trim()) {
+      this.handleSubmit();
+    }
+  };
+
   handleSubmit = () => {
     this.props.onSearch(this.state.query);
   };
@@ -23,7 +29,12 @@ class SearchBar extends Component<SearchBarProps, SearchBarState> {
   render() {
     return (
       <div>
-        <input type="text" value={this.state.query} onChange={this.handleChange} />
+        <input
+          type="text"
+          value={this.state.query}
+          onChange={this.handleChange}
+          onKeyDown={this.handleKeyDown}
+        />
         <button onClick={this.handleSubmit}>Search</button>
       </div>
     );
