@@ -1,39 +1,52 @@
 import { Component } from 'react';
 import { LS_SEARCHTERM_KEY } from '~/constants';
-import { TMDBSearchResult } from '~/types';
-import { getMovie } from '~/utils/api';
+import { ImageConfiguration, TMDBSearchResult } from '~/types';
 import { callWithDelay } from '~/utils/delay';
+import { ErrorData, getErrorData } from '~/utils/error';
+import { getMovie } from '~/utils/getMovie';
+import { imagesConfig } from '~/utils/imagesConfig';
 import style from './App.module.css';
 import CardList from '../CardList/CardList';
+import Empty from '../Empty/Empty';
 import SearchBar from '../SearchBar/SearchBar';
 
 interface AppState {
   searchTerm: string;
   result?: TMDBSearchResult;
+  imagesConfig: ImageConfiguration | null;
   loading: boolean;
-  error: string | null;
+  errorData: ErrorData | null;
 }
 
 class App extends Component<unknown, AppState> {
   state: AppState = {
     searchTerm: localStorage.getItem(LS_SEARCHTERM_KEY) || '',
+    imagesConfig: null,
     loading: false,
-    error: null,
+    errorData: null,
   };
 
-  fetchSearch = (query: string) => {
-    this.setState({ loading: true, error: null });
-    getMovie(query)
-      .then((data) => {
-        callWithDelay(() => {
-          this.setState({ result: data, loading: false });
-        });
-        console.log('>>', query, data.results[0]);
-      })
-      .catch((error) => {
-        this.setState({ error: error.message, loading: false });
-        console.log('>>', error);
-      });
+  fetchSearch = async (query: string) => {
+    if (!this.state.searchTerm && !this.state.imagesConfig) return;
+    this.setState({ loading: true, errorData: null });
+    callWithDelay(async () => {
+      try {
+        const data = await getMovie(query);
+        this.setState({ result: data, loading: false });
+      } catch (error) {
+        this.setState({ errorData: getErrorData(error), loading: false });
+      }
+    });
+  };
+
+  fetchImagesConfig = async () => {
+    this.setState({ loading: true, errorData: null });
+    try {
+      const data = await imagesConfig();
+      this.setState({ imagesConfig: data, loading: false });
+    } catch (error) {
+      this.setState({ errorData: getErrorData(error), loading: false });
+    }
   };
 
   handleSearch = (query: string) => {
@@ -44,7 +57,7 @@ class App extends Component<unknown, AppState> {
   };
 
   componentDidMount() {
-    this.fetchSearch(this.state.searchTerm);
+    this.fetchImagesConfig().then(() => this.fetchSearch(this.state.searchTerm));
   }
 
   render() {
@@ -54,7 +67,16 @@ class App extends Component<unknown, AppState> {
         <main className={style.content}>
           <div className={style.paper}>
             <SearchBar onSearch={this.handleSearch} initialValue={this.state.searchTerm} />
-            <CardList results={this.state.result?.results} />
+            {this.state.result?.results.length === 0 ? (
+              <Empty />
+            ) : (
+              this.state.imagesConfig && (
+                <CardList
+                  results={this.state.result?.results}
+                  imagesConfig={this.state.imagesConfig}
+                />
+              )
+            )}
           </div>
         </main>
         <footer className={style.footer}>Footer</footer>

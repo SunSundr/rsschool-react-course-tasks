@@ -1,20 +1,38 @@
 import { Component } from 'react';
-import { TMDBVideo } from '~/types';
+import { BackdropSize, ImageConfiguration, PosterSize, TMDBVideo } from '~/types';
+import { imageBaseUrl } from '~/utils/imageBaseUrl';
 import Card from '../Card/Card';
-import Empty from '../Empty/Empty';
 
 interface CardListProps {
   results?: TMDBVideo[];
+  imagesConfig: ImageConfiguration;
 }
 
-class CardList extends Component<CardListProps> {
+interface CardListState {
+  backdropUrl: string;
+  posterUrl: string;
+}
+
+class CardList extends Component<CardListProps, CardListState> {
+  constructor(props: CardListProps) {
+    super(props);
+    this.state = {
+      backdropUrl: imageBaseUrl({ size: BackdropSize.W780, type: 'backdrop' }, props.imagesConfig),
+      posterUrl: imageBaseUrl({ size: PosterSize.W154, type: 'poster' }, props.imagesConfig),
+    };
+  }
+
   render() {
-    return this.props.results?.length === 0 ? (
-      <Empty />
-    ) : (
+    return (
       <div>
         {this.props.results?.map((item, index) => (
-          <Card key={index} index={index + 1} video={item} />
+          <Card
+            key={index}
+            index={index + 1}
+            video={item}
+            backdropUrl={this.state.backdropUrl}
+            posterUrl={this.state.posterUrl}
+          />
         ))}
       </div>
     );

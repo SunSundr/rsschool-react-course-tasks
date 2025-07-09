@@ -1,11 +1,18 @@
-const baseUrl = 'https://api.themoviedb.org';
+export const DEV_MODE = import.meta.env.DEV;
+
+const baseUrl = DEV_MODE
+  ? 'https://api.themoviedb.org'
+  : 'https://XXXXXXXXXX.execute-api.eu-north-1.amazonaws.com';
+
+const apiVersion = DEV_MODE ? '3' : 'prod';
 
 export const API_PATHS = {
-  movie: `${baseUrl}/3/search/movie`,
-  discover: `${baseUrl}/3/discover/movie`,
-  multi: `${baseUrl}/3/search/multi`,
-  tv: `${baseUrl}/3/search/tv`,
-  configuration: `${baseUrl}/3/configuration`,
+  movie: `${baseUrl}/${apiVersion}/search/movie`,
+  configuration: `${baseUrl}/${apiVersion}/configuration`,
 };
+
+export const TMDB_API_KEY: string | null = DEV_MODE
+  ? import.meta.env.VITE_TMDB_API_ACCESS_KEY
+  : null;
 
 export const LS_SEARCHTERM_KEY = 'searchTerm';
