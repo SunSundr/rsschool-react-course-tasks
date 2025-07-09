@@ -56,6 +56,11 @@ class App extends Component<unknown, AppState> {
     this.fetchSearch(trimmedQuery);
   };
 
+  handleClear = () => {
+    this.setState({ searchTerm: '', result: undefined });
+    localStorage.removeItem(LS_SEARCHTERM_KEY);
+  };
+
   componentDidMount() {
     this.fetchImagesConfig().then(() => this.fetchSearch(this.state.searchTerm));
   }
@@ -65,7 +70,11 @@ class App extends Component<unknown, AppState> {
       <div className={`${style.app} dark`}>
         <header className={style.header}>App</header>
         <main className={style.content}>
-          <SearchBar onSearch={this.handleSearch} initialValue={this.state.searchTerm} />
+          <SearchBar
+            onSearch={this.handleSearch}
+            onClear={this.handleClear}
+            initialValue={this.state.searchTerm}
+          />
           <div className={style.paper}>
             {this.state.result?.results.length === 0 ? (
               <Empty />

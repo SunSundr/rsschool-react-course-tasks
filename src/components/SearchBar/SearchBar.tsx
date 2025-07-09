@@ -1,7 +1,9 @@
 import { Component } from 'react';
+import styles from './SearchBar.module.css';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
+  onClear: () => void;
   initialValue: string;
 }
 
@@ -26,16 +28,32 @@ class SearchBar extends Component<SearchBarProps, SearchBarState> {
     this.props.onSearch(this.state.query);
   };
 
+  handleClear = () => {
+    this.setState({ query: '' });
+    this.props.onClear();
+  };
+
   render() {
     return (
-      <div>
-        <input
-          type="text"
-          value={this.state.query}
-          onChange={this.handleChange}
-          onKeyDown={this.handleKeyDown}
-        />
-        <button onClick={this.handleSubmit}>Search</button>
+      <div className={styles.searchBar}>
+        <div className={styles.inputContainer}>
+          <input
+            type="text"
+            value={this.state.query}
+            onChange={this.handleChange}
+            onKeyDown={this.handleKeyDown}
+            placeholder="Search for movies..."
+            className={styles.input}
+          />
+          {this.state.query && (
+            <button onClick={this.handleClear} className={styles.clearButton}>
+              &#xD7;
+            </button>
+          )}
+        </div>
+        <button onClick={this.handleSubmit} className={styles.searchButton}>
+          Search
+        </button>
       </div>
     );
   }
