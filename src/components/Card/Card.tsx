@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { TMDBVideo } from '~/types';
+import styles from './Card.module.css';
 
 export interface CardProps {
   index: number;
@@ -9,45 +10,67 @@ export interface CardProps {
 }
 
 class Card extends Component<CardProps> {
-  imagePoster = () => {
-    if (this.props.video.poster_path) {
-      return (
-        <img
-          src={`${this.props.posterUrl}${this.props.video.poster_path}`}
-          alt={this.props.video.title}
-          style={{ maxWidth: '80px' }}
-        />
-      );
+  formatReleaseDate = (): string => {
+    const { video } = this.props;
+
+    if (video.release_date) {
+      const date = new Date(video.release_date);
+      return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
     }
+
+    const yearMatch = video.title.match(/(\d{4})$/) || video.original_title.match(/(\d{4})$/);
+    return yearMatch ? yearMatch[1] : '?';
   };
 
-  imageBackdrop = () => {
-    if (this.props.video.backdrop_path) {
+  renderImage = () => {
+    const { video, posterUrl, backdropUrl } = this.props;
+
+    if (video.poster_path) {
+      return (
+        <img src={`${posterUrl}${video.poster_path}`} alt={video.title} className={styles.image} />
+      );
+    }
+
+    if (video.backdrop_path) {
       return (
         <img
-          src={`${this.props.backdropUrl}${this.props.video.backdrop_path}`}
-          alt={this.props.video.title}
-          style={{ maxWidth: '80px' }}
+          src={`${backdropUrl}${video.backdrop_path}`}
+          alt={video.title}
+          className={`${styles.image} ${styles.backdropImage}`}
         />
       );
     }
+
+    return <img src="/noImage.png" alt="No image available" className={styles.image} />;
   };
 
   render() {
+    const { video, index } = this.props;
+
     return (
-      <article style={{ border: '1px solid white', padding: 5, margin: 10, borderRadius: 5 }}>
-        <div>
-          <h3>{this.props.index}</h3>
+      <article className={styles.card}>
+        <div className={styles.imageContainer}>
+          {this.renderImage()}
+          <div className={styles.cardNumber}>{index}</div>
         </div>
-        {this.imagePoster()}
-        {this.imageBackdrop()}
-        <h3>{this.props.video.title}</h3>
-        <p>{this.props.video.original_title}</p>
-        <p>{this.props.video.overview}</p>
-        <p>{this.props.video.original_language}</p>
-        <p>{this.props.video.release_date}</p>
-        <p>{this.props.video.popularity}</p>
-        <p>{this.props.video.vote_count}</p>
+
+        <div className={styles.content}>
+          <h3 className={styles.title}>{video.title}</h3>
+          <p className={styles.originalTitle}>{video.original_title}</p>
+
+          <div className={styles.metadata}>
+            <div className={styles.metadata}>
+              <span className={styles.chip}>{video.original_language.toLocaleUpperCase()}</span>
+              <span className={styles.chip}>{this.formatReleaseDate()}</span>
+            </div>
+            <div className={styles.metadata}>
+              <span className={styles.chip}>{video.popularity.toFixed(1)}</span>
+              <span className={styles.chip}>
+                {video.vote_average.toFixed(1)}/{video.vote_count}
+              </span>
+            </div>
+          </div>
+        </div>
       </article>
     );
   }

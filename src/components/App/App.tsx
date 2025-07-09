@@ -65,14 +65,15 @@ class App extends Component<unknown, AppState> {
       <div className={`${style.app} dark`}>
         <header className={style.header}>App</header>
         <main className={style.content}>
+          <SearchBar onSearch={this.handleSearch} initialValue={this.state.searchTerm} />
           <div className={style.paper}>
-            <SearchBar onSearch={this.handleSearch} initialValue={this.state.searchTerm} />
             {this.state.result?.results.length === 0 ? (
               <Empty />
             ) : (
+              this.state.result &&
               this.state.imagesConfig && (
                 <CardList
-                  results={this.state.result?.results}
+                  results={this.state.result.results}
                   imagesConfig={this.state.imagesConfig}
                 />
               )
