@@ -7,6 +7,7 @@ export interface CardProps {
   video: TMDBVideo;
   backdropUrl: string;
   posterUrl: string;
+  onClick: (video: TMDBVideo, event: React.MouseEvent) => void;
 }
 
 class Card extends Component<CardProps> {
@@ -48,7 +49,7 @@ class Card extends Component<CardProps> {
     const { video, index } = this.props;
 
     return (
-      <article className={styles.card}>
+      <article className={styles.card} onClick={(event) => this.props.onClick(video, event)}>
         <div className={styles.imageContainer}>
           {this.renderImage()}
           <div className={styles.cardNumber}>{index}</div>
@@ -58,7 +59,7 @@ class Card extends Component<CardProps> {
           <h3 className={styles.title}>{video.title}</h3>
           <p className={styles.originalTitle}>{video.original_title}</p>
 
-          <div className={styles.metadata}>
+          <div className={styles.metadataWrapper}>
             <div className={styles.metadata}>
               <span className={styles.chip}>{video.original_language.toLocaleUpperCase()}</span>
               <span className={styles.chip}>{this.formatReleaseDate()}</span>

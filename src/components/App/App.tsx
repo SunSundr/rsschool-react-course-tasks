@@ -5,7 +5,7 @@ import { callWithDelay } from '~/utils/delay';
 import { ErrorData, getErrorData } from '~/utils/error';
 import { getMovie } from '~/utils/getMovie';
 import { imagesConfig } from '~/utils/imagesConfig';
-import style from './App.module.css';
+import styles from './App.module.css';
 import CardList from '../CardList/CardList';
 import Empty from '../Empty/Empty';
 import SearchBar from '../SearchBar/SearchBar';
@@ -67,15 +67,15 @@ class App extends Component<unknown, AppState> {
 
   render() {
     return (
-      <div className={`${style.app} dark`}>
-        <header className={style.header}>App</header>
-        <main className={style.content}>
+      <div className={`${styles.app} dark`}>
+        <header className={styles.header}>App</header>
+        <main className={styles.content}>
           <SearchBar
             onSearch={this.handleSearch}
             onClear={this.handleClear}
             initialValue={this.state.searchTerm}
           />
-          <div className={style.paper}>
+          <div className={styles.paper}>
             {this.state.result?.results.length === 0 ? (
               <Empty />
             ) : (
@@ -89,7 +89,7 @@ class App extends Component<unknown, AppState> {
             )}
           </div>
         </main>
-        <footer className={style.footer}>Footer</footer>
+        <footer className={styles.footer}>Footer</footer>
       </div>
     );
   }

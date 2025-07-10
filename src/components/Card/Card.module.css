@@ -9,6 +9,7 @@
     transform 0.2s ease,
     box-shadow 0.2s ease;
   height: 100%;
+  cursor: pointer;
 }
 
 .card:hover {
@@ -88,7 +89,13 @@
   display: flex;
   flex-wrap: wrap;
   gap: 0.25rem;
+}
+
+.metadataWrapper {
+  display: flex;
+  flex-direction: column;
   margin-top: auto;
+  gap: 0.25rem;
 }
 
 .chip {
