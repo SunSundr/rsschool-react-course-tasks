@@ -8,6 +8,7 @@ import { imagesConfig } from '~/utils/imagesConfig';
 import styles from './App.module.css';
 import CardList from '../CardList/CardList';
 import Empty from '../Empty/Empty';
+import { Footer } from '../Footer/Footer';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import SearchBar from '../SearchBar/SearchBar';
 
@@ -59,7 +60,7 @@ class App extends Component<unknown, AppState> {
     this.setState({ loading: true, errorData: null });
     try {
       const data = await imagesConfig();
-      this.setState({ imagesConfig: data, loading: false });
+      this.setState({ imagesConfig: data });
     } catch (error) {
       this.setState({ errorData: getErrorData(error), loading: false });
     }
@@ -72,7 +73,11 @@ class App extends Component<unknown, AppState> {
     this.fetchSearch(trimmedQuery);
   };
 
-  handleClear = () => {
+  handleClear = async () => {
+    if (!this.state.topResult) {
+      this.setState({ searchTerm: '', currentPage: 1 });
+      await this.fetchSearch('');
+    }
     this.setState({ searchTerm: '', result: this.state.topResult, currentPage: 1 });
     localStorage.removeItem(LS_SEARCHTERM_KEY);
   };
@@ -86,15 +91,15 @@ class App extends Component<unknown, AppState> {
     this.fetchImagesConfig().then(() => {
       setTimeout(() => {
         this.fetchSearch(this.state.searchTerm);
-      }, 100);
+      }, 0);
     });
   }
 
   getContent = () => {
-    if (this.state.loading && this.state.currentPage === 1) {
-      return <LoadingSpinner />;
-    } else if (this.state.errorData) {
+    if (this.state.errorData) {
       return <div>Error: {this.state.errorData.message}</div>;
+    } else if (this.state.loading && this.state.currentPage === 1) {
+      return <LoadingSpinner />;
     } else if (
       this.state.result &&
       this.state.result?.results.length !== 0 &&
@@ -103,7 +108,7 @@ class App extends Component<unknown, AppState> {
       return (
         <CardList results={this.state.result.results} imagesConfig={this.state.imagesConfig} />
       );
-    } else {
+    } else if (this.state.imagesConfig) {
       return <Empty />;
     }
   };
@@ -129,21 +134,7 @@ class App extends Component<unknown, AppState> {
               </button>
             )}
         </main>
-        <footer className={styles.footer}>
-          <div className={styles.links}>
-            <img style={{ height: 32 }} src="github-mark.svg"></img>
-            <a href="https://github.com/SunSundr/rsschool-react-course-tasks">
-              SunSundr/rsschool-react-course-tasks
-            </a>
-          </div>
-          <div className={styles.links}>
-            <img
-              style={{ height: 32 }}
-              src="https://rs.school/_next/static/media/rss-logo.c19ce1b4.svg"
-            ></img>
-            <a href="https://rs.school/">Rolling Scopes School</a>
-          </div>
-        </footer>
+        <Footer />
       </div>
     );
   }
