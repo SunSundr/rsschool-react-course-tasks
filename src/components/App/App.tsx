@@ -18,6 +18,7 @@ interface AppState {
   loading: boolean;
   errorData: ErrorData | null;
   topResult?: TMDBSearchResult;
+  currentPage: number;
 }
 
 class App extends Component<unknown, AppState> {
@@ -26,9 +27,10 @@ class App extends Component<unknown, AppState> {
     imagesConfig: null,
     loading: false,
     errorData: null,
+    currentPage: 1,
   };
 
-  fetchSearch = async (query: string) => {
+  fetchSearch = async (query: string, loadMore = false) => {
     if (!this.state.imagesConfig) return;
     this.setState({ loading: true, errorData: null });
     callWithDelay(async () => {
@@ -39,7 +41,12 @@ class App extends Component<unknown, AppState> {
           }, 400);
           return;
         }
-        const data = query ? await getMovie(query) : await getMoviePopTop();
+        const data = query
+          ? await getMovie(query, { page: this.state.currentPage.toString() })
+          : await getMoviePopTop();
+        if (loadMore && this.state.result) {
+          data.results = [...this.state.result.results, ...data.results];
+        }
         this.setState({ result: data, loading: false });
         if (!query) this.setState({ topResult: data });
       } catch (error) {
@@ -60,14 +67,19 @@ class App extends Component<unknown, AppState> {
 
   handleSearch = (query: string) => {
     const trimmedQuery = query.trim();
-    this.setState({ searchTerm: trimmedQuery });
+    this.setState({ searchTerm: trimmedQuery, currentPage: 1, result: undefined });
     localStorage.setItem(LS_SEARCHTERM_KEY, trimmedQuery);
     this.fetchSearch(trimmedQuery);
   };
 
   handleClear = () => {
-    this.setState({ searchTerm: '', result: undefined });
+    this.setState({ searchTerm: '', result: this.state.topResult, currentPage: 1 });
     localStorage.removeItem(LS_SEARCHTERM_KEY);
+  };
+
+  handleShowMore = async () => {
+    this.setState({ currentPage: this.state.currentPage + 1 });
+    this.fetchSearch(this.state.searchTerm, true);
   };
 
   componentDidMount() {
@@ -79,7 +91,7 @@ class App extends Component<unknown, AppState> {
   }
 
   getContent = () => {
-    if (this.state.loading) {
+    if (this.state.loading && this.state.currentPage === 1) {
       return <LoadingSpinner />;
     } else if (this.state.errorData) {
       return <div>Error: {this.state.errorData.message}</div>;
@@ -99,7 +111,7 @@ class App extends Component<unknown, AppState> {
   render() {
     return (
       <div className={`${styles.app} dark`}>
-        <header className={styles.header}>App</header>
+        <header className={styles.header}>TMDB Movie&#9679;Search</header>
         <main className={styles.content}>
           <SearchBar
             onSearch={this.handleSearch}
@@ -108,8 +120,30 @@ class App extends Component<unknown, AppState> {
             loading={this.state.loading}
           />
           <div className={styles.paper}>{this.getContent()}</div>
+          {this.state.loading && this.state.currentPage > 1 && <LoadingSpinner overlay={true} />}
+          {this.state.result &&
+            this.state.result.total_pages > this.state.currentPage &&
+            this.state.searchTerm && (
+              <button onClick={this.handleShowMore} className={styles.showMoreButton}>
+                Show More
+              </button>
+            )}
         </main>
-        <footer className={styles.footer}>Footer</footer>
+        <footer className={styles.footer}>
+          <div className={styles.links}>
+            <img style={{ height: 32 }} src="github-mark.svg"></img>
+            <a href="https://github.com/SunSundr/rsschool-react-course-tasks">
+              SunSundr/rsschool-react-course-tasks
+            </a>
+          </div>
+          <div className={styles.links}>
+            <img
+              style={{ height: 32 }}
+              src="https://rs.school/_next/static/media/rss-logo.c19ce1b4.svg"
+            ></img>
+            <a href="https://rs.school/">Rolling Scopes School</a>
+          </div>
+        </footer>
       </div>
     );
   }
