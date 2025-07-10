@@ -6,7 +6,7 @@ import reactPlugin from 'eslint-plugin-react';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'public'] },
+  { ignores: ['dist', 'public', '.build'] },
   {
     files: ['**/*.css'],
     plugins: { css },
