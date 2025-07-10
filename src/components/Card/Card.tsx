@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { TMDBVideo } from '~/types';
+import { safeCall } from '~/utils/safeCall';
 import styles from './Card.module.css';
 
 export interface CardProps {
@@ -13,14 +14,16 @@ export interface CardProps {
 class Card extends Component<CardProps> {
   formatReleaseDate = (): string => {
     const { video } = this.props;
-
-    if (video.release_date) {
-      const date = new Date(video.release_date);
-      return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    try {
+      if (video.release_date) {
+        const date = new Date(video.release_date);
+        return `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+      }
+      const yearMatch = video.title.match(/(\d{4})$/) || video.original_title.match(/(\d{4})$/);
+      return yearMatch ? yearMatch[1] : '?';
+    } catch {
+      return '?';
     }
-
-    const yearMatch = video.title.match(/(\d{4})$/) || video.original_title.match(/(\d{4})$/);
-    return yearMatch ? yearMatch[1] : '?';
   };
 
   renderImage = () => {
@@ -61,13 +64,16 @@ class Card extends Component<CardProps> {
 
           <div className={styles.metadataWrapper}>
             <div className={styles.metadata}>
-              <span className={styles.chip}>{video.original_language.toLocaleUpperCase()}</span>
+              <span className={styles.chip}>
+                {safeCall(video.original_language, 'toLocaleUpperCase', [], '?')}
+              </span>
               <span className={styles.chip}>{this.formatReleaseDate()}</span>
             </div>
             <div className={styles.metadata}>
-              <span className={styles.chip}>{video.popularity.toFixed(1)}</span>
+              <span className={styles.chip}>{safeCall(video.popularity, 'toFixed', [1], '-')}</span>
               <span className={styles.chip}>
-                {video.vote_average.toFixed(1)}/{video.vote_count}
+                {safeCall(video.vote_average, 'toFixed', [1], '-')}/
+                {safeCall(video.vote_count, 'toFixed', [0], '-')}
               </span>
             </div>
           </div>
