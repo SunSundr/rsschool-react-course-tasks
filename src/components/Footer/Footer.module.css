@@ -23,6 +23,16 @@
   margin-left: -10px;
 }
 
+a.links:link {
+  font-style: italic;
+  color: var(--primary-light);
+}
+
+a.links:visited {
+  font-style: italic;
+  color: var(--primary-light);
+}
+
 @media (max-width: 480px) {
   .footer {
     padding: 0.75rem;

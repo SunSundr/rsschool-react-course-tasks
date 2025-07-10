@@ -26,6 +26,7 @@ class SearchBar extends Component<SearchBarProps, SearchBarState> {
   };
 
   handleSubmit = () => {
+    this.setState({ query: this.state.query.trim() });
     this.props.onSearch(this.state.query);
   };
 

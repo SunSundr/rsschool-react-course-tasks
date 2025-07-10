@@ -9,6 +9,7 @@ import styles from './App.module.css';
 import CardList from '../CardList/CardList';
 import Empty from '../Empty/Empty';
 import { Footer } from '../Footer/Footer';
+import { Header } from '../Header/Header';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import SearchBar from '../SearchBar/SearchBar';
 
@@ -116,7 +117,7 @@ class App extends Component<unknown, AppState> {
   render() {
     return (
       <div className={`${styles.app} dark`}>
-        <header className={styles.header}>TMDB Movie&#9679;Search</header>
+        <Header />
         <main className={styles.content}>
           <SearchBar
             onSearch={this.handleSearch}
