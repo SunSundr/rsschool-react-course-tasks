@@ -1,5 +1,5 @@
 import { Component, ReactNode } from 'react';
-import { getErrorData } from '~/utils/error';
+import { errorLog, getErrorData } from '~/utils/error';
 import styles from './ErrorBoundary.module.css';
 
 export interface ErrorBoundaryState {
@@ -25,7 +25,7 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
       error: error,
       errorInfo: info,
     });
-    console.error('Error caught: ', error, info);
+    errorLog(getErrorData(error).message, info);
   }
 
   render() {

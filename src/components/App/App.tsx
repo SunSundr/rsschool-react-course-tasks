@@ -2,7 +2,7 @@ import { Component } from 'react';
 import { LS_SEARCHTERM_KEY } from '~/constants';
 import { ImageConfiguration, TMDBSearchResult } from '~/types';
 import { callWithDelay } from '~/utils/delay';
-import { ErrorData, getErrorData } from '~/utils/error';
+import { ErrorData, errorLog, getErrorData } from '~/utils/error';
 import { getMovie, getMoviePopTop } from '~/utils/getMovie';
 import { imagesConfig } from '~/utils/imagesConfig';
 import styles from './App.module.css';
@@ -99,6 +99,16 @@ class App extends Component<unknown, AppState> {
 
   getContent = () => {
     if (this.state.errorData) {
+      const { errorData } = this.state;
+      errorLog(
+        [
+          errorData.name,
+          errorData.statusCode ? `code ${errorData.statusCode}` : null,
+          errorData.message,
+        ]
+          .filter(Boolean)
+          .join(', '),
+      );
       return <ErrorInfo message={this.state.errorData.message} />;
     } else if (this.state.loading && this.state.currentPage === 1) {
       return <LoadingSpinner />;
