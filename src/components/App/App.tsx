@@ -8,6 +8,7 @@ import { imagesConfig } from '~/utils/imagesConfig';
 import styles from './App.module.css';
 import CardList from '../CardList/CardList';
 import Empty from '../Empty/Empty';
+import { ErrorInfo } from '../ErrorInfo/ErrorInfo';
 import { Footer } from '../Footer/Footer';
 import { Header } from '../Header/Header';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
@@ -98,7 +99,7 @@ class App extends Component<unknown, AppState> {
 
   getContent = () => {
     if (this.state.errorData) {
-      return <div>Error: {this.state.errorData.message}</div>;
+      return <ErrorInfo message={this.state.errorData.message} />;
     } else if (this.state.loading && this.state.currentPage === 1) {
       return <LoadingSpinner />;
     } else if (

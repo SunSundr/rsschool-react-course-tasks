@@ -24,6 +24,11 @@
   color-scheme: dark;
   --scrollbar-thumb: #6e6e6e;
   --scrollbar-track: #0a0a0a;
+
+  --error-primary: #ff4444;
+  --error-secondary: #ff6666;
+  --warn-primary: #ff8e53;
+  --warn-secondary: #eca883;
 }
 
 @supports (scrollbar-color: auto) {

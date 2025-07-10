@@ -2,22 +2,15 @@
   padding: 0.5rem 1rem;
   font-size: 0.8rem;
   font-weight: 600;
-  background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+  background: linear-gradient(45deg, var(--error-primary), var(--warn-primary));
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-  box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
+  box-shadow: 0 0 6px rgba(255, 107, 107, 0.3);
 }
 
 .errorButton:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(255, 107, 107, 0.4);
-}
-
-.errorButton:active {
-  transform: translateY(0);
+  box-shadow: 0 0px 8px rgba(255, 107, 107, 0.4);
+  background: linear-gradient(45deg, var(--warn-primary), var(--error-primary));
 }
