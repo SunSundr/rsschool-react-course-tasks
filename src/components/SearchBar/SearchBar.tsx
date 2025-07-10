@@ -5,6 +5,7 @@ interface SearchBarProps {
   onSearch: (query: string) => void;
   onClear: () => void;
   initialValue: string;
+  loading: boolean;
 }
 
 interface SearchBarState {
@@ -44,14 +45,23 @@ class SearchBar extends Component<SearchBarProps, SearchBarState> {
             onKeyDown={this.handleKeyDown}
             placeholder="Search for movies..."
             className={styles.input}
+            disabled={this.props.loading}
           />
           {this.state.query && (
-            <button onClick={this.handleClear} className={styles.clearButton}>
+            <button
+              onClick={this.handleClear}
+              className={styles.clearButton}
+              disabled={this.props.loading}
+            >
               &#xD7;
             </button>
           )}
         </div>
-        <button onClick={this.handleSubmit} className={styles.searchButton}>
+        <button
+          onClick={this.handleSubmit}
+          className={styles.searchButton}
+          disabled={this.props.loading}
+        >
           Search
         </button>
       </div>

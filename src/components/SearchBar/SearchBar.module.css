@@ -33,6 +33,11 @@
   border-color: var(--primary-main);
 }
 
+.input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .input::placeholder {
   color: var(--text-disabled);
 }
@@ -57,6 +62,16 @@
   background-color: var(--background-elevated);
 }
 
+.clearButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.clearButton:disabled:hover {
+  color: var(--text-secondary);
+  background: none;
+}
+
 .searchButton {
   padding: 0.875rem 1.5rem;
   font-size: 1rem;
@@ -76,6 +91,16 @@
 
 .searchButton:active {
   background-color: var(--primary-dark);
+}
+
+.searchButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background-color: var(--primary-main);
+}
+
+.searchButton:disabled:hover {
+  background-color: var(--primary-main);
 }
 
 @media (max-width: 767px) {

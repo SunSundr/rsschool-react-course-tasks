@@ -3,11 +3,12 @@ import { LS_SEARCHTERM_KEY } from '~/constants';
 import { ImageConfiguration, TMDBSearchResult } from '~/types';
 import { callWithDelay } from '~/utils/delay';
 import { ErrorData, getErrorData } from '~/utils/error';
-import { getMovie } from '~/utils/getMovie';
+import { getMovie, getMoviePopTop } from '~/utils/getMovie';
 import { imagesConfig } from '~/utils/imagesConfig';
 import styles from './App.module.css';
 import CardList from '../CardList/CardList';
 import Empty from '../Empty/Empty';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import SearchBar from '../SearchBar/SearchBar';
 
 interface AppState {
@@ -16,6 +17,7 @@ interface AppState {
   imagesConfig: ImageConfiguration | null;
   loading: boolean;
   errorData: ErrorData | null;
+  topResult?: TMDBSearchResult;
 }
 
 class App extends Component<unknown, AppState> {
@@ -27,12 +29,19 @@ class App extends Component<unknown, AppState> {
   };
 
   fetchSearch = async (query: string) => {
-    if (!this.state.searchTerm && !this.state.imagesConfig) return;
+    if (!this.state.imagesConfig) return;
     this.setState({ loading: true, errorData: null });
     callWithDelay(async () => {
       try {
-        const data = await getMovie(query);
+        if (!query && this.state.topResult) {
+          setTimeout(() => {
+            this.setState({ result: this.state.topResult, loading: false });
+          }, 400);
+          return;
+        }
+        const data = query ? await getMovie(query) : await getMoviePopTop();
         this.setState({ result: data, loading: false });
+        if (!query) this.setState({ topResult: data });
       } catch (error) {
         this.setState({ errorData: getErrorData(error), loading: false });
       }
@@ -62,8 +71,30 @@ class App extends Component<unknown, AppState> {
   };
 
   componentDidMount() {
-    this.fetchImagesConfig().then(() => this.fetchSearch(this.state.searchTerm));
+    this.fetchImagesConfig().then(() => {
+      setTimeout(() => {
+        this.fetchSearch(this.state.searchTerm);
+      }, 100);
+    });
   }
+
+  getContent = () => {
+    if (this.state.loading) {
+      return <LoadingSpinner />;
+    } else if (this.state.errorData) {
+      return <div>Error: {this.state.errorData.message}</div>;
+    } else if (
+      this.state.result &&
+      this.state.result?.results.length !== 0 &&
+      this.state.imagesConfig
+    ) {
+      return (
+        <CardList results={this.state.result.results} imagesConfig={this.state.imagesConfig} />
+      );
+    } else {
+      return <Empty />;
+    }
+  };
 
   render() {
     return (
@@ -74,20 +105,9 @@ class App extends Component<unknown, AppState> {
             onSearch={this.handleSearch}
             onClear={this.handleClear}
             initialValue={this.state.searchTerm}
+            loading={this.state.loading}
           />
-          <div className={styles.paper}>
-            {this.state.result?.results.length === 0 ? (
-              <Empty />
-            ) : (
-              this.state.result &&
-              this.state.imagesConfig && (
-                <CardList
-                  results={this.state.result.results}
-                  imagesConfig={this.state.imagesConfig}
-                />
-              )
-            )}
-          </div>
+          <div className={styles.paper}>{this.getContent()}</div>
         </main>
         <footer className={styles.footer}>Footer</footer>
       </div>

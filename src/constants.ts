@@ -8,6 +8,8 @@ const apiVersion = DEV_MODE ? '3' : 'prod';
 
 export const API_PATHS = {
   movie: `${baseUrl}/${apiVersion}/search/movie`,
+  topRated: `${baseUrl}/${apiVersion}/movie/top_rated`,
+  popular: `${baseUrl}/${apiVersion}/movie/popular`,
   configuration: `${baseUrl}/${apiVersion}/configuration`,
 };
 
