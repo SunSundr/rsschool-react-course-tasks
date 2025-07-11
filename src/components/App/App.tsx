@@ -1,10 +1,9 @@
 import { Component } from 'react';
-import { LS_SEARCHTERM_KEY, QUERY_KEY } from '~/constants';
-import { ImageConfiguration, QueryType, TMDBSearchResult } from '~/types';
+import { LS_SEARCHTERM_KEY } from '~/constants';
+import { fetchImagesConfig, fetchMovies } from '~/services/movieService';
+import { ImageConfiguration, TMDBSearchResult } from '~/types';
 import { callWithDelay } from '~/utils/callWithDelay';
-import { ErrorData, errorLog, getErrorData } from '~/utils/error';
-import { getMovie, getMoviePopTop } from '~/utils/getMovie';
-import { imagesConfig } from '~/utils/imagesConfig';
+import { ErrorData, errorLog, formatErrorData, getErrorData } from '~/utils/error';
 import styles from './App.module.css';
 import CardList from '../CardList/CardList';
 import Empty from '../Empty/Empty';
@@ -33,12 +32,7 @@ class App extends Component<unknown, AppState> {
     currentPage: 1,
   };
 
-  getQueryType = () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(QUERY_KEY) as QueryType;
-  };
-
-  fetchSearch = async (query: string, loadMore = false) => {
+  fetchSearch = async (query: string, loadMore = false, delay?: number) => {
     if (!this.state.imagesConfig) return;
     this.setState({ loading: true, errorData: null });
     callWithDelay(async () => {
@@ -47,24 +41,21 @@ class App extends Component<unknown, AppState> {
           callWithDelay(() => this.setState({ result: this.state.defaultResult, loading: false }));
           return;
         }
-        const data = query
-          ? await getMovie(query, { page: this.state.currentPage.toString() })
-          : await getMoviePopTop(this.getQueryType());
+        const data = await fetchMovies(query, this.state.currentPage);
         if (loadMore && this.state.result) {
           data.results = [...this.state.result.results, ...data.results];
         }
-        this.setState({ result: data, loading: false });
-        if (!query) this.setState({ defaultResult: data });
+        this.setState({ result: data, loading: false, ...(!query && { defaultResult: data }) });
       } catch (error) {
         this.setState({ errorData: getErrorData(error), loading: false });
       }
-    });
+    }, delay);
   };
 
   fetchImagesConfig = async () => {
     this.setState({ loading: true, errorData: null });
     try {
-      const data = await imagesConfig();
+      const data = await fetchImagesConfig();
       this.setState({ imagesConfig: data });
     } catch (error) {
       this.setState({ errorData: getErrorData(error), loading: false });
@@ -74,47 +65,40 @@ class App extends Component<unknown, AppState> {
   handleSearch = (query: string) => {
     const trimmedQuery = query.trim();
     this.setState({ searchTerm: trimmedQuery, currentPage: 1, result: undefined });
-    localStorage.setItem(LS_SEARCHTERM_KEY, trimmedQuery);
     this.fetchSearch(trimmedQuery);
+    localStorage.setItem(LS_SEARCHTERM_KEY, trimmedQuery);
   };
 
   handleClear = async (clearDefault = false) => {
-    if (clearDefault) this.setState({ defaultResult: undefined });
-    if (clearDefault || !this.state.defaultResult) {
-      this.setState({ searchTerm: '', currentPage: 1 });
-      await this.fetchSearch('');
-    }
-    this.setState({ searchTerm: '', result: this.state.defaultResult, currentPage: 1 });
+    const newState = {
+      searchTerm: '',
+      currentPage: 1,
+      ...(clearDefault && { defaultResult: undefined }),
+    };
+    this.setState(newState);
+    await this.fetchSearch('');
     localStorage.removeItem(LS_SEARCHTERM_KEY);
   };
 
   handleShowMore = async () => {
+    if (this.state.loading) return;
     this.setState({ currentPage: this.state.currentPage + 1 });
-    this.fetchSearch(this.state.searchTerm, true);
+    this.fetchSearch(this.state.searchTerm, true, 0);
   };
 
   componentDidMount() {
     this.fetchImagesConfig().then(() =>
-      callWithDelay(() => this.fetchSearch(this.state.searchTerm), 0),
+      callWithDelay(() => this.fetchSearch(this.state.searchTerm, false, 0), 200),
     );
   }
 
   getContent = (state: AppState) => {
     if (state.errorData) {
-      const { errorData } = state;
-      errorLog(
-        [
-          errorData.name,
-          errorData.statusCode ? `code ${errorData.statusCode}` : null,
-          errorData.message,
-        ]
-          .filter(Boolean)
-          .join(', '),
-      );
+      errorLog(formatErrorData(state.errorData));
       return <ErrorInfo message={state.errorData.message} />;
     } else if (state.loading && state.currentPage === 1) {
       return <LoadingSpinner />;
-    } else if (state.result && state.result?.results.length !== 0 && state.imagesConfig) {
+    } else if (state.result?.results.length && state.imagesConfig) {
       return <CardList results={state.result.results} imagesConfig={state.imagesConfig} />;
     } else if (state.imagesConfig) {
       return <Empty />;

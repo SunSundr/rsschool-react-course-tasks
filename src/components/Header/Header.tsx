@@ -1,6 +1,5 @@
 import { Component } from 'react';
-import { QUERY_KEY } from '~/constants';
-import { QueryType } from '~/types';
+import { setQueryType } from '~/utils/queryType';
 import styles from './Header.module.css';
 
 interface HeaderProps {
@@ -9,16 +8,7 @@ interface HeaderProps {
 
 export class Header extends Component<HeaderProps> {
   setQuery = () => {
-    const type: QueryType = 'popular';
-    const urlParams = new URLSearchParams(window.location.search);
-    const url = new URL(window.location.href);
-    const params = url.searchParams;
-    if (urlParams.get(QUERY_KEY) === type) {
-      params.delete(QUERY_KEY);
-    } else {
-      params.set(QUERY_KEY, type);
-    }
-    history.replaceState(null, '', url.href);
+    setQueryType();
     this.props.updateSearch(true);
   };
 

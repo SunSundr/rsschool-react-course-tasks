@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { BackdropSize, ImageConfiguration, PosterSize, TMDBVideo } from '~/types';
+import { getTransformSide } from '~/utils/getTransformSide';
 import { imageBaseUrl } from '~/utils/imageBaseUrl';
 import styles from './CardList.module.css';
 import Card from '../Card/Card';
@@ -28,28 +29,8 @@ class CardList extends Component<CardListProps, CardListState> {
     };
   }
 
-  getTransformSide = (event: React.MouseEvent): string => {
-    const { clientX: x, clientY: y } = event;
-    const viewportWidth = window.innerWidth;
-    const viewportHeight = window.innerHeight;
-
-    const distances = {
-      left: x,
-      right: viewportWidth - x,
-      top: y,
-      bottom: viewportHeight - y,
-    };
-
-    const closestSide = Object.entries(distances).reduce(
-      (min, [side, distance]) => (distance < min.distance ? { side, distance } : min),
-      { side: 'left', distance: distances.left },
-    ).side;
-
-    return closestSide;
-  };
-
   handleCardClick = (video: TMDBVideo, event: React.MouseEvent) => {
-    this.setState({ selectedVideo: video, transformSide: this.getTransformSide(event) });
+    this.setState({ selectedVideo: video, transformSide: getTransformSide(event) });
   };
 
   handleCloseDetail = () => {

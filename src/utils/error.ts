@@ -34,3 +34,13 @@ export function getErrorData(error: unknown): ErrorData {
 export function errorLog(...msg: unknown[]) {
   console.error('[ERROR]', ...msg);
 }
+
+export function formatErrorData(errorData: ErrorData) {
+  return [
+    errorData.name,
+    errorData.statusCode ? `code ${errorData.statusCode}` : null,
+    errorData.message,
+  ]
+    .filter(Boolean)
+    .join(', ');
+}
