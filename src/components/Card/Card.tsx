@@ -1,7 +1,7 @@
 import { Component } from 'react';
 import { renderImage } from '~/helpers/renderImage';
 import { TMDBVideo } from '~/types';
-import { formatReleaseDate } from '~/utils/formatDate';
+import { formatReleaseDate } from '~/utils/formatReleaseDate';
 import { safeCall } from '~/utils/safeCall';
 import styles from './Card.module.css';
 

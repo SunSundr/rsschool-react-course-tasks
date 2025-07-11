@@ -1,12 +1,12 @@
 import { QUERY_KEY } from '~/constants';
 import { QueryType } from '~/types';
 
-export function getQueryType() {
+export function getQueryType(): QueryType {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get(QUERY_KEY) as QueryType;
 }
 
-export function setQueryType() {
+export function setQueryType(): void {
   const type: QueryType = 'popular';
   const urlParams = new URLSearchParams(window.location.search);
   const url = new URL(window.location.href);

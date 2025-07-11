@@ -35,7 +35,7 @@ export function errorLog(...msg: unknown[]) {
   console.error('[ERROR]', ...msg);
 }
 
-export function formatErrorData(errorData: ErrorData) {
+export function formatErrorData(errorData: ErrorData): string {
   return [
     errorData.name,
     errorData.statusCode ? `code ${errorData.statusCode}` : null,
