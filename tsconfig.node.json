@@ -9,7 +9,7 @@
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "moduleDetection": "force",
-    "outDir": "./.build",
+    "outDir": "./.build"
   },
   "include": ["vite.config.mts"]
 }
