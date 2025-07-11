@@ -1,10 +1,10 @@
-export const DEV_MODE = import.meta.env.DEV;
+export const USE_PROXY = !import.meta.env.DEV || !import.meta.env.VITE_TMDB_API_ACCESS_KEY;
 
-const baseUrl = DEV_MODE
-  ? 'https://api.themoviedb.org'
-  : 'https://zxkpc14sca.execute-api.eu-north-1.amazonaws.com';
+const baseUrl = USE_PROXY
+  ? 'https://zxkpc14sca.execute-api.eu-north-1.amazonaws.com'
+  : 'https://api.themoviedb.org';
 
-const apiVersion = DEV_MODE ? '3' : 'prod';
+const apiVersion = USE_PROXY ? 'prod' : '3';
 
 export const API_PATHS = {
   movie: `${baseUrl}/${apiVersion}/search/movie`,
@@ -13,8 +13,8 @@ export const API_PATHS = {
   configuration: `${baseUrl}/${apiVersion}/configuration`,
 };
 
-export const TMDB_API_KEY: string | null = DEV_MODE
-  ? import.meta.env.VITE_TMDB_API_ACCESS_KEY
-  : null;
+export const TMDB_API_KEY: string | null = USE_PROXY
+  ? null
+  : import.meta.env.VITE_TMDB_API_ACCESS_KEY;
 
 export const LS_SEARCHTERM_KEY = 'searchTerm';
