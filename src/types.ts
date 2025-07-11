@@ -94,3 +94,5 @@ export interface ImageUrlParams {
   type?: ImageType;
   useSecure?: boolean;
 }
+
+export type QueryType = 'popular' | 'topRated' | null;

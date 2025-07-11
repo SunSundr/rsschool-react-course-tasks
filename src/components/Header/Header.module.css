@@ -32,7 +32,10 @@ a.links:visited {
   gap: 14px;
 }
 
-.text {
+.textButton {
+  background: transparent;
+  border: none;
+  cursor: pointer;
   font-size: large;
   font-weight: bold;
 }

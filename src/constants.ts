@@ -18,3 +18,5 @@ export const TMDB_API_KEY: string | null = USE_PROXY
   : import.meta.env.VITE_TMDB_API_ACCESS_KEY;
 
 export const LS_SEARCHTERM_KEY = 'searchTerm';
+
+export const QUERY_KEY = 'q';

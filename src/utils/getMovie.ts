@@ -1,5 +1,5 @@
 import { API_PATHS, TMDB_API_KEY } from '~/constants';
-import { TMDBSearchResult } from '~/types';
+import { QueryType, TMDBSearchResult } from '~/types';
 import { ResponseError } from './error';
 
 export async function getMovie(
@@ -35,7 +35,7 @@ export async function getMovie(
 }
 
 export async function getMoviePopTop(
-  type: 'popular' | 'topRated' = 'topRated',
+  type: QueryType = 'topRated',
   options: Record<string, string> = {},
 ): Promise<TMDBSearchResult> {
   const searchParams = new URLSearchParams({

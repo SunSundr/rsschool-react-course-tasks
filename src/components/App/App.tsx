@@ -1,7 +1,7 @@
 import { Component } from 'react';
-import { LS_SEARCHTERM_KEY } from '~/constants';
-import { ImageConfiguration, TMDBSearchResult } from '~/types';
-import { callWithDelay } from '~/utils/delay';
+import { LS_SEARCHTERM_KEY, QUERY_KEY } from '~/constants';
+import { ImageConfiguration, QueryType, TMDBSearchResult } from '~/types';
+import { callWithDelay } from '~/utils/callWithDelay';
 import { ErrorData, errorLog, getErrorData } from '~/utils/error';
 import { getMovie, getMoviePopTop } from '~/utils/getMovie';
 import { imagesConfig } from '~/utils/imagesConfig';
@@ -20,7 +20,7 @@ interface AppState {
   imagesConfig: ImageConfiguration | null;
   loading: boolean;
   errorData: ErrorData | null;
-  topResult?: TMDBSearchResult;
+  defaultResult?: TMDBSearchResult;
   currentPage: number;
 }
 
@@ -33,25 +33,28 @@ class App extends Component<unknown, AppState> {
     currentPage: 1,
   };
 
+  getQueryType = () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(QUERY_KEY) as QueryType;
+  };
+
   fetchSearch = async (query: string, loadMore = false) => {
     if (!this.state.imagesConfig) return;
     this.setState({ loading: true, errorData: null });
     callWithDelay(async () => {
       try {
-        if (!query && this.state.topResult) {
-          setTimeout(() => {
-            this.setState({ result: this.state.topResult, loading: false });
-          }, 400);
+        if (!query && this.state.defaultResult) {
+          callWithDelay(() => this.setState({ result: this.state.defaultResult, loading: false }));
           return;
         }
         const data = query
           ? await getMovie(query, { page: this.state.currentPage.toString() })
-          : await getMoviePopTop();
+          : await getMoviePopTop(this.getQueryType());
         if (loadMore && this.state.result) {
           data.results = [...this.state.result.results, ...data.results];
         }
         this.setState({ result: data, loading: false });
-        if (!query) this.setState({ topResult: data });
+        if (!query) this.setState({ defaultResult: data });
       } catch (error) {
         this.setState({ errorData: getErrorData(error), loading: false });
       }
@@ -75,12 +78,13 @@ class App extends Component<unknown, AppState> {
     this.fetchSearch(trimmedQuery);
   };
 
-  handleClear = async () => {
-    if (!this.state.topResult) {
+  handleClear = async (clearDefault = false) => {
+    if (clearDefault) this.setState({ defaultResult: undefined });
+    if (clearDefault || !this.state.defaultResult) {
       this.setState({ searchTerm: '', currentPage: 1 });
       await this.fetchSearch('');
     }
-    this.setState({ searchTerm: '', result: this.state.topResult, currentPage: 1 });
+    this.setState({ searchTerm: '', result: this.state.defaultResult, currentPage: 1 });
     localStorage.removeItem(LS_SEARCHTERM_KEY);
   };
 
@@ -90,16 +94,14 @@ class App extends Component<unknown, AppState> {
   };
 
   componentDidMount() {
-    this.fetchImagesConfig().then(() => {
-      setTimeout(() => {
-        this.fetchSearch(this.state.searchTerm);
-      }, 0);
-    });
+    this.fetchImagesConfig().then(() =>
+      callWithDelay(() => this.fetchSearch(this.state.searchTerm), 0),
+    );
   }
 
-  getContent = () => {
-    if (this.state.errorData) {
-      const { errorData } = this.state;
+  getContent = (state: AppState) => {
+    if (state.errorData) {
+      const { errorData } = state;
       errorLog(
         [
           errorData.name,
@@ -109,42 +111,35 @@ class App extends Component<unknown, AppState> {
           .filter(Boolean)
           .join(', '),
       );
-      return <ErrorInfo message={this.state.errorData.message} />;
-    } else if (this.state.loading && this.state.currentPage === 1) {
+      return <ErrorInfo message={state.errorData.message} />;
+    } else if (state.loading && state.currentPage === 1) {
       return <LoadingSpinner />;
-    } else if (
-      this.state.result &&
-      this.state.result?.results.length !== 0 &&
-      this.state.imagesConfig
-    ) {
-      return (
-        <CardList results={this.state.result.results} imagesConfig={this.state.imagesConfig} />
-      );
-    } else if (this.state.imagesConfig) {
+    } else if (state.result && state.result?.results.length !== 0 && state.imagesConfig) {
+      return <CardList results={state.result.results} imagesConfig={state.imagesConfig} />;
+    } else if (state.imagesConfig) {
       return <Empty />;
     }
   };
 
   render() {
+    const { state } = this;
     return (
       <div className={`${styles.app} dark`}>
-        <Header />
+        <Header updateSearch={this.handleClear} />
         <main className={styles.content}>
           <SearchBar
             onSearch={this.handleSearch}
             onClear={this.handleClear}
-            initialValue={this.state.searchTerm}
-            loading={this.state.loading}
+            initialValue={state.searchTerm}
+            loading={state.loading}
           />
-          <div className={styles.paper}>{this.getContent()}</div>
-          {this.state.loading && this.state.currentPage > 1 && <LoadingSpinner overlay={true} />}
-          {this.state.result &&
-            this.state.result.total_pages > this.state.currentPage &&
-            this.state.searchTerm && (
-              <button onClick={this.handleShowMore} className={styles.showMoreButton}>
-                Show More
-              </button>
-            )}
+          <div className={styles.paper}>{this.getContent(state)}</div>
+          {state.loading && state.currentPage > 1 && <LoadingSpinner overlay={true} />}
+          {state.result && state.result.total_pages > state.currentPage && state.searchTerm && (
+            <button onClick={this.handleShowMore} className={styles.showMoreButton}>
+              Show More
+            </button>
+          )}
         </main>
         <Footer />
       </div>
