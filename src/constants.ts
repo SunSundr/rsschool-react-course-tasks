@@ -2,7 +2,7 @@ export const DEV_MODE = import.meta.env.DEV;
 
 const baseUrl = DEV_MODE
   ? 'https://api.themoviedb.org'
-  : 'https://XXXXXXXXXX.execute-api.eu-north-1.amazonaws.com';
+  : 'https://zxkpc14sca.execute-api.eu-north-1.amazonaws.com';
 
 const apiVersion = DEV_MODE ? '3' : 'prod';
 
