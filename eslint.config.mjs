@@ -13,7 +13,7 @@ export default tseslint.config(
     extends: [css.configs.recommended, prettierRecommended],
     language: 'css/css',
     rules: {
-      'css/no-invalid-properties': 'off',
+      'css/no-invalid-properties': ['error', { allowUnknownVariables: true }],
     },
   },
   {
