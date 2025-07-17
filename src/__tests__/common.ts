@@ -1,4 +1,22 @@
-import { TMDBVideo } from '~/types';
+import {
+  BackdropSize,
+  ImageConfiguration,
+  LogoSize,
+  PosterSize,
+  ProfileSize,
+  StillSize,
+  TMDBVideo,
+} from '~/types';
+
+export const mockImageConfig: ImageConfiguration = {
+  base_url: 'http://image.tmdb.org/t/p/',
+  secure_base_url: 'https://image.tmdb.org/t/p/',
+  backdrop_sizes: Object.values(BackdropSize),
+  poster_sizes: Object.values(PosterSize),
+  logo_sizes: Object.values(LogoSize),
+  profile_sizes: Object.values(ProfileSize),
+  still_sizes: Object.values(StillSize),
+};
 
 export const createMockVideo = (overrides: Partial<TMDBVideo> = {}): TMDBVideo => ({
   adult: false,
