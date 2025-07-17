@@ -1,3 +1,4 @@
+import { JSX } from 'react';
 import { TMDBVideo } from '~/types';
 
 export const renderImage = (
@@ -5,7 +6,7 @@ export const renderImage = (
   posterUrl: string,
   backdropUrl: string,
   styles: Record<string, string>,
-) => {
+): JSX.Element => {
   if (video.poster_path) {
     return (
       <img src={`${posterUrl}${video.poster_path}`} alt={video.title} className={styles.image} />

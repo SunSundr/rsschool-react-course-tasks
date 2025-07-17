@@ -1,6 +1,7 @@
 import { Component } from 'react';
-import styles from './Footer.module.css';
+import { TASK } from '~/constants';
 import { ErrorButton } from '../ErrorButton/ErrorButton';
+import styles from './Footer.module.css';
 
 export class Footer extends Component {
   render() {
@@ -8,10 +9,7 @@ export class Footer extends Component {
       <footer className={styles.footer}>
         <div className={styles.linksWrap}>
           <img style={{ height: 32 }} src="github-mark.svg"></img>
-          <a
-            className={styles.links}
-            href="https://github.com/SunSundr/rsschool-react-course-tasks"
-          >
+          <a className={styles.links} href={TASK.git}>
             SunSundr/rsschool-react-course-tasks
           </a>
           <img

@@ -6,7 +6,7 @@ export function getQueryType(): QueryType {
   return urlParams.get(QUERY_KEY) as QueryType;
 }
 
-export function setQueryType(): void {
+export function toggleQueryType(): void {
   const type: QueryType = 'popular';
   const urlParams = new URLSearchParams(window.location.search);
   const url = new URL(window.location.href);

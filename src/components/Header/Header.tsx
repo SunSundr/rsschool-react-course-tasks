@@ -1,15 +1,16 @@
 import { Component } from 'react';
-import { setQueryType } from '~/utils/queryType';
+import { APP_NAME, TASK } from '~/constants';
+import { toggleQueryType } from '~/utils/queryType';
 import styles from './Header.module.css';
 
 interface HeaderProps {
-  updateSearch: (clearDefault?: boolean) => void;
+  updateContext: () => void;
 }
 
 export class Header extends Component<HeaderProps> {
   setQuery = () => {
-    setQueryType();
-    this.props.updateSearch(true);
+    toggleQueryType();
+    this.props.updateContext();
   };
 
   render() {
@@ -18,14 +19,11 @@ export class Header extends Component<HeaderProps> {
         <div className={styles.logo}>
           <img className={styles.image} src="/tmdb.png" alt="No image available" />
           <button onClick={this.setQuery} type="button" className={styles.textButton}>
-            TMDB Movie&#9679;Searcher
+            {APP_NAME}
           </button>
         </div>
-        <a
-          className={styles.links}
-          href="https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/class-components.md"
-        >
-          #Task 1
+        <a className={styles.links} href={TASK.url}>
+          {TASK.title}
         </a>
       </header>
     );

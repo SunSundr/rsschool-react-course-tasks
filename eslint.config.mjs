@@ -6,7 +6,7 @@ import reactPlugin from 'eslint-plugin-react';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
-  { ignores: ['dist', 'public', '.build'] },
+  { ignores: ['dist', 'public', '.build', 'coverage'] },
   {
     files: ['**/*.css'],
     plugins: { css },
@@ -55,8 +55,14 @@ export default tseslint.config(
               pattern: '~/**',
               group: 'internal',
             },
+            {
+              pattern: '*.css',
+              group: 'unknown',
+              patternOptions: { matchBase: true },
+              position: 'after',
+            },
           ],
-          pathGroupsExcludedImportTypes: ['react'],
+          pathGroupsExcludedImportTypes: ['react', '**/*.css'],
           'newlines-between': 'never',
           alphabetize: {
             order: 'asc',

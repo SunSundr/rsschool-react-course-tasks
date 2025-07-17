@@ -28,16 +28,14 @@ class Detail extends Component<DetailProps, DetailState> {
 
   getTransformClass = () => {
     switch (this.props.transformSide) {
-      case 'left':
-        return styles.transformLeft;
-      case 'right':
-        return styles.transformRight;
       case 'top':
         return styles.transformTop;
       case 'bottom':
         return styles.transformBottom;
+      case 'left':
+        return styles.transformLeft;
       default:
-        return '';
+        return styles.transformRight;
     }
   };
 
