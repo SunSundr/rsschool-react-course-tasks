@@ -13,8 +13,33 @@ export default defineConfig({
   },
   plugins: [react()],
   test: {
-    globals: true,
     environment: 'jsdom',
+    globals: true,
+    clearMocks: true,
+    setupFiles: ['src/__tests__/setup.ts'],
+    coverage: {
+      provider: 'istanbul',
+      reporter: ['text', 'json', 'html'],
+      reportsDirectory: './coverage',
+      include: ['src/**/*.{ts,tsx}'],
+      exclude: [
+        'src/index.tsx',
+        'src/App.tsx',
+        'src/types.ts',
+        'src/constants.ts',
+        'src/**/*.d.ts',
+        'src/__tests__/**/*.ts',
+      ],
+      all: true,
+      thresholds: {
+        global: {
+          statements: 80,
+          branches: 50,
+          functions: 50,
+          lines: 50,
+        },
+      },
+    },
   },
   build: {
     rollupOptions: {
