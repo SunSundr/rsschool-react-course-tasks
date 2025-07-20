@@ -1,0 +1,22 @@
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+
+.card {
+  background-color: var(--background-paper);
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  max-width: 400px;
+  min-width: 400px;
+}
+
+.title {
+  font-size: 1.25rem;
+  color: var(--error-primary);
+  margin: 0 0 1rem 0;
+}
