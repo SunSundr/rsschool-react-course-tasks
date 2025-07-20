@@ -45,6 +45,12 @@ npm install
 # Start development server
 npm run dev
 
+# Run tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
 # Build for production
 npm run build
 ```
@@ -56,6 +62,14 @@ npm run build
 - **Error Boundary**: Application-wide error handling with recovery mechanism
 - **CSS Modules**: Scoped styling without external frameworks
 - **TypeScript**: Full type coverage for better development experience
+
+## Testing
+
+- **Vitest**: Test runner integrated with Vite
+- **React Testing Library**: Component testing with user-centric approach
+- **JSDOM**: Browser-like environment for tests
+- **Test Location**: All tests are in the `src/__tests__` folder
+- **Coverage**: Istanbul coverage reports with thresholds (80% statements, 50% branches/functions/lines)
 
 ## Limitations
 
