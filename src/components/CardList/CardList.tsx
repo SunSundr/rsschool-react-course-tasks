@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { BackdropSize, ImageConfiguration, PosterSize, TMDBVideo } from '~/types';
 import { getTransformSide } from '~/utils/getTransformSide';
 import { imageBaseUrl } from '~/utils/imageBaseUrl';
-import Card from '../Card/Card';
+import { Card } from '../Card/Card';
 import Detail from '../Detail/Detail';
 import styles from './CardList.module.css';
 
