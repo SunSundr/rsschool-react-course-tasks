@@ -1,10 +1,10 @@
 import { Component, ContextType } from 'react';
-import CardList from '~/components/CardList/CardList';
-import Empty from '~/components/Empty/Empty';
+import { CardList } from '~/components/CardList/CardList';
+import { Empty } from '~/components/Empty/Empty';
 import { ErrorInfo } from '~/components/ErrorInfo/ErrorInfo';
 import { RefreshContext } from '~/components/Layout/Layout';
 import LoadingSpinner from '~/components/LoadingSpinner/LoadingSpinner';
-import SearchBar from '~/components/SearchBar/SearchBar';
+import { SearchBar } from '~/components/SearchBar/SearchBar';
 import { LS_SEARCHTERM_KEY } from '~/constants';
 import { fetchImagesConfig, fetchMovies } from '~/services/movieService';
 import { ImageConfiguration, TMDBSearchResult } from '~/types';

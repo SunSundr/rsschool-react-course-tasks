@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import styles from './Empty.module.css';
 
-const Empty: React.FC = () => {
+export const Empty: React.FC = () => {
   const tips = [
     'Try searching for "Avengers"',
     'Try searching for "Batman"',
@@ -26,5 +26,3 @@ const Empty: React.FC = () => {
     </div>
   );
 };
-
-export default Empty;
