@@ -11,7 +11,7 @@ interface CardListProps {
   imagesConfig: ImageConfiguration;
 }
 
-export const CardList: React.FC<CardListProps> = ({ results, imagesConfig }: CardListProps) => {
+export const CardList: React.FC<CardListProps> = ({ results, imagesConfig }) => {
   const [backdropUrl] = useState(
     imageBaseUrl({ size: BackdropSize.W780, type: 'backdrop' }, imagesConfig),
   );

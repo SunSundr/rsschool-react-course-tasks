@@ -6,7 +6,7 @@ interface HeaderProps {
   updateContext: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ updateContext }: HeaderProps) => {
+export const Header: React.FC<HeaderProps> = ({ updateContext }) => {
   const setQuery = () => {
     toggleQueryType();
     updateContext();

@@ -4,7 +4,7 @@ interface ErrorInfoProps {
   message: string;
 }
 
-export const ErrorInfo: React.FC<ErrorInfoProps> = ({ message }: ErrorInfoProps) => {
+export const ErrorInfo: React.FC<ErrorInfoProps> = ({ message }) => {
   return (
     <div className={styles.container}>
       <div className={styles.card}>

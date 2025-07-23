@@ -12,13 +12,7 @@ export interface CardProps {
   onClick: (video: TMDBVideo, event: React.MouseEvent) => void;
 }
 
-const Card: React.FC<CardProps> = ({
-  video,
-  index,
-  posterUrl,
-  backdropUrl,
-  onClick,
-}: CardProps) => {
+const Card: React.FC<CardProps> = ({ video, index, posterUrl, backdropUrl, onClick }) => {
   return (
     <article className={styles.card} onClick={(event) => onClick(video, event)}>
       <div className={styles.imageContainer}>
