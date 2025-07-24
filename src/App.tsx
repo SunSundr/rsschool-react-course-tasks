@@ -1,13 +1,26 @@
-import { JSX } from 'react';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { Layout } from './components/Layout/Layout';
+import { DetailPage } from './pages/DetailPage/DetailPage';
 import { MainPage } from './pages/MainPage/MainPage';
 
-function App(): JSX.Element {
-  return (
-    <Layout>
-      <MainPage />
-    </Layout>
-  );
-}
+const router = createBrowserRouter([
+  {
+    element: <Layout />,
+    children: [
+      {
+        path: '/',
+        element: <MainPage />,
+        children: [
+          {
+            path: 'detailed/:id',
+            element: <DetailPage />,
+          },
+        ],
+      },
+    ],
+  },
+]);
 
-export default App;
+export function App() {
+  return <RouterProvider router={router} />;
+}

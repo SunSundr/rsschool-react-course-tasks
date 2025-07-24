@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { renderImage } from '~/helpers/renderImage';
 import { TMDBVideo } from '~/types';
 import { formatReleaseDate } from '~/utils/formatReleaseDate';
@@ -9,12 +10,17 @@ export interface CardProps {
   video: TMDBVideo;
   backdropUrl: string;
   posterUrl: string;
-  onClick: (video: TMDBVideo, event: React.MouseEvent) => void;
+  onClick: (
+    video: TMDBVideo,
+    event: React.MouseEvent,
+    ref: React.RefObject<HTMLElement | null>,
+  ) => void;
 }
 
 export const Card: React.FC<CardProps> = ({ video, index, posterUrl, backdropUrl, onClick }) => {
+  const ref = useRef(null);
   return (
-    <article className={styles.card} onClick={(event) => onClick(video, event)}>
+    <article ref={ref} className={styles.card} onClick={(event) => onClick(video, event, ref)}>
       <div className={styles.imageContainer}>
         {renderImage(video, posterUrl, backdropUrl, styles)}
         <div className={styles.cardNumber}>{index}</div>

@@ -1,5 +1,5 @@
 import { API_PATHS, TMDB_API_KEY } from '~/constants';
-import { QueryType, TMDBSearchResult } from '~/types';
+import { QueryType, TMDBDetailResult, TMDBSearchResult } from '~/types';
 import { ResponseError } from './error';
 
 export async function getMovie(
@@ -60,6 +60,34 @@ export async function getMoviePopTop(
     throw new ResponseError(
       `Failed to fetch movie: ${response.statusText}`,
       'MovieError',
+      response.status,
+    );
+  }
+
+  return await response.json();
+}
+
+export async function getDetailMovie(
+  id: string,
+  options: Record<string, string> = {},
+): Promise<TMDBDetailResult> {
+  const searchParams = new URLSearchParams({
+    language: options.language || 'en-US',
+  });
+
+  const init: RequestInit = {
+    headers: {
+      ...(TMDB_API_KEY && { Authorization: `Bearer ${TMDB_API_KEY}` }),
+      Accept: 'application/json',
+    },
+  };
+
+  const response = await fetch(`${API_PATHS.movieDetail}/${id}?${searchParams.toString()}`, init);
+
+  if (!response.ok) {
+    throw new ResponseError(
+      `Failed to fetch movie: ${response.statusText}`,
+      'MovieDetailError',
       response.status,
     );
   }

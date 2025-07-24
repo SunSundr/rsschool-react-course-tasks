@@ -1,4 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
+// import { Outlet } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { CardList } from '~/components/CardList/CardList';
 import { Empty } from '~/components/Empty/Empty';
 import { ErrorInfo } from '~/components/ErrorInfo/ErrorInfo';
@@ -19,16 +21,20 @@ export const MainPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [errorData, setErrorData] = useState<ErrorData | null>(null);
   const [defaultResult, setDefaultResult] = useState<TMDBSearchResult | undefined>();
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1', 10));
+  const [totalPages, setTotalPages] = useState(1);
   const [updateTrigger, setUpdateTrigger] = useState(false);
 
   const refreshContext = useContext(RefreshContext);
+  const location = useLocation();
 
   const fetchSearch = async (
     query: string,
-    loadMore = false,
     delay?: number,
     firstInit = false,
+    clearDefault = false,
+    page = 1,
   ) => {
     if (!firstInit && !imagesConfig) return;
     setLoading(true);
@@ -36,24 +42,23 @@ export const MainPage: React.FC = () => {
 
     callWithDelay(async () => {
       try {
-        if (!query && defaultResult) {
+        if (!query && page === 1 && defaultResult && !clearDefault) {
           callWithDelay(() => {
             setResult(defaultResult);
             setLoading(false);
+            setSearchParams({ page: '1' });
+            setTotalPages(defaultResult.total_pages);
+            setCurrentPage(1);
           });
           return;
         }
-
-        const data = await fetchMovies(query, currentPage);
-        if (loadMore && result) {
-          data.results = [...result.results, ...data.results];
-        }
-
+        const data = await fetchMovies(query, page);
+        setCurrentPage(page);
         setResult(data);
         setLoading(false);
-        if (!query) {
-          setDefaultResult(data);
-        }
+        setTotalPages(data.total_pages);
+        setSearchParams({ page: page.toString() });
+        if (!query && page === 1) setDefaultResult(data);
       } catch (error) {
         setErrorData(getErrorData(error));
         setLoading(false);
@@ -73,35 +78,49 @@ export const MainPage: React.FC = () => {
     }
   };
 
-  const handleSearch = (query: string) => {
+  const needNavigateHome = (query: string): boolean => {
+    if (location.pathname !== '/') {
+      refreshContext.handleCloseTrigger();
+      callWithDelay(() => {
+        if (query) {
+          handleSearch(query, false);
+        } else {
+          handleClear(false, false);
+        }
+      }, 1000);
+      return true;
+    }
+    return false;
+  };
+
+  const handleSearch = (query: string, checkNavigate = true) => {
     const trimmedQuery = query.trim();
     setSearchTerm(trimmedQuery);
-    setCurrentPage(1);
+    if (checkNavigate && needNavigateHome(trimmedQuery)) return;
     setResult(undefined);
     fetchSearch(trimmedQuery);
     localStorage.setItem(LS_SEARCHTERM_KEY, trimmedQuery);
   };
 
-  const handleClear = async (clearDefault = false) => {
+  const handleClear = async (clearDefault = false, checkNavigate = true) => {
+    if (checkNavigate && needNavigateHome('')) return;
     setSearchTerm('');
-    setCurrentPage(1);
     setUpdateTrigger(refreshContext.updateTrigger);
-    if (clearDefault) {
-      setDefaultResult(undefined);
-    }
-    await fetchSearch('');
+    if (clearDefault) setDefaultResult(undefined);
+    await fetchSearch('', undefined, false, clearDefault);
     localStorage.removeItem(LS_SEARCHTERM_KEY);
     localStorage.removeItem('reset');
   };
 
-  const handleShowMore = async () => {
+  const handlePageChange = async (page: number) => {
     if (loading) return;
-    setCurrentPage((prevPage) => prevPage + 1);
-    fetchSearch(searchTerm, true, 0);
+    fetchSearch(searchTerm, 0, false, false, page);
   };
 
   useEffect(() => {
-    fetchImgConfig().then(() => callWithDelay(() => fetchSearch(searchTerm, false, 0, true), 0));
+    fetchImgConfig().then(() =>
+      callWithDelay(() => fetchSearch(searchTerm, 0, true, false, currentPage), 0),
+    );
   }, []);
 
   useEffect(() => {
@@ -115,10 +134,18 @@ export const MainPage: React.FC = () => {
     if (errorData) {
       errorLog(formatErrorData(errorData));
       return <ErrorInfo message={errorData.message} />;
-    } else if (loading && currentPage === 1) {
+    } else if (loading) {
       return <LoadingSpinner />;
     } else if (result?.results.length && imagesConfig) {
-      return <CardList results={result.results} imagesConfig={imagesConfig} />;
+      return (
+        <CardList
+          results={result.results}
+          imagesConfig={imagesConfig}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          handlePageChange={handlePageChange}
+        />
+      );
     } else if (imagesConfig) {
       return <Empty />;
     }
@@ -134,12 +161,6 @@ export const MainPage: React.FC = () => {
         loading={loading}
       />
       <div className={styles.paper}>{getContent()}</div>
-      {loading && currentPage > 1 && <LoadingSpinner overlay={true} />}
-      {result && result.total_pages > currentPage && searchTerm && (
-        <button onClick={handleShowMore} className={styles.showMoreButton}>
-          Show More
-        </button>
-      )}
     </>
   );
 };

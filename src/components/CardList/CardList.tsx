@@ -1,58 +1,124 @@
-import { useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { Outlet, useNavigate, useOutlet } from 'react-router-dom';
+import { ITEMS_PER_PAGE, MAX_PAGES } from '~/constants';
 import { BackdropSize, ImageConfiguration, PosterSize, TMDBVideo } from '~/types';
-import { getTransformSide } from '~/utils/getTransformSide';
 import { imageBaseUrl } from '~/utils/imageBaseUrl';
 import { Card } from '../Card/Card';
-import Detail from '../Detail/Detail';
+import { RefreshContext } from '../Layout/Layout';
+import Pagination from '../Pagination/Pagination';
 import styles from './CardList.module.css';
 
 interface CardListProps {
   results: TMDBVideo[];
   imagesConfig: ImageConfiguration;
+  currentPage: number;
+  totalPages: number;
+  handlePageChange: (page: number) => void;
 }
 
-export const CardList: React.FC<CardListProps> = ({ results, imagesConfig }) => {
+export const CardList: React.FC<CardListProps> = ({
+  results,
+  imagesConfig,
+  currentPage,
+  totalPages,
+  handlePageChange,
+}) => {
+  const navigate = useNavigate();
+  const outlet = useOutlet();
+  const hasDetail = !!outlet;
+  const { closeTrigger, handleCloseTrigger } = useContext(RefreshContext);
   const [backdropUrl] = useState(
     imageBaseUrl({ size: BackdropSize.W780, type: 'backdrop' }, imagesConfig),
   );
   const [posterUrl] = useState(
     imageBaseUrl({ size: PosterSize.W342, type: 'poster' }, imagesConfig),
   );
-  const [selectedVideo, setSelectedVideo] = useState<TMDBVideo | null>(null);
-  const [transformSide, setTransformSide] = useState('');
 
-  const handleCardClick = (video: TMDBVideo, event: React.MouseEvent) => {
-    setSelectedVideo(video);
-    setTransformSide(getTransformSide(event));
+  const [showOutlet, setShowOutlet] = useState(false);
+  const detailOutletRef = useRef<HTMLDivElement>(null);
+
+  const navigateHome = () => {
+    setShowOutlet(false);
+    setTimeout(() => {
+      navigate('/');
+    }, 1000);
   };
 
-  const handleCloseDetail = () => {
-    setSelectedVideo(null);
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    const isSmallScreen = window.innerWidth <= 700;
+    if (isSmallScreen) {
+      navigateHome();
+    } else {
+      if (detailOutletRef.current) {
+        const outletRect = detailOutletRef.current.getBoundingClientRect();
+        if (e.clientX < outletRect.left) {
+          navigateHome();
+        }
+      }
+    }
   };
+
+  const handleCardClick = (
+    video: TMDBVideo,
+    _event: React.MouseEvent,
+    ref: React.RefObject<HTMLElement | null>,
+  ) => {
+    if (hasDetail) {
+      navigateHome();
+    } else {
+      navigate(`/detailed/${video.id}`, { state: { video } });
+    }
+    setTimeout(() => {
+      if (ref.current) {
+        ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 1100);
+  };
+
+  useEffect(() => {
+    setShowOutlet(hasDetail);
+  }, [hasDetail]);
+
+  useEffect(() => {
+    if (closeTrigger && hasDetail) {
+      handleCloseTrigger();
+      navigateHome();
+    }
+  }, [closeTrigger, hasDetail, navigate]);
+
+  const pageOffset = (currentPage - 1) * ITEMS_PER_PAGE;
 
   return (
-    <>
-      <div className={styles.cardGrid}>
-        {results.map((item, index) => (
-          <Card
-            key={index}
-            index={index + 1}
-            video={item}
-            backdropUrl={backdropUrl}
-            posterUrl={posterUrl}
-            onClick={handleCardClick}
-          />
-        ))}
-      </div>
-      {selectedVideo && (
-        <Detail
-          video={selectedVideo}
-          backdropUrl={backdropUrl}
-          posterUrl={posterUrl}
-          onClose={handleCloseDetail}
-          transformSide={transformSide}
+    <div
+      className={`${styles.container} ${hasDetail ? styles.withDetail : ''} ${showOutlet ? styles.withDetailFill : styles.withDetailZero}`}
+    >
+      {hasDetail && <div className={styles.backdrop} onClick={handleBackdropClick} />}
+      <div className={styles.cardGridWrapper}>
+        <div className={styles.cardGrid}>
+          {results.map((item, index) => (
+            <Card
+              key={`${item.id}-${index}`}
+              index={index + 1 + pageOffset}
+              video={item}
+              backdropUrl={backdropUrl}
+              posterUrl={posterUrl}
+              onClick={handleCardClick}
+            />
+          ))}
+        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages < MAX_PAGES ? totalPages : MAX_PAGES}
+          onPageChange={handlePageChange}
         />
-      )}
-    </>
+      </div>
+      <div
+        ref={detailOutletRef}
+        className={`${styles.detailOutlet} ${showOutlet ? styles.scaleOne : styles.scaleZero}`}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <Outlet context={{ imagesConfig }} />
+      </div>
+    </div>
   );
 };
