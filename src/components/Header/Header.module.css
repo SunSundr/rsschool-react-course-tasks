@@ -40,6 +40,14 @@ a.links:visited {
   font-weight: bold;
 }
 
+.linkButton {
+  text-decoration: none;
+  cursor: pointer;
+  font-size: large;
+  font-weight: bold;
+  color: var(--text-primary);
+}
+
 @supports (user-select: none) {
   .text {
     user-select: none;

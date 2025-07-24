@@ -1,4 +1,5 @@
-import { APP_NAME, TASK } from '~/constants';
+import { Link } from 'react-router-dom';
+import { APP_NAME } from '~/constants';
 import { toggleQueryType } from '~/utils/queryType';
 import styles from './Header.module.css';
 
@@ -20,9 +21,9 @@ export const Header: React.FC<HeaderProps> = ({ updateContext }) => {
           {APP_NAME}
         </button>
       </div>
-      <a className={styles.links} href={TASK.url}>
-        {TASK.title}
-      </a>
+      <Link to="/about" className={styles.linkButton}>
+        About
+      </Link>
     </header>
   );
 };
