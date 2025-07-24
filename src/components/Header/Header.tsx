@@ -1,6 +1,6 @@
-import { Link } from 'react-router-dom';
-import { APP_NAME } from '~/constants';
-import { toggleQueryType } from '~/utils/queryType';
+import { Link, useSearchParams } from 'react-router-dom';
+import { APP_NAME, QUERY_KEY } from '~/constants';
+import { QueryType } from '~/types';
 import styles from './Header.module.css';
 
 interface HeaderProps {
@@ -8,9 +8,24 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ updateContext }) => {
+  const [, setSearchParams] = useSearchParams();
+
+  const toggleQueryType = () => {
+    const type: QueryType = 'popular';
+    setSearchParams((prev) => {
+      const params = new URLSearchParams(prev);
+      if (params.get(QUERY_KEY) === type) {
+        params.delete(QUERY_KEY);
+      } else {
+        params.set(QUERY_KEY, type);
+      }
+      return params;
+    });
+  };
+
   const setQuery = () => {
     toggleQueryType();
-    updateContext();
+    setTimeout(() => updateContext(), 350);
   };
 
   return (

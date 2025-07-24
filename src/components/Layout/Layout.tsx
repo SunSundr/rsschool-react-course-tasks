@@ -1,18 +1,16 @@
 import { createContext, useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { ImageConfiguration } from '~/types';
 import { Footer } from '../Footer/Footer';
 import { Header } from '../Header/Header';
 import styles from './Layout.module.css';
-
-// type LayoutProps = {
-//   children: ReactNode;
-// };
 
 interface RefreshContextType {
   updateTrigger: boolean;
   handleUpdateTrigger: () => void;
   closeTrigger: boolean;
   handleCloseTrigger: () => void;
+  imagesConfig?: ImageConfiguration;
 }
 
 export const RefreshContext = createContext<RefreshContextType>({

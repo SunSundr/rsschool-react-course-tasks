@@ -15,6 +15,12 @@ export interface ErrorData {
   statusCode?: number;
 }
 
+export interface ErrorTMDB {
+  success: boolean;
+  status_code: number;
+  status_message: string;
+}
+
 export function getErrorData(error: unknown): ErrorData {
   if (typeof error === 'object' && error !== null) {
     const message =
@@ -44,3 +50,15 @@ export function formatErrorData(errorData: ErrorData): string {
     .filter(Boolean)
     .join(', ');
 }
+
+export const getErrorResponceObject = async (response: Response): Promise<ErrorTMDB> => {
+  try {
+    return await response.json();
+  } catch {
+    return {
+      success: false,
+      status_code: response.status,
+      status_message: response.statusText,
+    };
+  }
+};

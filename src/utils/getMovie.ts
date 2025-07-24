@@ -1,6 +1,6 @@
 import { API_PATHS, TMDB_API_KEY } from '~/constants';
 import { QueryType, TMDBDetailResult, TMDBSearchResult } from '~/types';
-import { ResponseError } from './error';
+import { getErrorResponceObject, ResponseError } from './error';
 
 export async function getMovie(
   query: string,
@@ -24,11 +24,8 @@ export async function getMovie(
   const response = await fetch(`${API_PATHS.movie}?${searchParams.toString()}`, init);
 
   if (!response.ok) {
-    throw new ResponseError(
-      `Failed to fetch movie: ${response.statusText}`,
-      'MovieError',
-      response.status,
-    );
+    const errObj = await getErrorResponceObject(response);
+    throw new ResponseError(errObj.status_message, 'MovieError', response.status);
   }
 
   return await response.json();
@@ -57,11 +54,8 @@ export async function getMoviePopTop(
   );
 
   if (!response.ok) {
-    throw new ResponseError(
-      `Failed to fetch movie: ${response.statusText}`,
-      'MovieError',
-      response.status,
-    );
+    const errObj = await getErrorResponceObject(response);
+    throw new ResponseError(errObj.status_message, 'MovieError', response.status);
   }
 
   return await response.json();
@@ -85,11 +79,8 @@ export async function getDetailMovie(
   const response = await fetch(`${API_PATHS.movieDetail}/${id}?${searchParams.toString()}`, init);
 
   if (!response.ok) {
-    throw new ResponseError(
-      `Failed to fetch movie: ${response.statusText}`,
-      'MovieDetailError',
-      response.status,
-    );
+    const errObj = await getErrorResponceObject(response);
+    throw new ResponseError(errObj.status_message, 'MovieDetailError', response.status);
   }
 
   return await response.json();

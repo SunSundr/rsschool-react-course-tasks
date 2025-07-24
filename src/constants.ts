@@ -24,7 +24,6 @@ export const QUERY_KEY = 'q';
 
 export const TASK = {
   title: '#Task 3',
-  url: 'https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/class-components.md',
   git: 'https://github.com/SunSundr/rsschool-react-course-tasks',
   avatar: 'https://avatars.githubusercontent.com/u/160144047',
 };

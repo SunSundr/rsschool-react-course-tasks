@@ -1,5 +1,5 @@
 import { useContext, useEffect, useRef, useState } from 'react';
-import { Outlet, useNavigate, useOutlet } from 'react-router-dom';
+import { Outlet, useNavigate, useOutlet, useSearchParams } from 'react-router-dom';
 import { ITEMS_PER_PAGE, MAX_PAGES } from '~/constants';
 import { BackdropSize, ImageConfiguration, PosterSize, TMDBVideo } from '~/types';
 import { imageBaseUrl } from '~/utils/imageBaseUrl';
@@ -24,6 +24,7 @@ export const CardList: React.FC<CardListProps> = ({
   handlePageChange,
 }) => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const outlet = useOutlet();
   const hasDetail = !!outlet;
   const { closeTrigger, handleCloseTrigger } = useContext(RefreshContext);
@@ -33,14 +34,18 @@ export const CardList: React.FC<CardListProps> = ({
   const [posterUrl] = useState(
     imageBaseUrl({ size: PosterSize.W342, type: 'poster' }, imagesConfig),
   );
-
   const [showOutlet, setShowOutlet] = useState(false);
   const detailOutletRef = useRef<HTMLDivElement>(null);
+
+  const navUrlWithCurrentParams = (url: string) => {
+    const paramsString = searchParams.toString();
+    return `${url}${paramsString ? `?${paramsString}` : ''}`;
+  };
 
   const navigateHome = () => {
     setShowOutlet(false);
     setTimeout(() => {
-      navigate('/');
+      navigate(navUrlWithCurrentParams('/'));
     }, 1000);
   };
 
@@ -66,7 +71,7 @@ export const CardList: React.FC<CardListProps> = ({
     if (hasDetail) {
       navigateHome();
     } else {
-      navigate(`/detailed/${video.id}`, { state: { video } });
+      navigate(navUrlWithCurrentParams(`/detailed/${video.id}`));
     }
     setTimeout(() => {
       if (ref.current) {

@@ -30,6 +30,17 @@ export const MainPage: React.FC = () => {
   const refreshContext = useContext(RefreshContext);
   const location = useLocation();
 
+  const updateParams = (newParams: Record<string, string>) => {
+    const params = new URLSearchParams(searchParams);
+    callWithDelay(() => {
+      console.log('updateParams', searchParams.get('q'));
+      Object.entries(newParams).forEach(([key, value]) => {
+        params.set(key, value);
+      });
+      setSearchParams(params);
+    }, 0);
+  };
+
   const fetchSearch = async (
     query: string,
     delay?: number,
@@ -47,7 +58,7 @@ export const MainPage: React.FC = () => {
           callWithDelay(() => {
             setResult(defaultResult);
             setLoading(false);
-            setSearchParams({ page: '1' });
+            updateParams({ page: '1' });
             setTotalPages(defaultResult.total_pages);
             setCurrentPage(1);
           });
@@ -58,7 +69,7 @@ export const MainPage: React.FC = () => {
         setResult(data);
         setLoading(false);
         setTotalPages(data.total_pages);
-        setSearchParams({ page: page.toString() });
+        updateParams({ page: page.toString() });
         if (!query && page === 1) setDefaultResult(data);
       } catch (error) {
         setErrorData(getErrorData(error));

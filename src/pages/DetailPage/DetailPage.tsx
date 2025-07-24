@@ -1,10 +1,13 @@
 import { useContext, useEffect, useState } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useOutletContext, useParams } from 'react-router-dom';
 import { RefreshContext } from '~/components/Layout/Layout';
+import { LoadingSpinner } from '~/components/LoadingSpinner/LoadingSpinner';
 import { renderImage } from '~/helpers/renderImage';
 import { fetchDetailMovie } from '~/services/movieService';
-import { TMDBVideo } from '~/types';
+import { BackdropSize, ImageConfiguration, PosterSize, TMDBVideo } from '~/types';
+import { getErrorData } from '~/utils/error';
 import { formatReleaseDate } from '~/utils/formatReleaseDate';
+import { imageBaseUrl } from '~/utils/imageBaseUrl';
 import { safeCall } from '~/utils/safeCall';
 import styles from './DetailPage.module.css';
 
@@ -18,9 +21,10 @@ export const DetailPage = (props: DetailProps = {}) => {
   const { id } = useParams();
   const location = useLocation();
   const { handleCloseTrigger } = useContext(RefreshContext);
+  const { imagesConfig } = useOutletContext<{ imagesConfig: ImageConfiguration }>();
   const [video, setVideo] = useState<TMDBVideo | null>(props.video || null);
   const [loading, setLoading] = useState(!props.video);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<{ msg: string; statusCode?: number } | null>(null);
 
   const locationState = location.state as { video?: TMDBVideo };
 
@@ -37,8 +41,8 @@ export const DetailPage = (props: DetailProps = {}) => {
           const data = await fetchDetailMovie(id);
           setVideo(data);
         } catch (err) {
-          setError('Failed to load movie details');
-          console.error(err);
+          const errData = getErrorData(err);
+          setError({ msg: errData.message, statusCode: errData.statusCode });
         } finally {
           setLoading(false);
         }
@@ -52,20 +56,28 @@ export const DetailPage = (props: DetailProps = {}) => {
     handleCloseTrigger();
   };
 
-  if (loading) return <div className={styles.loading}>Loading...</div>;
-  if (error) return <div className={styles.error}>{error}</div>;
-
-  const posterUrl = props.posterUrl || `https://image.tmdb.org/t/p/w500${video?.poster_path}`;
-  const backdropUrl =
-    props.backdropUrl || `https://image.tmdb.org/t/p/original${video?.backdrop_path}`;
-
-  return (
-    <div className={styles.container}>
-      <button className={styles.closeButton} onClick={handleClose}>
-        <span className={styles.closeCrossText}>&#xD7;</span>
-      </button>
-      <div className={styles.content}>
-        {video && (
+  const getContent = () => {
+    if (error) {
+      return (
+        <div className={styles.emptyWrapper}>
+          <h2>Error {error.statusCode}</h2>
+          <div className={styles.error}>{error.msg}</div>
+        </div>
+      );
+    } else if (loading) {
+      return (
+        <div className={styles.loadingWrapper}>
+          <LoadingSpinner />
+        </div>
+      );
+    } else if (video) {
+      const posterUrl =
+        props.posterUrl ||
+        imageBaseUrl({ size: BackdropSize.W780, type: 'backdrop' }, imagesConfig);
+      const backdropUrl =
+        props.backdropUrl || imageBaseUrl({ size: PosterSize.W500, type: 'poster' }, imagesConfig);
+      return (
+        <>
           <div className={styles.topBlock}>
             <div className={styles.imageContainer}>
               {renderImage(video, posterUrl, backdropUrl, styles)}
@@ -88,14 +100,26 @@ export const DetailPage = (props: DetailProps = {}) => {
               </div>
             </div>
           </div>
-        )}
-        {video && (
           <div className={styles.bottomBlock}>
             <div className={styles.overview}>{video.overview}</div>
           </div>
-        )}
-        {!video && <div className={styles.error}>Movie not found</div>}
-      </div>
+        </>
+      );
+    } else {
+      return (
+        <div className={styles.emptyWrapper}>
+          <div className={styles.error}>Movie not found</div>
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div className={styles.container}>
+      <button className={styles.closeButton} onClick={handleClose}>
+        <span className={styles.closeCrossText}>&#xD7;</span>
+      </button>
+      <div className={styles.content}>{getContent()}</div>
     </div>
   );
 };
