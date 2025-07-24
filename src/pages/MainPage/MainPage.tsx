@@ -8,6 +8,7 @@ import { RefreshContext } from '~/components/Layout/Layout';
 import { LoadingSpinner } from '~/components/LoadingSpinner/LoadingSpinner';
 import { SearchBar } from '~/components/SearchBar/SearchBar';
 import { LS_SEARCHTERM_KEY } from '~/constants';
+import { useLocalStorage } from '~/hooks/useLocalStorage';
 import { fetchImagesConfig, fetchMovies } from '~/services/movieService';
 import { ImageConfiguration, TMDBSearchResult } from '~/types';
 import { callWithDelay } from '~/utils/callWithDelay';
@@ -15,7 +16,7 @@ import { ErrorData, errorLog, formatErrorData, getErrorData } from '~/utils/erro
 import styles from './MainPage.module.css';
 
 export const MainPage: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState(localStorage.getItem(LS_SEARCHTERM_KEY) || '');
+  const [searchTerm, setSearchTerm] = useLocalStorage(LS_SEARCHTERM_KEY, '');
   const [result, setResult] = useState<TMDBSearchResult | undefined>();
   const [imagesConfig, setImagesConfig] = useState<ImageConfiguration | null>(null);
   const [loading, setLoading] = useState(false);
@@ -99,7 +100,6 @@ export const MainPage: React.FC = () => {
     if (checkNavigate && needNavigateHome(trimmedQuery)) return;
     setResult(undefined);
     fetchSearch(trimmedQuery);
-    localStorage.setItem(LS_SEARCHTERM_KEY, trimmedQuery);
   };
 
   const handleClear = async (clearDefault = false, checkNavigate = true) => {
@@ -108,8 +108,6 @@ export const MainPage: React.FC = () => {
     setUpdateTrigger(refreshContext.updateTrigger);
     if (clearDefault) setDefaultResult(undefined);
     await fetchSearch('', undefined, false, clearDefault);
-    localStorage.removeItem(LS_SEARCHTERM_KEY);
-    localStorage.removeItem('reset');
   };
 
   const handlePageChange = async (page: number) => {
