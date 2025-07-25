@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from 'react';
-// import { Outlet } from 'react-router-dom';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { CardList } from '~/components/CardList/CardList';
 import { Empty } from '~/components/Empty/Empty';
@@ -33,7 +32,6 @@ export const MainPage: React.FC = () => {
   const updateParams = (newParams: Record<string, string>) => {
     const params = new URLSearchParams(searchParams);
     callWithDelay(() => {
-      console.log('updateParams', searchParams.get('q'));
       Object.entries(newParams).forEach(([key, value]) => {
         params.set(key, value);
       });
@@ -51,7 +49,6 @@ export const MainPage: React.FC = () => {
     if (!firstInit && !imagesConfig) return;
     setLoading(true);
     setErrorData(null);
-
     callWithDelay(async () => {
       try {
         if (!query && page === 1 && defaultResult && !clearDefault) {
@@ -84,9 +81,11 @@ export const MainPage: React.FC = () => {
     try {
       const data = await fetchImagesConfig();
       setImagesConfig(data);
+      return true;
     } catch (error) {
       setErrorData(getErrorData(error));
       setLoading(false);
+      return false;
     }
   };
 
@@ -127,9 +126,9 @@ export const MainPage: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchImgConfig().then(() =>
-      callWithDelay(() => fetchSearch(searchTerm, 0, true, false, currentPage), 0),
-    );
+    fetchImgConfig().then((status) => {
+      if (status) callWithDelay(() => fetchSearch(searchTerm, 0, true, false, currentPage), 0);
+    });
   }, []);
 
   useEffect(() => {

@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { createMockVideo } from './common';
-import Card from '../components/Card/Card';
+import { Card } from '../components/Card/Card';
 
 vi.mock('../helpers/renderImage', () => ({
   renderImage: () => <img data-testid="mocked-image" alt="Mocked image" />,
@@ -61,11 +61,15 @@ describe('Card', () => {
     expect(screen.getByText('8.5/8.5')).toBeInTheDocument();
   });
 
-  it('calls onClick with video and event when clicked', () => {
+  it('calls onClick with video, event, and ref when clicked', () => {
     render(<Card {...defaultProps} />);
     const card = screen.getByRole('article');
     fireEvent.click(card);
-    expect(defaultProps.onClick).toHaveBeenCalledWith(defaultProps.video, expect.any(Object));
+    expect(defaultProps.onClick).toHaveBeenCalledWith(
+      defaultProps.video,
+      expect.any(Object),
+      expect.any(Object),
+    );
   });
 
   it('renders with different index', () => {

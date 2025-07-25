@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
 import * as constants from '../../constants';
 import { ResponseError } from '../../utils/error';
-import { getMovie, getMoviePopTop } from '../../utils/getMovie';
+import { getDetailMovie, getMovie, getMoviePopTop } from '../../utils/getMovie';
 
 globalThis.fetch = vi.fn();
 
@@ -9,6 +9,7 @@ const urlConfiguration = vi.hoisted(() => ({
   movie: 'https://api.example.com/search/movie',
   popular: 'https://api.example.com/movie/popular',
   topRated: 'https://api.example.com/movie/top_rated',
+  movieDetail: 'https://api.example.com/movie',
 }));
 
 vi.mock('../../constants', () => ({
@@ -156,5 +157,55 @@ describe('getMoviePopTop', () => {
       statusText: 'Internal Server Error',
     });
     await expect(getMoviePopTop()).rejects.toThrow(ResponseError);
+  });
+});
+
+describe('getDetailMovie', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('fetches movie detail successfully', async () => {
+    const mockResult = {
+      id: 123,
+      title: 'Test Movie',
+      overview: 'Test overview',
+    };
+    vi.mocked(constants).TMDB_API_KEY = null;
+    (fetch as Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockResult),
+    });
+    const result = await getDetailMovie('123');
+    expect(fetch).toHaveBeenCalledWith(`${urlConfiguration.movieDetail}/123?language=en-US`, {
+      headers: {
+        Accept: 'application/json',
+      },
+    });
+    expect(result).toEqual(mockResult);
+  });
+
+  it('includes Authorization header when TMDB_API_KEY is present', async () => {
+    vi.mocked(constants).TMDB_API_KEY = 'test-api-key';
+    (fetch as Mock).mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ id: 123 }),
+    });
+    await getDetailMovie('123');
+    expect(fetch).toHaveBeenCalledWith(expect.any(String), {
+      headers: {
+        Authorization: 'Bearer test-api-key',
+        Accept: 'application/json',
+      },
+    });
+  });
+
+  it('throws ResponseError when fetch fails', async () => {
+    (fetch as Mock).mockResolvedValueOnce({
+      ok: false,
+      status: 404,
+      statusText: 'Not Found',
+    });
+    await expect(getDetailMovie('123')).rejects.toThrow(ResponseError);
   });
 });

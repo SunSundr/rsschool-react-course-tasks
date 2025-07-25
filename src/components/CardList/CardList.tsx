@@ -5,7 +5,7 @@ import { BackdropSize, ImageConfiguration, PosterSize, TMDBVideo } from '~/types
 import { imageBaseUrl } from '~/utils/imageBaseUrl';
 import { Card } from '../Card/Card';
 import { RefreshContext } from '../Layout/Layout';
-import Pagination from '../Pagination/Pagination';
+import { Pagination } from '../Pagination/Pagination';
 import styles from './CardList.module.css';
 
 interface CardListProps {
@@ -44,9 +44,7 @@ export const CardList: React.FC<CardListProps> = ({
 
   const navigateHome = () => {
     setShowOutlet(false);
-    setTimeout(() => {
-      navigate(navUrlWithCurrentParams('/'));
-    }, 1000);
+    setTimeout(() => navigate(navUrlWithCurrentParams('/')), 1000);
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
@@ -73,11 +71,7 @@ export const CardList: React.FC<CardListProps> = ({
     } else {
       navigate(navUrlWithCurrentParams(`/detailed/${video.id}`));
     }
-    setTimeout(() => {
-      if (ref.current) {
-        ref.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }, 1100);
+    setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 1100);
   };
 
   useEffect(() => {
