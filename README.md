@@ -1,27 +1,29 @@
 # TMDB Movie•Searcher
 
-A React application built with Class components for searching movies using The Movie Database ([TMDB](https://www.themoviedb.org)) API.
+A React application built with functional components and hooks for searching movies using The Movie Database ([TMDB](https://www.themoviedb.org)) API.
 
 🔗 **[Live Demo](https://tmdbmoviesearcher.netlify.app)**
 
 ## Overview
 
-This application was created as part of the RS School React course task: [Class Components](https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/class-components.md)
+This application was created as part of the RS School React course task: [React: Routing and Hooks](https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/functional-routing.md)
 
 ## Features
 
 - **Movie Search**: Search for movies in the TMDB database
-- **Detailed View**: Click on any movie card to view detailed information in a modal
-- **Load More Results**: "Show More" button to load additional results (20 results per request)
+- **Detailed View**: Click on any movie card to view detailed information with routing
+- **Pagination**: Navigate through multiple pages of results
 - **Persistent Search**: Automatically saves and restores search queries using localStorage
 - **Loading States**: Loading spinner during data fetching
 - **Error Handling**: Error boundary with fallback UI and reset functionality
 - **Responsive Design**: Adaptive layout for different screen sizes
 - **Empty States**: User-friendly messages when no results are found
+- **Routing**: React Router for navigation between pages and detailed views
 
 ## Technology Stack
 
-- **React** with Class Components (no hooks)
+- **React** with Functional Components and Hooks
+- **React Router** for client-side routing
 - **TypeScript** for type safety
 - **CSS Modules** for styling (no external CSS frameworks)
 - **Vite** for build tooling
@@ -57,8 +59,9 @@ npm run build
 
 ## Architecture
 
-- **Class Components Only**: All components use class-based architecture for state management and lifecycle methods
-- **No Hooks**: Adheres to class component patterns without using React hooks
+- **Functional Components**: All components use functional architecture with React hooks
+- **React Hooks**: useState, useEffect, useContext, and custom hooks for state management
+- **React Router**: Client-side routing with nested routes and outlet patterns
 - **Error Boundary**: Application-wide error handling with recovery mechanism
 - **CSS Modules**: Scoped styling without external frameworks
 - **TypeScript**: Full type coverage for better development experience
@@ -75,8 +78,8 @@ npm run build
 
 - Configured for `en_US` locale only
 - No direct DOM manipulations within React components
-- Minimal external dependencies (React only)
-- Class components used exclusively for state and lifecycle management
+- Minimal external dependencies (React and React Router)
+- Functional components with hooks used exclusively for state and lifecycle management
 
 ## Testing Error Handling
 
