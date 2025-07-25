@@ -63,11 +63,53 @@ describe('Header', () => {
         initialEntries: ['/?q=popular'],
       },
     );
-
     render(<RouterProvider router={router} />);
     const titleButton = screen.getByText(APP_NAME);
     fireEvent.click(titleButton);
     await new Promise((resolve) => setTimeout(resolve, 100));
     expect(router.state.location.search).toBe('');
+  });
+
+  it('navigates to home when not on home or detailed page', async () => {
+    const router = createMemoryRouter(
+      [
+        {
+          path: '/',
+          element: <div>Home Page</div>,
+        },
+        {
+          path: '/about',
+          element: <Header {...defaultProps} />,
+        },
+      ],
+      {
+        initialEntries: ['/about'],
+      },
+    );
+    render(<RouterProvider router={router} />);
+    const titleButton = screen.getByText(APP_NAME);
+    fireEvent.click(titleButton);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(router.state.location.pathname).toBe('/');
+  });
+
+  it('toggles query parameter when on home page', async () => {
+    const router = createMemoryRouter(
+      [
+        {
+          path: '/',
+          element: <Header {...defaultProps} />,
+        },
+      ],
+      {
+        initialEntries: ['/'],
+      },
+    );
+    render(<RouterProvider router={router} />);
+    const titleButton = screen.getByText(APP_NAME);
+    fireEvent.click(titleButton);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    expect(router.state.location.pathname).toBe('/');
+    expect(router.state.location.search).toBe('?q=popular');
   });
 });

@@ -1,4 +1,4 @@
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { APP_NAME, QUERY_KEY } from '~/constants';
 import { QueryType } from '~/types';
 import styles from './Header.module.css';
@@ -9,18 +9,25 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ updateContext }) => {
   const [, setSearchParams] = useSearchParams();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const toggleQueryType = () => {
-    const type: QueryType = 'popular';
-    setSearchParams((prev) => {
-      const params = new URLSearchParams(prev);
-      if (params.get(QUERY_KEY) === type) {
-        params.delete(QUERY_KEY);
-      } else {
-        params.set(QUERY_KEY, type);
-      }
-      return params;
-    });
+    if (location.pathname === '/' || location.pathname.startsWith('/detailed')) {
+      const type: QueryType = 'popular';
+      setSearchParams((prev) => {
+        const params = new URLSearchParams(prev);
+        if (params.get(QUERY_KEY) === type) {
+          params.delete(QUERY_KEY);
+        } else {
+          params.set(QUERY_KEY, type);
+        }
+        return params;
+      });
+    } else {
+      navigate('/');
+      return;
+    }
   };
 
   const setQuery = () => {
