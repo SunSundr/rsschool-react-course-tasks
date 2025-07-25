@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import Empty from '../components/Empty/Empty';
+import { Empty } from '../components/Empty/Empty';
 
 describe('Empty', () => {
   it('renders sorry message', () => {

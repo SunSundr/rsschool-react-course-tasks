@@ -8,6 +8,7 @@ const apiVersion = USE_PROXY ? 'prod' : '3';
 
 export const API_PATHS = {
   movie: `${baseUrl}/${apiVersion}/search/movie`,
+  movieDetail: `${baseUrl}/${apiVersion}/movie`,
   topRated: `${baseUrl}/${apiVersion}/movie/top_rated`,
   popular: `${baseUrl}/${apiVersion}/movie/popular`,
   configuration: `${baseUrl}/${apiVersion}/configuration`,
@@ -22,9 +23,12 @@ export const LS_SEARCHTERM_KEY = 'searchTerm';
 export const QUERY_KEY = 'q';
 
 export const TASK = {
-  title: '#Task 1',
-  url: 'https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/class-components.md',
+  title: '#Task 3',
   git: 'https://github.com/SunSundr/rsschool-react-course-tasks',
+  avatar: 'https://avatars.githubusercontent.com/u/160144047',
 };
 
 export const APP_NAME = 'TMDB Movie\u25CFSearcher';
+
+export const ITEMS_PER_PAGE = 20;
+export const MAX_PAGES = 500;

@@ -1,0 +1,32 @@
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 30px 0;
+}
+
+.button {
+  padding: 4px 16px;
+  margin: 0 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: var(--secondary-dark);
+  min-width: 80px;
+  cursor: pointer;
+}
+
+.button:disabled:hover {
+  background-color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.pageInfo {
+  font-size: 16px;
+  margin: 0 10px;
+}
+
+@supports (user-select: none) {
+  .pageInfo {
+    user-select: none;
+  }
+}

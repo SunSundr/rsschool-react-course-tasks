@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './SearchBar.module.css';
 
 interface SearchBarProps {
@@ -8,66 +8,59 @@ interface SearchBarProps {
   loading: boolean;
 }
 
-interface SearchBarState {
-  query: string;
-}
+export const SearchBar: React.FC<SearchBarProps> = ({
+  onSearch,
+  onClear,
+  initialValue,
+  loading,
+}) => {
+  const [query, setQuery] = useState(initialValue || '');
 
-class SearchBar extends Component<SearchBarProps, SearchBarState> {
-  state: SearchBarState = { query: this.props.initialValue || '' };
+  useEffect(() => {
+    setQuery(initialValue || '');
+  }, [initialValue]);
 
-  handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState({ query: event.target.value });
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(event.target.value);
   };
 
-  handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && this.state.query.trim()) {
-      this.handleSubmit();
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && query.trim()) {
+      handleSubmit();
     }
   };
 
-  handleSubmit = () => {
-    this.setState({ query: this.state.query.trim() });
-    this.props.onSearch(this.state.query);
+  const handleSubmit = () => {
+    setQuery(query.trim());
+    onSearch(query);
   };
 
-  handleClear = () => {
-    this.setState({ query: '' });
-    this.props.onClear();
+  const handleClear = () => {
+    setQuery('');
+    onClear();
   };
 
-  render() {
-    return (
-      <div className={styles.searchBar}>
-        <div className={styles.inputContainer}>
-          <input
-            type="text"
-            value={this.state.query}
-            onChange={this.handleChange}
-            onKeyDown={this.handleKeyDown}
-            placeholder="Search for movies..."
-            className={styles.input}
-            disabled={this.props.loading}
-          />
-          {this.state.query && (
-            <button
-              onClick={this.handleClear}
-              className={styles.clearButton}
-              disabled={this.props.loading}
-            >
-              &#xD7;
-            </button>
-          )}
-        </div>
-        <button
-          onClick={this.handleSubmit}
-          className={styles.searchButton}
-          disabled={this.props.loading}
-        >
-          Search
-        </button>
+  return (
+    <div className={styles.searchBar}>
+      <div className={styles.inputContainer}>
+        <input
+          type="text"
+          value={query}
+          onChange={handleChange}
+          onKeyDown={handleKeyDown}
+          placeholder="Search for movies..."
+          className={styles.input}
+          disabled={loading}
+        />
+        {query && (
+          <button onClick={handleClear} className={styles.clearButton} disabled={loading}>
+            &#xD7;
+          </button>
+        )}
       </div>
-    );
-  }
-}
-
-export default SearchBar;
+      <button onClick={handleSubmit} className={styles.searchButton} disabled={loading}>
+        Search
+      </button>
+    </div>
+  );
+};

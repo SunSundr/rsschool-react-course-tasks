@@ -34,6 +34,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unused-expressions': ['error', { allowTernary: true }],
       'react/jsx-uses-react': 'off',
       'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
       'sort-imports': [
         'error',
         {

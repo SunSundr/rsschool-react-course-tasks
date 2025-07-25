@@ -18,7 +18,6 @@ export async function imagesConfig(): Promise<ImageConfiguration> {
       response.status,
     );
   }
-
   const configuration: TMDBConfiguration = await response.json();
 
   return configuration.images;

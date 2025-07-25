@@ -1,31 +1,17 @@
 import { act } from 'react';
+import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
-import { mockImageConfig } from './common';
+import { localStorageMock, mockImageConfig } from './common';
 import { RefreshContext } from '../components/Layout/Layout';
-import MainPage from '../pages/MainPage/MainPage';
+import { MainPage } from '../pages/MainPage/MainPage';
 import * as movieService from '../services/movieService';
 import { TMDBSearchResult, TMDBVideo } from '../types';
 
-const localStorageMock = (() => {
-  let store: Record<string, string> = {};
-  return {
-    getItem: vi.fn((key: string) => store[key] || null),
-    setItem: vi.fn((key: string, value: string) => {
-      store[key] = value;
-    }),
-    removeItem: vi.fn((key: string) => {
-      delete store[key];
-    }),
-    clear: vi.fn(() => {
-      store = {};
-    }),
-  };
-})();
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 vi.mock('../components/SearchBar/SearchBar', () => ({
-  default: ({
+  SearchBar: ({
     onSearch,
     onClear,
     initialValue,
@@ -54,19 +40,28 @@ vi.mock('../components/SearchBar/SearchBar', () => ({
 }));
 
 vi.mock('../components/CardList/CardList', () => ({
-  default: ({ results }: { results: TMDBVideo[] }) => (
+  CardList: ({
+    results,
+    handlePageChange,
+  }: {
+    results: TMDBVideo[];
+    handlePageChange: (page: number) => void;
+  }) => (
     <div data-testid="card-list">
       {results.map((item, index) => (
         <div key={index} data-testid={`movie-item-${index}`}>
           {item.title}
         </div>
       ))}
+      <button data-testid="pagination-next" onClick={() => handlePageChange(2)}>
+        Next Page
+      </button>
     </div>
   ),
 }));
 
 vi.mock('../components/Empty/Empty', () => ({
-  default: () => <div data-testid="empty-state">No results found</div>,
+  Empty: () => <div data-testid="empty-state">No results found</div>,
 }));
 
 vi.mock('../components/ErrorInfo/ErrorInfo', () => ({
@@ -76,7 +71,7 @@ vi.mock('../components/ErrorInfo/ErrorInfo', () => ({
 }));
 
 vi.mock('../components/LoadingSpinner/LoadingSpinner', () => ({
-  default: ({ overlay }: { overlay?: boolean }) => (
+  LoadingSpinner: ({ overlay }: { overlay?: boolean }) => (
     <div data-testid={overlay ? 'loading-overlay' : 'loading-spinner'}>Loading...</div>
   ),
 }));
@@ -91,6 +86,23 @@ vi.mock('../utils/callWithDelay', () => ({
       }, 0);
     });
   }),
+}));
+
+vi.mock('../hooks/useLocalStorage', () => ({
+  useLocalStorage: vi.fn((_key: string, defaultValue: string) => {
+    const setValue = vi.fn();
+    return [defaultValue, setValue];
+  }),
+}));
+
+vi.mock('../utils/error', () => ({
+  getErrorData: vi.fn((error: unknown) => ({ message: (error as Error).message })),
+  errorLog: vi.fn(),
+  formatErrorData: vi.fn((data: unknown) => (data as Error).message),
+}));
+
+vi.mock('~/constants', () => ({
+  LS_SEARCHTERM_KEY: 'searchTerm',
 }));
 
 describe('MainPage Component', () => {
@@ -116,12 +128,25 @@ describe('MainPage Component', () => {
     localStorage.clear();
   });
 
-  const renderMainPage = (contextValue = { updateTrigger: false }) => {
-    return render(
-      <RefreshContext.Provider value={contextValue}>
-        <MainPage />
-      </RefreshContext.Provider>,
-    );
+  const renderMainPage = (
+    contextValue = {
+      updateTrigger: false,
+      handleUpdateTrigger: vi.fn(),
+      closeTrigger: false,
+      handleCloseTrigger: vi.fn(),
+    },
+  ) => {
+    const router = createMemoryRouter([
+      {
+        path: '/',
+        element: (
+          <RefreshContext.Provider value={contextValue}>
+            <MainPage />
+          </RefreshContext.Provider>
+        ),
+      },
+    ]);
+    return render(<RouterProvider router={router} />);
   };
 
   it('initializes and loads data correctly', async () => {
@@ -146,55 +171,56 @@ describe('MainPage Component', () => {
   it('handles search correctly', async () => {
     await act(async () => renderMainPage());
     const searchInput = screen.getByTestId('search-input');
-    const searchButton = screen.getByTestId('search-button');
     await act(async () => {
       fireEvent.change(searchInput, { target: { value: 'test query' } });
-      fireEvent.click(searchButton);
     });
     await waitFor(() => {
       expect(movieService.fetchMovies).toHaveBeenCalledWith('test query', 1);
-      expect(localStorage.setItem).toHaveBeenCalledWith('searchTerm', 'test query');
     });
   });
 
-  it('handles show more correctly', async () => {
-    localStorageMock.setItem('searchTerm', 'test query');
+  it('handles pagination correctly', async () => {
     await act(async () => renderMainPage());
     await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalledWith('test query', 1);
+      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
     });
-    const showMoreButton = screen.getByText('Show More');
-    await act(async () => {
-      fireEvent.click(showMoreButton);
-    });
-    await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalledWith('test query', 2);
-    });
+    expect(screen.getByTestId('card-list')).toBeInTheDocument();
   });
 
   it('responds to context updates', async () => {
-    let updateTrigger = false;
-    const updateContext = () => {
-      updateTrigger = !updateTrigger;
+    const contextValue1 = {
+      updateTrigger: false,
+      handleUpdateTrigger: vi.fn(),
+      closeTrigger: false,
+      handleCloseTrigger: vi.fn(),
     };
     const { rerender } = await act(async () => {
-      return render(
-        <RefreshContext.Provider value={{ updateTrigger }}>
-          <MainPage />
-        </RefreshContext.Provider>,
-      );
+      return renderMainPage(contextValue1);
     });
+
+    const contextValue2 = {
+      updateTrigger: true,
+      handleUpdateTrigger: vi.fn(),
+      closeTrigger: false,
+      handleCloseTrigger: vi.fn(),
+    };
+
     await act(async () => {
-      updateContext();
-      rerender(
-        <RefreshContext.Provider value={{ updateTrigger }}>
-          <MainPage />
-        </RefreshContext.Provider>,
-      );
+      const router = createMemoryRouter([
+        {
+          path: '/',
+          element: (
+            <RefreshContext.Provider value={contextValue2}>
+              <MainPage />
+            </RefreshContext.Provider>
+          ),
+        },
+      ]);
+      rerender(<RouterProvider router={router} />);
     });
+
     await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
-      expect(localStorage.removeItem).toHaveBeenCalledWith('searchTerm');
+      expect(movieService.fetchMovies).toHaveBeenCalled();
     });
   });
 
@@ -216,11 +242,14 @@ describe('MainPage Component', () => {
   });
 
   it('shows error state correctly (get image config)', async () => {
-    (movieService.fetchImagesConfig as Mock).mockRejectedValue(new Error('API Error'));
+    (movieService.fetchImagesConfig as Mock).mockRejectedValueOnce(new Error('API Error'));
+    (movieService.fetchMovies as Mock).mockClear();
     await act(async () => renderMainPage());
+    expect(movieService.fetchImagesConfig).toHaveBeenCalledTimes(1);
     await waitFor(() => {
       expect(screen.getByTestId('error-info')).toHaveTextContent('API Error');
     });
+    expect(movieService.fetchMovies).not.toHaveBeenCalled();
   });
 
   it('shows error state correctly (fetch movies)', async () => {
@@ -228,6 +257,88 @@ describe('MainPage Component', () => {
     await act(async () => renderMainPage());
     await waitFor(() => {
       expect(screen.getByTestId('error-info')).toHaveTextContent('Fetch error');
+    });
+  });
+
+  it('shows empty state when imagesConfig exists but no result', async () => {
+    (movieService.fetchMovies as Mock).mockClear();
+    (movieService.fetchImagesConfig as Mock).mockClear();
+    (movieService.fetchMovies as Mock).mockResolvedValue({
+      page: 1,
+      results: [],
+      total_pages: 0,
+      total_results: 0,
+    });
+    await act(async () => renderMainPage());
+    await waitFor(() => {
+      expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+    });
+  });
+
+  it('handles clear button click correctly', async () => {
+    await act(async () => renderMainPage());
+    await waitFor(() => {
+      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
+    });
+    (movieService.fetchMovies as Mock).mockClear();
+    const clearButton = screen.getByTestId('clear-button');
+    await act(async () => {
+      fireEvent.click(clearButton);
+    });
+    await waitFor(() => {
+      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
+    });
+  });
+
+  it('handles page change correctly', async () => {
+    await act(async () => renderMainPage());
+    await waitFor(() => {
+      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
+      expect(screen.getByTestId('card-list')).toBeInTheDocument();
+    });
+    (movieService.fetchMovies as Mock).mockClear();
+    const nextButton = screen.getByTestId('pagination-next');
+    await act(async () => {
+      fireEvent.click(nextButton);
+    });
+    await waitFor(() => {
+      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 2);
+    });
+  });
+
+  it('handles refresh context updateTrigger change', async () => {
+    const contextValue = {
+      updateTrigger: false,
+      handleUpdateTrigger: vi.fn(),
+      closeTrigger: false,
+      handleCloseTrigger: vi.fn(),
+    };
+    const { rerender } = await act(async () => {
+      return renderMainPage(contextValue);
+    });
+    await waitFor(() => {
+      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
+    });
+    (movieService.fetchMovies as Mock).mockClear();
+    const updatedContextValue = {
+      ...contextValue,
+      updateTrigger: true,
+    };
+    await act(async () => {
+      const router = createMemoryRouter([
+        {
+          path: '/',
+          element: (
+            <RefreshContext.Provider value={updatedContextValue}>
+              <MainPage />
+            </RefreshContext.Provider>
+          ),
+        },
+      ]);
+      rerender(<RouterProvider router={router} />);
+    });
+    await waitFor(() => {
+      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
     });
   });
 });
