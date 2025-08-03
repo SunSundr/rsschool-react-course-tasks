@@ -2,7 +2,14 @@ import { Component } from 'react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { Theme } from '~/types';
 import { Layout, RefreshContext } from '../components/Layout/Layout';
+
+vi.mock('~/store/store', () => ({
+  useStore: () => ({
+    theme: Theme.Dark,
+  }),
+}));
 
 vi.mock('../components/Header/Header', () => ({
   Header: ({ updateContext }: { updateContext: () => void }) => (

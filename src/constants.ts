@@ -34,6 +34,8 @@ export const TASK = {
   title: '#Task 4',
   git: 'https://github.com/SunSundr/rsschool-react-course-tasks',
   avatar: 'https://avatars.githubusercontent.com/u/160144047',
+  task: 'https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/state-management.md',
+  course: 'https://rs.school/courses/reactjs',
 };
 
 export const APP_NAME = 'TMDB Movie\u25CFSearcher';

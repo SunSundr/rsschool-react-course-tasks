@@ -3,7 +3,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import { CardList } from '~/components/CardList/CardList';
 import { Empty } from '~/components/Empty/Empty';
 import { ErrorInfo } from '~/components/ErrorInfo/ErrorInfo';
-import Flyout from '~/components/Flyout/Flyout';
+import { Flyout } from '~/components/Flyout/Flyout';
 import { RefreshContext } from '~/components/Layout/Layout';
 import { LoadingSpinner } from '~/components/LoadingSpinner/LoadingSpinner';
 import { SearchBar } from '~/components/SearchBar/SearchBar';

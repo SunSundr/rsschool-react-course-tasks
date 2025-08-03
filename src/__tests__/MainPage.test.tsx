@@ -10,6 +10,14 @@ import { TMDBSearchResult, TMDBVideo } from '../types';
 
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
+vi.mock('~/store/store', () => ({
+  useStore: vi.fn(),
+}));
+
+vi.mock('../components/Flyout/Flyout', () => ({
+  Flyout: () => <div data-testid="flyout">Flyout</div>,
+}));
+
 vi.mock('../components/SearchBar/SearchBar', () => ({
   SearchBar: ({
     onSearch,
@@ -103,6 +111,7 @@ vi.mock('../utils/error', () => ({
 
 vi.mock('~/constants', () => ({
   LS_SEARCHTERM_KEY: 'searchTerm',
+  LS_THEME_KEY: 'theme',
 }));
 
 describe('MainPage Component', () => {

@@ -2,6 +2,12 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { SearchBar } from '../components/SearchBar/SearchBar';
 
+vi.mock('~/store/store', () => ({
+  useStore: () => ({
+    clearVideos: vi.fn(),
+  }),
+}));
+
 describe('SearchBar', () => {
   const defaultProps = {
     onSearch: vi.fn(),

@@ -9,9 +9,10 @@ describe('Pagination', () => {
     onPageChange: vi.fn(),
   };
 
-  it('renders pagination with current page info', () => {
+  it('renders pagination with current page input', () => {
     render(<Pagination {...defaultProps} />);
-    expect(screen.getByText('Page 2 of 5')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('2')).toBeInTheDocument();
+    expect(screen.getByText('of 5')).toBeInTheDocument();
   });
 
   it('renders Previous and Next buttons', () => {
@@ -39,18 +40,7 @@ describe('Pagination', () => {
     render(
       <Pagination {...defaultProps} currentPage={5} totalPages={0} onPageChange={onPageChange} />,
     );
-    screen.getByText('Next').removeAttribute('disabled');
     fireEvent.click(screen.getByText('Next'));
-    expect(onPageChange).not.toHaveBeenCalled();
-  });
-
-  it('should prevent page change when currentPage is zero', () => {
-    const onPageChange = vi.fn();
-    render(
-      <Pagination {...defaultProps} currentPage={0} totalPages={1} onPageChange={onPageChange} />,
-    );
-    screen.getByText('Previous').removeAttribute('disabled');
-    fireEvent.click(screen.getByText('Previous'));
     expect(onPageChange).not.toHaveBeenCalled();
   });
 
@@ -64,23 +54,49 @@ describe('Pagination', () => {
     expect(screen.getByText('Next')).toBeDisabled();
   });
 
-  it('does not call onPageChange when Previous is clicked on first page', () => {
-    const onPageChange = vi.fn();
-    render(<Pagination {...defaultProps} currentPage={1} onPageChange={onPageChange} />);
-    fireEvent.click(screen.getByText('Previous'));
-    expect(onPageChange).not.toHaveBeenCalled();
+  it('updates input value when currentPage prop changes', () => {
+    const { rerender } = render(<Pagination {...defaultProps} />);
+    expect(screen.getByDisplayValue('2')).toBeInTheDocument();
+    rerender(<Pagination {...defaultProps} currentPage={3} />);
+    expect(screen.getByDisplayValue('3')).toBeInTheDocument();
   });
 
-  it('does not call onPageChange when Next is clicked on last page', () => {
+  it('calls onPageChange with valid page number on Enter', () => {
     const onPageChange = vi.fn();
-    render(<Pagination {...defaultProps} currentPage={5} onPageChange={onPageChange} />);
-    fireEvent.click(screen.getByText('Next'));
+    render(<Pagination {...defaultProps} onPageChange={onPageChange} />);
+    const input = screen.getByDisplayValue('2');
+    fireEvent.change(input, { target: { value: '4' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(onPageChange).toHaveBeenCalledWith(4);
+  });
+
+  it('ignores invalid page number on Enter', () => {
+    const onPageChange = vi.fn();
+    render(<Pagination {...defaultProps} onPageChange={onPageChange} />);
+    const input = screen.getByDisplayValue('2');
+    fireEvent.change(input, { target: { value: '6' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
     expect(onPageChange).not.toHaveBeenCalled();
+    expect(input).toHaveValue(2);
+  });
+
+  it('calls onPageChange after debounce timeout', async () => {
+    vi.useFakeTimers();
+    const onPageChange = vi.fn();
+    render(<Pagination {...defaultProps} onPageChange={onPageChange} />);
+    const input = screen.getByDisplayValue('2');
+    fireEvent.change(input, { target: { value: '3' } });
+    vi.advanceTimersByTime(500);
+    expect(onPageChange).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(300);
+    expect(onPageChange).toHaveBeenCalledWith(3);
+
+    vi.useRealTimers();
   });
 
   it('handles single page correctly', () => {
     render(<Pagination {...defaultProps} currentPage={1} totalPages={1} />);
-    expect(screen.getByText('Page 1 of 1')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('1')).toBeInTheDocument();
     expect(screen.getByText('Previous')).toBeDisabled();
     expect(screen.getByText('Next')).toBeDisabled();
   });

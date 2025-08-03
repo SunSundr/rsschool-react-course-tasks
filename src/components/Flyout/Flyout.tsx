@@ -3,7 +3,7 @@ import { useStore } from '~/store/store';
 import { downloadCSV } from '~/utils/downloadCSV';
 import styles from './Flyout.module.css';
 
-const Flyout: React.FC = () => {
+export const Flyout: React.FC = () => {
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const linkRef = useRef<HTMLAnchorElement | null>(null);
   const { videos, clearVideos } = useStore();
@@ -42,5 +42,3 @@ const Flyout: React.FC = () => {
     </div>
   );
 };
-
-export default Flyout;

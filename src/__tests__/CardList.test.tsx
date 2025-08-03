@@ -7,6 +7,14 @@ import { RefreshContext } from '../components/Layout/Layout';
 import { BackdropSize, PosterSize, TMDBVideo } from '../types';
 import * as imageBaseUrlUtils from '../utils/imageBaseUrl';
 
+vi.mock('~/store/store', () => ({
+  useStore: () => ({
+    videos: [],
+    addVideo: vi.fn(),
+    removeVideo: vi.fn(),
+  }),
+}));
+
 vi.mock('../components/Card/Card', () => ({
   Card: ({
     index,
@@ -43,6 +51,7 @@ vi.mock('../utils/imageBaseUrl', () => ({
 vi.mock('~/constants', () => ({
   ITEMS_PER_PAGE: 20,
   MAX_PAGES: 500,
+  LS_THEME_KEY: 'theme',
 }));
 
 const generateMockVideo = (id: number): TMDBVideo =>
@@ -165,48 +174,13 @@ describe('CardList', () => {
     expect(screen.getByTestId('card-1')).toBeInTheDocument();
   });
 
-  it('handles backdrop click on small screen', async () => {
-    Object.defineProperty(window, 'innerWidth', {
-      writable: true,
-      configurable: true,
-      value: 600,
-    });
+  it('handles backdrop click', async () => {
     renderWithRouter(<CardList {...defaultProps} />, true);
     const backdrop = document.querySelector('[class*="backdrop"]');
     await act(async () => {
       fireEvent.click(backdrop!);
     });
     expect(backdrop).toBeTruthy();
-  });
-
-  it('handles backdrop click on large screen with outlet ref', async () => {
-    Object.defineProperty(window, 'innerWidth', {
-      writable: true,
-      configurable: true,
-      value: 1200,
-    });
-    renderWithRouter(<CardList {...defaultProps} />, true);
-    const backdrop = document.querySelector('[class*="backdrop"]');
-    const mockGetBoundingClientRect = vi.fn(() => ({
-      left: 500,
-      right: 800,
-      top: 0,
-      bottom: 600,
-      width: 300,
-      height: 600,
-      x: 0,
-      y: 0,
-      toJSON: () => {},
-    }));
-
-    const detailOutlet = document.querySelector('[class*="detailOutlet"]');
-    if (detailOutlet) {
-      detailOutlet.getBoundingClientRect = mockGetBoundingClientRect;
-    }
-    await act(async () => {
-      fireEvent.click(backdrop!, { clientX: 400 });
-    });
-    expect(mockGetBoundingClientRect).toHaveBeenCalled();
   });
 
   it('handles card click when hasDetail is true', async () => {

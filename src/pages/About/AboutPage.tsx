@@ -44,9 +44,9 @@ export const AboutPage = () => {
 
           <div className={styles.taskLink}>
             <p>
-              This application was built as part of the
+              This application was built as part of the{' '}
               <a
-                href="https://rs.school/courses/reactjs"
+                href={TASK?.course ?? ''}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.link}
@@ -57,7 +57,7 @@ export const AboutPage = () => {
             </p>
 
             <a
-              href="https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/state-management.md"
+              href={TASK?.task ?? ''}
               target="_blank"
               rel="noopener noreferrer"
               className={styles.link}
