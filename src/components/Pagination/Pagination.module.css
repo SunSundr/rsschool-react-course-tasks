@@ -47,6 +47,7 @@
   font-size: 16px;
   margin-right: 5px;
   background-color: transparent;
+  color: var(--text-primary);
 }
 
 .pageInput:focus {

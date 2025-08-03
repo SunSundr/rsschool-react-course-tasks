@@ -18,6 +18,12 @@
   transform: translateY(100%);
 }
 
+@supports (user-select: none) {
+  .flyout {
+    user-select: none;
+  }
+}
+
 .flyout.show {
   transform: translateY(0);
 }

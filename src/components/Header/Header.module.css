@@ -137,6 +137,12 @@ a.links:visited {
   opacity: 1;
 }
 
+@supports (user-select: none) {
+  .dropdownContent span {
+    user-select: none;
+  }
+}
+
 .dropdownItem {
   cursor: pointer;
   display: flex;
