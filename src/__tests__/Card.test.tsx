@@ -31,6 +31,9 @@ describe('Card', () => {
     backdropUrl: 'https://backdrop.url/',
     posterUrl: 'https://poster.url/',
     onClick: vi.fn(),
+    isActive: false,
+    onCheckboxChange: vi.fn(),
+    isSelected: false,
   };
 
   it('renders card with movie title', () => {
