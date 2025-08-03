@@ -1,6 +1,7 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Outlet, useNavigate, useOutlet, useSearchParams } from 'react-router-dom';
 import { ITEMS_PER_PAGE, MAX_PAGES } from '~/constants';
+import { useStore } from '~/store/store';
 import { BackdropSize, ImageConfiguration, PosterSize, TMDBVideo } from '~/types';
 import { imageBaseUrl } from '~/utils/imageBaseUrl';
 import { Card } from '../Card/Card';
@@ -38,6 +39,12 @@ export const CardList: React.FC<CardListProps> = ({
   const detailOutletRef = useRef<HTMLDivElement>(null);
 
   const [selectedDetealId, setelectedDetealId] = useState<null | number>(null);
+
+  const { videos, addVideo, removeVideo } = useStore();
+
+  const handleCheckboxChange = useCallback((video: TMDBVideo, isChecked: boolean) => {
+    isChecked ? addVideo(video) : removeVideo(video.id);
+  }, []);
 
   const navUrlWithCurrentParams = (url: string) => {
     const paramsString = searchParams.toString();
@@ -78,6 +85,7 @@ export const CardList: React.FC<CardListProps> = ({
   }, [closeTrigger, hasDetail, navigate]);
 
   const pageOffset = (currentPage - 1) * ITEMS_PER_PAGE;
+  const ids = videos.map((v) => v.id);
 
   return (
     <div
@@ -94,7 +102,9 @@ export const CardList: React.FC<CardListProps> = ({
               backdropUrl={backdropUrl}
               posterUrl={posterUrl}
               onClick={handleCardClick}
-              isSelected={selectedDetealId === item.id}
+              isActive={selectedDetealId === item.id}
+              isSelected={ids.includes(item.id)}
+              onCheckboxChange={(e) => handleCheckboxChange(item, e.target.checked)}
             />
           ))}
         </div>

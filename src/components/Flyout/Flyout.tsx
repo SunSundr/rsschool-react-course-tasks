@@ -1,30 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-// import { useDispatch, useSelector } from 'react-redux';
-import { TMDBSearchResult } from '~/types';
-// import { unselectAll } from '../../app/selectedItemsSlice';
-// import { downloadCSV } from '../../utils/downloadCSV';
-// import { RootState } from '../../app/store';
+import { useStore } from '~/store/store';
+import { downloadCSV } from '~/utils/downloadCSV';
 import styles from './Flyout.module.css';
 
-export interface FlyoutProps {
-  data: TMDBSearchResult | undefined;
-}
-
-const Flyout: React.FC<FlyoutProps> = ({ data }) => {
-  console.log('download', data);
-  // const dispatch = useDispatch();
+const Flyout: React.FC = () => {
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
   const linkRef = useRef<HTMLAnchorElement | null>(null);
-  // const selectedItems = useSelector((state: RootState) => state.selectedItems.items);
+  const { videos, clearVideos } = useStore();
 
-  const handleDownload = () => {
-    //downloadCSV(data, selectedItems, setDownloadUrl);
-  };
-
-  const handleUnselectAll = useCallback(() => {
-    // dispatch(unselectAll());
-    // dispatch
-  }, []);
+  const handleDownload = () => downloadCSV(videos, setDownloadUrl);
+  const handleUnselectAll = useCallback(() => clearVideos(), []);
 
   useEffect(() => {
     if (downloadUrl && linkRef.current) {
@@ -34,29 +19,26 @@ const Flyout: React.FC<FlyoutProps> = ({ data }) => {
     }
   }, [downloadUrl]);
 
-  // const selectedItemsCount = selectedItems.length;
-  const selectedItemsCount = 5;
-
-  //if (selectedItemsCount === 0) return null;
+  const selectedItemsCount = videos.length;
 
   return (
-    <div className={styles.flyout}>
+    <div className={`${styles.flyout} ${selectedItemsCount ? styles.show : ''}`}>
       <div>{selectedItemsCount} items are selected</div>
       <div className={styles.buttons}>
         <button onClick={handleUnselectAll}>Unselect all</button>
         <button onClick={handleDownload}>Download</button>
       </div>
-      {/* {downloadUrl && (
+      {downloadUrl && (
         <a
           href={downloadUrl || '#'}
-          download={`${selectedItemsCount}_.csv`}
+          download={`${selectedItemsCount}_items.csv`}
           style={{ display: 'none' }}
           ref={linkRef}
           role="link"
         >
           Download
         </a>
-      )} */}
+      )}
     </div>
   );
 };

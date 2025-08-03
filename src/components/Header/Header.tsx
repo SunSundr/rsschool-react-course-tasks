@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { APP_NAME, LS_THEME_KEY, QUERY_KEY } from '~/constants';
 import { useLocalStorage } from '~/hooks/useLocalStorage';
+import { useWindowEvent } from '~/hooks/useWindowEvent';
 import { useStore } from '~/store/store';
 import { QueryType, Theme } from '~/types';
 import styles from './Header.module.css';
@@ -16,8 +17,22 @@ export const Header: React.FC<HeaderProps> = ({ updateContext }) => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { theme, setTheme } = useStore();
+  const { theme, setTheme, clearVideos } = useStore();
   const [, setThemeLS] = useLocalStorage(LS_THEME_KEY, '');
+
+  useWindowEvent(
+    'scroll',
+    () => {
+      if (isDropdownOpen) setIsDropdownOpen(false);
+    },
+    { passive: true },
+  );
+
+  useWindowEvent('mousedown', (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      setIsDropdownOpen(false);
+    }
+  });
 
   const toggleQueryType = () => {
     if (location.pathname === '/' || location.pathname.startsWith('/detailed')) {
@@ -39,6 +54,7 @@ export const Header: React.FC<HeaderProps> = ({ updateContext }) => {
 
   const setQuery = () => {
     toggleQueryType();
+    clearVideos();
     setTimeout(() => updateContext(), 350);
   };
 
@@ -53,7 +69,6 @@ export const Header: React.FC<HeaderProps> = ({ updateContext }) => {
   };
 
   const handleLightTheme = () => {
-    console.log('Sun icon clicked');
     setIsDropdownOpen(false);
     setTheme(Theme.Light);
     setThemeLS(Theme.Light);

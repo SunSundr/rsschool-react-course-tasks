@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useStore } from '~/store/store';
 import styles from './SearchBar.module.css';
 
 interface SearchBarProps {
@@ -15,6 +16,7 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   loading,
 }) => {
   const [query, setQuery] = useState(initialValue || '');
+  const { clearVideos } = useStore();
 
   useEffect(() => {
     setQuery(initialValue || '');
@@ -33,10 +35,12 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   const handleSubmit = () => {
     setQuery(query.trim());
     onSearch(query);
+    clearVideos();
   };
 
   const handleClear = () => {
     setQuery('');
+    clearVideos();
     onClear();
   };
 

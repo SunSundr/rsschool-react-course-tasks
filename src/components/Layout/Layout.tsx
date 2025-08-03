@@ -25,16 +25,9 @@ export const Layout: React.FC = () => {
   const [updateTrigger, setUpdateTrigger] = useState(false);
   const [closeTrigger, setCloseTrigger] = useState(false);
   const { theme } = useStore();
-  console.log('>>', theme);
 
-  const handleUpdateTrigger = () => {
-    setUpdateTrigger((prev) => !prev);
-  };
-
-  const handleCloseTrigger = () => {
-    setCloseTrigger((prev) => !prev);
-  };
-
+  const handleUpdateTrigger = () => setUpdateTrigger((prev) => !prev);
+  const handleCloseTrigger = () => setCloseTrigger((prev) => !prev);
   return (
     <RefreshContext.Provider
       value={{ updateTrigger, handleUpdateTrigger, closeTrigger, handleCloseTrigger }}

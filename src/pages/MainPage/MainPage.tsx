@@ -170,7 +170,7 @@ export const MainPage: React.FC = () => {
         loading={loading}
       />
       <div className={styles.paper}>{getContent()}</div>
-      {result && <Flyout data={result} />}
+      {result && <Flyout />}
     </>
   );
 };

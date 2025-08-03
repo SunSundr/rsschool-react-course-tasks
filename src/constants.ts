@@ -23,6 +23,13 @@ export const LS_THEME_KEY = 'theme';
 
 export const QUERY_KEY = 'q';
 
+export enum CSV_Separators {
+  comma = ',',
+  semicolon = ';',
+}
+
+export const CSV_SEPARATOR = CSV_Separators.comma;
+
 export const TASK = {
   title: '#Task 4',
   git: 'https://github.com/SunSundr/rsschool-react-course-tasks',

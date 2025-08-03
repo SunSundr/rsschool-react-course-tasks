@@ -10,12 +10,14 @@ export interface CardProps {
   video: TMDBVideo;
   backdropUrl: string;
   posterUrl: string;
-  isSelected: boolean;
+  isActive: boolean;
   onClick: (
     video: TMDBVideo,
     event: React.MouseEvent,
     ref: React.RefObject<HTMLElement | null>,
   ) => void;
+  onCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  isSelected: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -24,13 +26,15 @@ export const Card: React.FC<CardProps> = ({
   posterUrl,
   backdropUrl,
   onClick,
+  isActive,
+  onCheckboxChange,
   isSelected,
 }) => {
   const ref = useRef(null);
   return (
     <article
       ref={ref}
-      className={`${styles.card} ${isSelected ? styles.detailSelected : ''}`}
+      className={`${styles.card} ${isActive ? styles.detailSelected : ''}`}
       onClick={(event) => onClick(video, event, ref)}
     >
       <div className={styles.imageContainer}>
@@ -39,8 +43,8 @@ export const Card: React.FC<CardProps> = ({
         <input
           type="checkbox"
           className={styles.checkbox}
-          // checked={isSelected}
-          // onChange={onCheckboxChange}
+          checked={isSelected}
+          onChange={onCheckboxChange}
           onClick={(e) => e.stopPropagation()}
         />
       </div>
