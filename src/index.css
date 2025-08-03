@@ -20,6 +20,7 @@
 
   --hover-shadow: #3b4347;
   --spinner-background: transparent;
+  --disabled-button: #353535;
 }
 
 .light {
@@ -44,6 +45,7 @@
 
   --hover-shadow: #d4d4d4;
   --spinner-background: #7296b825;
+  --disabled-button: #5a5a5a;
 }
 
 :root {

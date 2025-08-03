@@ -14,10 +14,16 @@
   min-width: 80px;
   min-height: 28px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
-.button:disabled:hover {
-  background-color: var(--text-disabled);
+.button:hover {
+  background-color: var(--secondary-light);
+}
+
+.button:disabled {
+  background-color: var(--disabled-button);
+  color: var(--text-disabled);
   cursor: not-allowed;
 }
 
