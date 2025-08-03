@@ -9,7 +9,7 @@
   background-color: var(--background-paper);
   border-radius: 12px;
   padding: 2rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 16px var(--box-shadow-color);
 }
 
 .header {

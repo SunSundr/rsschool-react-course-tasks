@@ -22,7 +22,7 @@ export const AboutPage = () => {
 
         <div className={styles.description}>
           <p>
-            {`Hello! I'm Alexander, a passionate beginner fullstack developer currently living in the
+            {`Hello! I'm Aleksandr, a passionate beginner fullstack developer currently living in the
             beautiful city of Batumi 🌊. When I'm not busy turning coffee into code, you can find me
             exploring the latest web technologies or debugging why my CSS doesn't work (spoiler:
             it's usually a missing semicolon).`}
@@ -57,7 +57,7 @@ export const AboutPage = () => {
             </p>
 
             <a
-              href="https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/functional-routing.md"
+              href="https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/state-management.md"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.link}

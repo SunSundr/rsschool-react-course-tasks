@@ -2,8 +2,7 @@
   top: 0;
   padding: 0.5rem 2rem;
   background-color: var(--background-paper);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 100;
+  box-shadow: 0 2px 4px var(--box-shadow-color);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -30,6 +29,7 @@ a.links:visited {
   flex-direction: row;
   align-items: center;
   gap: 14px;
+  z-index: 1200;
 }
 
 .textButton {
@@ -38,6 +38,7 @@ a.links:visited {
   cursor: pointer;
   font-size: large;
   font-weight: bold;
+  color: var(--text-primary);
 }
 
 .linkButton {
@@ -45,7 +46,14 @@ a.links:visited {
   cursor: pointer;
   font-size: large;
   font-weight: bold;
+  z-index: 1200;
   color: var(--text-primary);
+  padding: 8px 14px 8px 14px;
+  border-radius: 20px;
+}
+
+.linkButton:hover {
+  background-color: var(--background-elevated);
 }
 
 @supports (user-select: none) {
@@ -73,4 +81,80 @@ a.links:visited {
   .links {
     display: none;
   }
+}
+
+.leftItems {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dropdownContainer {
+  z-index: 1200;
+}
+
+.dropdownContainer svg {
+  fill: var(--text-primary);
+  font-size: 1.2rem;
+}
+
+.dropdownMenu {
+  padding: 10px;
+  border-radius: 50%;
+  display: flex;
+  background-color: transparent;
+  transition: background-color 0.5s ease;
+  cursor: pointer;
+}
+
+.dropdownMenu:hover {
+  background-color: var(--background-elevated);
+}
+
+.dropdownContent {
+  position: fixed;
+  box-shadow: 0 2px 4px var(--box-shadow-color);
+  padding: 8px 0;
+  margin-top: 4px;
+  margin-left: -68px;
+  border-radius: 4px;
+  background-color: var(--background-elevated);
+  font-size: 1.2rem;
+  transition:
+    transform 0.3s ease-in-out,
+    opacity 0.6s ease;
+  transform: scaleY(0) scaleX(0);
+  opacity: 0;
+  transform-origin: 102px 0;
+}
+
+.dropdownContent.show {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transform: scaleY(1) scaleX(1);
+  opacity: 1;
+}
+
+.dropdownItem {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  transition: background-color 0.3s ease;
+}
+
+.dropdownItem span {
+  font-size: medium;
+  padding: 10px 14px 10px 10px;
+}
+
+.dropdownItem svg {
+  margin-left: 0.9rem;
+  fill: var(--secondary-light);
+}
+
+.dropdownItem:hover {
+  background-color: var(--primary-light);
 }

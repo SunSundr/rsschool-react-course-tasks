@@ -1,5 +1,6 @@
 import { createContext, useState } from 'react';
 import { Outlet } from 'react-router-dom';
+import { useStore } from '~/store/store';
 import { ImageConfiguration } from '~/types';
 import { Footer } from '../Footer/Footer';
 import { Header } from '../Header/Header';
@@ -23,6 +24,8 @@ export const RefreshContext = createContext<RefreshContextType>({
 export const Layout: React.FC = () => {
   const [updateTrigger, setUpdateTrigger] = useState(false);
   const [closeTrigger, setCloseTrigger] = useState(false);
+  const { theme } = useStore();
+  console.log('>>', theme);
 
   const handleUpdateTrigger = () => {
     setUpdateTrigger((prev) => !prev);
@@ -36,7 +39,7 @@ export const Layout: React.FC = () => {
     <RefreshContext.Provider
       value={{ updateTrigger, handleUpdateTrigger, closeTrigger, handleCloseTrigger }}
     >
-      <div className={`${styles.app} dark`}>
+      <div className={`${styles.app} ${theme}`}>
         <Header updateContext={handleUpdateTrigger} />
         <main className={styles.content}>
           <Outlet />

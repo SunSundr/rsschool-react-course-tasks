@@ -10,6 +10,7 @@ export interface CardProps {
   video: TMDBVideo;
   backdropUrl: string;
   posterUrl: string;
+  isSelected: boolean;
   onClick: (
     video: TMDBVideo,
     event: React.MouseEvent,
@@ -17,10 +18,21 @@ export interface CardProps {
   ) => void;
 }
 
-export const Card: React.FC<CardProps> = ({ video, index, posterUrl, backdropUrl, onClick }) => {
+export const Card: React.FC<CardProps> = ({
+  video,
+  index,
+  posterUrl,
+  backdropUrl,
+  onClick,
+  isSelected,
+}) => {
   const ref = useRef(null);
   return (
-    <article ref={ref} className={styles.card} onClick={(event) => onClick(video, event, ref)}>
+    <article
+      ref={ref}
+      className={`${styles.card} ${isSelected ? styles.detailSelected : ''}`}
+      onClick={(event) => onClick(video, event, ref)}
+    >
       <div className={styles.imageContainer}>
         {renderImage(video, posterUrl, backdropUrl, styles)}
         <div className={styles.cardNumber}>{index}</div>

@@ -11,31 +11,26 @@ import { imageBaseUrl } from '~/utils/imageBaseUrl';
 import { safeCall } from '~/utils/safeCall';
 import styles from './DetailPage.module.css';
 
-interface DetailProps {
-  video?: TMDBVideo;
-  backdropUrl?: string;
-  posterUrl?: string;
-}
-
-export const DetailPage = (props: DetailProps = {}) => {
+export const DetailPage = () => {
   const { id } = useParams();
   const location = useLocation();
   const { handleCloseTrigger } = useContext(RefreshContext);
   const { imagesConfig } = useOutletContext<{ imagesConfig: ImageConfiguration }>();
-  const [video, setVideo] = useState<TMDBVideo | null>(props.video || null);
-  const [loading, setLoading] = useState(!props.video);
+  const [video, setVideo] = useState<TMDBVideo | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<{ msg: string; statusCode?: number } | null>(null);
 
   const locationState = location.state as { video?: TMDBVideo };
 
   useEffect(() => {
+    setLoading(true);
     if (locationState?.video) {
       setVideo(locationState.video);
-      setLoading(false);
+      setTimeout(() => setLoading(false), 400);
       return;
     }
 
-    if (!props.video && id) {
+    if (id) {
       const loadData = async () => {
         try {
           const data = await fetchDetailMovie(id);
@@ -44,13 +39,13 @@ export const DetailPage = (props: DetailProps = {}) => {
           const errData = getErrorData(err);
           setError({ msg: errData.message, statusCode: errData.statusCode });
         } finally {
-          setLoading(false);
+          setTimeout(() => setLoading(false), 400);
         }
       };
 
       loadData();
     }
-  }, [id, props.video, locationState]);
+  }, [id, locationState]);
 
   const handleClose = () => {
     handleCloseTrigger();
@@ -67,15 +62,12 @@ export const DetailPage = (props: DetailProps = {}) => {
     } else if (loading) {
       return (
         <div className={styles.loadingWrapper}>
-          <LoadingSpinner />
+          <LoadingSpinner inline={true} />
         </div>
       );
     } else if (video) {
-      const posterUrl =
-        props.posterUrl ||
-        imageBaseUrl({ size: BackdropSize.W780, type: 'backdrop' }, imagesConfig);
-      const backdropUrl =
-        props.backdropUrl || imageBaseUrl({ size: PosterSize.W500, type: 'poster' }, imagesConfig);
+      const posterUrl = imageBaseUrl({ size: BackdropSize.W780, type: 'backdrop' }, imagesConfig);
+      const backdropUrl = imageBaseUrl({ size: PosterSize.W500, type: 'poster' }, imagesConfig);
       return (
         <>
           <div className={styles.topBlock}>

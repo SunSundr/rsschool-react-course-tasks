@@ -37,6 +37,8 @@ export const CardList: React.FC<CardListProps> = ({
   const [showOutlet, setShowOutlet] = useState(false);
   const detailOutletRef = useRef<HTMLDivElement>(null);
 
+  const [selectedDetealId, setelectedDetealId] = useState<null | number>(null);
+
   const navUrlWithCurrentParams = (url: string) => {
     const paramsString = searchParams.toString();
     return `${url}${paramsString ? `?${paramsString}` : ''}`;
@@ -47,18 +49,8 @@ export const CardList: React.FC<CardListProps> = ({
     setTimeout(() => navigate(navUrlWithCurrentParams('/')), 1000);
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    const isSmallScreen = window.innerWidth <= 700;
-    if (isSmallScreen) {
-      navigateHome();
-    } else {
-      if (detailOutletRef.current) {
-        const outletRect = detailOutletRef.current.getBoundingClientRect();
-        if (e.clientX < outletRect.left) {
-          navigateHome();
-        }
-      }
-    }
+  const handleBackdropClick = () => {
+    navigateHome();
   };
 
   const handleCardClick = (
@@ -66,12 +58,11 @@ export const CardList: React.FC<CardListProps> = ({
     _event: React.MouseEvent,
     ref: React.RefObject<HTMLElement | null>,
   ) => {
-    if (hasDetail) {
-      navigateHome();
-    } else {
-      navigate(navUrlWithCurrentParams(`/detailed/${video.id}`));
+    setelectedDetealId(video.id);
+    navigate(navUrlWithCurrentParams(`/detailed/${video.id}`), { state: { video } });
+    if (!hasDetail) {
+      setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 1100);
     }
-    setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 1100);
   };
 
   useEffect(() => {
@@ -81,6 +72,7 @@ export const CardList: React.FC<CardListProps> = ({
   useEffect(() => {
     if (closeTrigger && hasDetail) {
       handleCloseTrigger();
+      setelectedDetealId(null);
       navigateHome();
     }
   }, [closeTrigger, hasDetail, navigate]);
@@ -102,6 +94,7 @@ export const CardList: React.FC<CardListProps> = ({
               backdropUrl={backdropUrl}
               posterUrl={posterUrl}
               onClick={handleCardClick}
+              isSelected={selectedDetealId === item.id}
             />
           ))}
         </div>

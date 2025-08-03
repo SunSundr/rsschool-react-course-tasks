@@ -4,17 +4,22 @@
   background-color: var(--background-paper);
   border-radius: 8px;
   overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px var(--box-shadow-color);
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease;
   height: 100%;
   cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.detailSelected {
+  border: 1px solid var(--primary-light);
 }
 
 .card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 16px var(--box-shadow-color);
 }
 
 .imageContainer {
@@ -40,7 +45,7 @@
   position: absolute;
   top: 8px;
   right: 8px;
-  background-color: var(--primary-dark);
+  background-color: var(--primary-light);
   color: var(--text-primary);
   width: 24px;
   height: 24px;
@@ -50,7 +55,7 @@
   justify-content: center;
   font-size: 0.75rem;
   font-weight: bold;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 4px var(--box-shadow-color);
 }
 
 .content {
@@ -114,8 +119,8 @@
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  border: 1px solid var(--border-dark);
-  background-color: var(--text-primary);
+  border: 1px solid var(--light-border);
+  background-color: var(--white);
   appearance: none;
   cursor: pointer;
   transition:
@@ -126,8 +131,11 @@
 
 .checkbox:checked {
   background-color: var(--primary-main);
-  border: 1px solid var(--text-primary);
   z-index: 2;
+}
+
+.checkbox:hover {
+  background-color: var(--secondary-light);
 }
 
 .checkbox:checked::after {
@@ -137,7 +145,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 14px;
-  color: var(--text-primary);
+  color: var(--white);
   z-index: 2;
 }
 

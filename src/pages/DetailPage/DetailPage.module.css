@@ -6,7 +6,7 @@
   right: 20px;
   background-color: var(--background-paper);
   border-radius: 8px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 16px var(--box-shadow-color);
   overflow: hidden;
 }
 
@@ -30,7 +30,7 @@
 }
 
 .closeButton:hover {
-  background-color: var(--primary-main);
+  background-color: var(--hover-shadow);
 }
 
 .closeCrossText {
@@ -49,7 +49,10 @@
 }
 
 .loadingWrapper {
-  height: 350px;
+  height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .emptyWrapper {
@@ -138,7 +141,7 @@
   color: var(--secondary-light);
   line-height: 1.5;
   overflow-y: auto;
-  max-height: 300px;
+  max-height: 210px;
   padding-right: 0.5rem;
 }
 
