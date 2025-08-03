@@ -24,6 +24,13 @@ export const Card: React.FC<CardProps> = ({ video, index, posterUrl, backdropUrl
       <div className={styles.imageContainer}>
         {renderImage(video, posterUrl, backdropUrl, styles)}
         <div className={styles.cardNumber}>{index}</div>
+        <input
+          type="checkbox"
+          className={styles.checkbox}
+          // checked={isSelected}
+          // onChange={onCheckboxChange}
+          onClick={(e) => e.stopPropagation()}
+        />
       </div>
 
       <div className={styles.content}>

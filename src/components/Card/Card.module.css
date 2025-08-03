@@ -107,6 +107,40 @@
   border: 1px solid var(--border-light);
 }
 
+.checkbox {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 1px solid var(--border-dark);
+  background-color: var(--text-primary);
+  appearance: none;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    border-color 0.3s ease;
+  z-index: 100;
+}
+
+.checkbox:checked {
+  background-color: var(--primary-main);
+  border: 1px solid var(--text-primary);
+  z-index: 2;
+}
+
+.checkbox:checked::after {
+  content: '✔';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  color: var(--text-primary);
+  z-index: 2;
+}
+
 @media (max-width: 767px) {
   .content {
     padding: 0.75rem;
