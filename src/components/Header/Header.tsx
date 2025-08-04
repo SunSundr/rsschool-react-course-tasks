@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { APP_NAME, LS_THEME_KEY, QUERY_KEY } from '~/constants';
-import { useLocalStorage } from '~/hooks/useLocalStorage';
+import { APP_NAME, QUERY_KEY } from '~/constants';
+import useTheme from '~/context/useTheme';
 import { useWindowEvent } from '~/hooks/useWindowEvent';
 import { useStore } from '~/store/store';
 import { QueryType, Theme } from '~/types';
@@ -17,8 +17,8 @@ export const Header: React.FC<HeaderProps> = ({ updateContext }) => {
   const navigate = useNavigate();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { theme, setTheme, clearVideos } = useStore();
-  const [, setThemeLS] = useLocalStorage(LS_THEME_KEY, '');
+  const { clearVideos } = useStore();
+  const { theme, setTheme } = useTheme();
 
   useWindowEvent(
     'scroll',
@@ -65,13 +65,11 @@ export const Header: React.FC<HeaderProps> = ({ updateContext }) => {
   const handleDarkTheme = () => {
     setTheme(Theme.Dark);
     setIsDropdownOpen(false);
-    setThemeLS(Theme.Dark);
   };
 
   const handleLightTheme = () => {
     setIsDropdownOpen(false);
     setTheme(Theme.Light);
-    setThemeLS(Theme.Light);
   };
 
   useEffect(() => {

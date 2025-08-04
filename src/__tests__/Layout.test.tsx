@@ -5,8 +5,8 @@ import { describe, expect, it, vi } from 'vitest';
 import { Theme } from '~/types';
 import { Layout, RefreshContext } from '../components/Layout/Layout';
 
-vi.mock('~/store/store', () => ({
-  useStore: () => ({
+vi.mock('~/context/useTheme', () => ({
+  default: () => ({
     theme: Theme.Dark,
   }),
 }));

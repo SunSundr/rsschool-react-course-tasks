@@ -2,6 +2,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { APP_NAME } from '~/constants';
+import { ThemeProvider } from '~/context/ThemeContext';
 import { Theme } from '~/types';
 import { Header } from '../components/Header/Header';
 
@@ -10,14 +11,19 @@ const mockClearVideos = vi.fn();
 
 vi.mock('~/store/store', () => ({
   useStore: () => ({
-    theme: Theme.Dark,
-    setTheme: mockSetTheme,
     clearVideos: mockClearVideos,
   }),
 }));
 
 vi.mock('~/hooks/useLocalStorage', () => ({
   useLocalStorage: () => [null, vi.fn()],
+}));
+
+vi.mock('~/context/useTheme', () => ({
+  default: () => ({
+    theme: Theme.Dark,
+    setTheme: mockSetTheme,
+  }),
 }));
 
 describe('Header', () => {
@@ -29,7 +35,7 @@ describe('Header', () => {
     const router = createMemoryRouter([
       {
         path: '/',
-        element: component,
+        element: <ThemeProvider>{component}</ThemeProvider>,
       },
       {
         path: '/about',
