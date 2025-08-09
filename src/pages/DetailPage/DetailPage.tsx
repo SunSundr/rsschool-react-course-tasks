@@ -1,11 +1,10 @@
-import { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import { useLocation, useOutletContext, useParams } from 'react-router-dom';
 import { RefreshContext } from '~/components/Layout/Layout';
 import { LoadingSpinner } from '~/components/LoadingSpinner/LoadingSpinner';
 import { renderImage } from '~/helpers/renderImage';
-import { fetchDetailMovie } from '~/services/movieService';
+import { useMovieDetail } from '~/hooks/useMovieDetail';
 import { BackdropSize, ImageConfiguration, PosterSize, TMDBVideo } from '~/types';
-import { getErrorData } from '~/utils/error';
 import { formatReleaseDate } from '~/utils/formatReleaseDate';
 import { imageBaseUrl } from '~/utils/imageBaseUrl';
 import { safeCall } from '~/utils/safeCall';
@@ -16,36 +15,11 @@ export const DetailPage = () => {
   const location = useLocation();
   const { handleCloseTrigger } = useContext(RefreshContext);
   const { imagesConfig } = useOutletContext<{ imagesConfig: ImageConfiguration }>();
-  const [video, setVideo] = useState<TMDBVideo | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<{ msg: string; statusCode?: number } | null>(null);
 
   const locationState = location.state as { video?: TMDBVideo };
+  const { data: video, isLoading: loading, error } = useMovieDetail(id || '');
 
-  useEffect(() => {
-    setLoading(true);
-    if (locationState?.video) {
-      setVideo(locationState.video);
-      setTimeout(() => setLoading(false), 400);
-      return;
-    }
-
-    if (id) {
-      const loadData = async () => {
-        try {
-          const data = await fetchDetailMovie(id);
-          setVideo(data);
-        } catch (err) {
-          const errData = getErrorData(err);
-          setError({ msg: errData.message, statusCode: errData.statusCode });
-        } finally {
-          setTimeout(() => setLoading(false), 400);
-        }
-      };
-
-      loadData();
-    }
-  }, [id, locationState]);
+  const currentVideo = locationState?.video || video;
 
   const handleClose = () => {
     handleCloseTrigger();
@@ -55,45 +29,45 @@ export const DetailPage = () => {
     if (error) {
       return (
         <div className={styles.emptyWrapper}>
-          <h2>Error {error.statusCode}</h2>
-          <div className={styles.error}>{error.msg}</div>
+          <h2>Error</h2>
+          <div className={styles.error}>{error.message || 'Unknown error'}</div>
         </div>
       );
-    } else if (loading) {
+    } else if (loading && !locationState?.video) {
       return (
         <div className={styles.loadingWrapper}>
           <LoadingSpinner inline={true} />
         </div>
       );
-    } else if (video) {
+    } else if (currentVideo) {
       const posterUrl = imageBaseUrl({ size: BackdropSize.W780, type: 'backdrop' }, imagesConfig);
       const backdropUrl = imageBaseUrl({ size: PosterSize.W500, type: 'poster' }, imagesConfig);
       return (
         <>
           <div className={styles.topBlock}>
             <div className={styles.imageContainer}>
-              {renderImage(video, posterUrl, backdropUrl, styles)}
+              {renderImage(currentVideo, posterUrl, backdropUrl, styles)}
             </div>
             <div className={styles.info}>
-              <h2 className={styles.title}>{video.title}</h2>
-              <p className={styles.originalTitle}>{video.original_title}</p>
+              <h2 className={styles.title}>{currentVideo.title}</h2>
+              <p className={styles.originalTitle}>{currentVideo.original_title}</p>
               <div className={styles.metadata}>
                 <span className={styles.chip}>
-                  {safeCall(video.original_language, 'toLocaleUpperCase', [], '?')}
+                  {safeCall(currentVideo.original_language, 'toLocaleUpperCase', [], '?')}
                 </span>
-                <span className={styles.chip}>{formatReleaseDate(video)}</span>
+                <span className={styles.chip}>{formatReleaseDate(currentVideo)}</span>
                 <span className={styles.chip}>
-                  {safeCall(video.popularity, 'toFixed', [1], '-')}
+                  {safeCall(currentVideo.popularity, 'toFixed', [1], '-')}
                 </span>
                 <span className={styles.chip}>
-                  {safeCall(video.vote_average, 'toFixed', [1], '-')}/
-                  {safeCall(video.vote_count, 'toFixed', [0], '-')}
+                  {safeCall(currentVideo.vote_average, 'toFixed', [1], '-')}/
+                  {safeCall(currentVideo.vote_count, 'toFixed', [0], '-')}
                 </span>
               </div>
             </div>
           </div>
           <div className={styles.bottomBlock}>
-            <div className={styles.overview}>{video.overview}</div>
+            <div className={styles.overview}>{currentVideo.overview}</div>
           </div>
         </>
       );

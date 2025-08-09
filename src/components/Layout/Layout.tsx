@@ -1,6 +1,7 @@
 import { createContext, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import useTheme from '~/context/useTheme';
+import { useImagesConfig } from '~/hooks/useImagesConfig';
 import { ImageConfiguration } from '~/types';
 import { Footer } from '../Footer/Footer';
 import { Header } from '../Header/Header';
@@ -25,18 +26,19 @@ export const Layout: React.FC = () => {
   const [updateTrigger, setUpdateTrigger] = useState(false);
   const [closeTrigger, setCloseTrigger] = useState(false);
   const { theme } = useTheme();
+  const { data: imagesConfig } = useImagesConfig();
 
   const handleUpdateTrigger = () => setUpdateTrigger((prev) => !prev);
   const handleCloseTrigger = () => setCloseTrigger((prev) => !prev);
 
   return (
     <RefreshContext.Provider
-      value={{ updateTrigger, handleUpdateTrigger, closeTrigger, handleCloseTrigger }}
+      value={{ updateTrigger, handleUpdateTrigger, closeTrigger, handleCloseTrigger, imagesConfig }}
     >
       <div className={`${styles.app} ${theme}`}>
         <Header updateContext={handleUpdateTrigger} />
         <main className={styles.content}>
-          <Outlet />
+          <Outlet context={{ imagesConfig }} />
         </main>
         <Footer />
       </div>

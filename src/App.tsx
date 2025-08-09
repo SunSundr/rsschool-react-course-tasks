@@ -6,6 +6,7 @@ import { AboutPage } from './pages/About/AboutPage';
 import { DetailPage } from './pages/DetailPage/DetailPage';
 import { MainPage } from './pages/MainPage/MainPage';
 import { NotFoundPage } from './pages/NotFoundPage/NotFoundPage';
+import { QueryProvider } from './providers/QueryProvider';
 
 const router = createBrowserRouter([
   {
@@ -36,8 +37,10 @@ const router = createBrowserRouter([
 
 export function App() {
   return (
-    <ThemeProvider>
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <QueryProvider>
+      <ThemeProvider>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </QueryProvider>
   );
 }

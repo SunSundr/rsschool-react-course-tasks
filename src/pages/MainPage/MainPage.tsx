@@ -8,26 +8,33 @@ import { RefreshContext } from '~/components/Layout/Layout';
 import { LoadingSpinner } from '~/components/LoadingSpinner/LoadingSpinner';
 import { SearchBar } from '~/components/SearchBar/SearchBar';
 import { LS_SEARCHTERM_KEY } from '~/constants';
+import { useImagesConfig } from '~/hooks/useImagesConfig';
 import { useLocalStorage } from '~/hooks/useLocalStorage';
-import { fetchImagesConfig, fetchMovies } from '~/services/movieService';
-import { ImageConfiguration, TMDBSearchResult } from '~/types';
+import { useMovies } from '~/hooks/useMovies';
+import { useRefreshData } from '~/hooks/useRefreshData';
 import { callWithDelay } from '~/utils/callWithDelay';
-import { ErrorData, errorLog, formatErrorData, getErrorData } from '~/utils/error';
+import { errorLog } from '~/utils/error';
 import styles from './MainPage.module.css';
 
 export const MainPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useLocalStorage(LS_SEARCHTERM_KEY, '');
-  const [result, setResult] = useState<TMDBSearchResult | undefined>();
-  const [imagesConfig, setImagesConfig] = useState<ImageConfiguration | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [errorData, setErrorData] = useState<ErrorData | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1', 10));
-  const [totalPages, setTotalPages] = useState(1);
   const [updateTrigger, setUpdateTrigger] = useState(false);
 
   const refreshContext = useContext(RefreshContext);
   const location = useLocation();
+  const { refreshMovies } = useRefreshData();
+
+  const { data: imagesConfig, isLoading: imagesLoading, error: imagesError } = useImagesConfig();
+  const {
+    data: result,
+    isLoading: moviesLoading,
+    error: moviesError,
+  } = useMovies(searchTerm, currentPage);
+
+  const loading = imagesLoading || moviesLoading;
+  const errorData = imagesError || moviesError;
 
   const updateParams = (newParams: Record<string, string>) => {
     const params = new URLSearchParams(searchParams);
@@ -37,39 +44,6 @@ export const MainPage: React.FC = () => {
       });
       setSearchParams(params);
     }, 0);
-  };
-
-  const fetchSearch = async (query: string, delay?: number, firstInit = false, page = 1) => {
-    if (!firstInit && !imagesConfig) return;
-    setLoading(true);
-    setErrorData(null);
-    callWithDelay(async () => {
-      try {
-        const data = await fetchMovies(query, page);
-        setCurrentPage(page);
-        setResult(data);
-        setLoading(false);
-        setTotalPages(data.total_pages);
-        updateParams({ page: page.toString() });
-      } catch (error) {
-        setErrorData(getErrorData(error));
-        setLoading(false);
-      }
-    }, delay);
-  };
-
-  const fetchImgConfig = async () => {
-    setLoading(true);
-    setErrorData(null);
-    try {
-      const data = await fetchImagesConfig();
-      setImagesConfig(data);
-      return true;
-    } catch (error) {
-      setErrorData(getErrorData(error));
-      setLoading(false);
-      return false;
-    }
   };
 
   const needNavigateHome = (query: string): boolean => {
@@ -91,30 +65,29 @@ export const MainPage: React.FC = () => {
     const trimmedQuery = query.trim();
     setSearchTerm(trimmedQuery);
     if (checkNavigate && needNavigateHome(trimmedQuery)) return;
-    setResult(undefined);
-    fetchSearch(trimmedQuery);
+    setCurrentPage(1);
+    updateParams({ page: '1' });
   };
 
   const handleClear = async (checkNavigate = true) => {
     if (checkNavigate && needNavigateHome('')) return;
     setSearchTerm('');
     setUpdateTrigger(refreshContext.updateTrigger);
-    await fetchSearch('', undefined, false);
+    setCurrentPage(1);
+    updateParams({ page: '1' });
   };
 
   const handlePageChange = async (page: number) => {
     if (loading) return;
-    fetchSearch(searchTerm, 0, false, page);
+    setCurrentPage(page);
+    updateParams({ page: page.toString() });
+  };
+
+  const handleRefresh = () => {
+    refreshMovies(searchTerm, currentPage);
   };
 
   useEffect(() => {
-    fetchImgConfig().then((status) => {
-      if (status) callWithDelay(() => fetchSearch(searchTerm, 0, true, currentPage), 0);
-    });
-  }, []);
-
-  useEffect(() => {
-    if (loading) return;
     if (refreshContext.updateTrigger !== updateTrigger) {
       handleClear();
     }
@@ -122,8 +95,8 @@ export const MainPage: React.FC = () => {
 
   const getContent = () => {
     if (errorData) {
-      errorLog(formatErrorData(errorData));
-      return <ErrorInfo message={errorData.message} />;
+      errorLog(errorData.message || 'Unknown error');
+      return <ErrorInfo message={errorData.message || 'Unknown error'} />;
     } else if (loading) {
       return <LoadingSpinner />;
     } else if (result?.results.length && imagesConfig) {
@@ -132,7 +105,7 @@ export const MainPage: React.FC = () => {
           results={result.results}
           imagesConfig={imagesConfig}
           currentPage={currentPage}
-          totalPages={totalPages}
+          totalPages={result.total_pages}
           handlePageChange={handlePageChange}
         />
       );
@@ -149,6 +122,7 @@ export const MainPage: React.FC = () => {
         onClear={handleClear}
         initialValue={searchTerm}
         loading={loading}
+        onRefresh={handleRefresh}
       />
       <div className={styles.paper}>{getContent()}</div>
       {result && <Flyout />}
