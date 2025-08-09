@@ -21,7 +21,6 @@ export const MainPage: React.FC = () => {
   const [imagesConfig, setImagesConfig] = useState<ImageConfiguration | null>(null);
   const [loading, setLoading] = useState(false);
   const [errorData, setErrorData] = useState<ErrorData | null>(null);
-  const [defaultResult, setDefaultResult] = useState<TMDBSearchResult | undefined>();
   const [searchParams, setSearchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(parseInt(searchParams.get('page') || '1', 10));
   const [totalPages, setTotalPages] = useState(1);
@@ -40,35 +39,18 @@ export const MainPage: React.FC = () => {
     }, 0);
   };
 
-  const fetchSearch = async (
-    query: string,
-    delay?: number,
-    firstInit = false,
-    clearDefault = false,
-    page = 1,
-  ) => {
+  const fetchSearch = async (query: string, delay?: number, firstInit = false, page = 1) => {
     if (!firstInit && !imagesConfig) return;
     setLoading(true);
     setErrorData(null);
     callWithDelay(async () => {
       try {
-        if (!query && page === 1 && defaultResult && !clearDefault) {
-          callWithDelay(() => {
-            setResult(defaultResult);
-            setLoading(false);
-            updateParams({ page: '1' });
-            setTotalPages(defaultResult.total_pages);
-            setCurrentPage(1);
-          });
-          return;
-        }
         const data = await fetchMovies(query, page);
         setCurrentPage(page);
         setResult(data);
         setLoading(false);
         setTotalPages(data.total_pages);
         updateParams({ page: page.toString() });
-        if (!query && page === 1) setDefaultResult(data);
       } catch (error) {
         setErrorData(getErrorData(error));
         setLoading(false);
@@ -97,7 +79,7 @@ export const MainPage: React.FC = () => {
         if (query) {
           handleSearch(query, false);
         } else {
-          handleClear(false, false);
+          handleClear(false);
         }
       }, 1000);
       return true;
@@ -113,29 +95,28 @@ export const MainPage: React.FC = () => {
     fetchSearch(trimmedQuery);
   };
 
-  const handleClear = async (clearDefault = false, checkNavigate = true) => {
+  const handleClear = async (checkNavigate = true) => {
     if (checkNavigate && needNavigateHome('')) return;
     setSearchTerm('');
     setUpdateTrigger(refreshContext.updateTrigger);
-    if (clearDefault) setDefaultResult(undefined);
-    await fetchSearch('', undefined, false, clearDefault);
+    await fetchSearch('', undefined, false);
   };
 
   const handlePageChange = async (page: number) => {
     if (loading) return;
-    fetchSearch(searchTerm, 0, false, false, page);
+    fetchSearch(searchTerm, 0, false, page);
   };
 
   useEffect(() => {
     fetchImgConfig().then((status) => {
-      if (status) callWithDelay(() => fetchSearch(searchTerm, 0, true, false, currentPage), 0);
+      if (status) callWithDelay(() => fetchSearch(searchTerm, 0, true, currentPage), 0);
     });
   }, []);
 
   useEffect(() => {
     if (loading) return;
     if (refreshContext.updateTrigger !== updateTrigger) {
-      handleClear(true);
+      handleClear();
     }
   }, [refreshContext.updateTrigger]);
 
