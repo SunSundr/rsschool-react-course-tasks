@@ -140,3 +140,10 @@ export interface TMDBDetailResult extends TMDBVideo {
   status: string;
   tagline: string | null;
 }
+
+export enum Theme {
+  Dark = 'dark',
+  Light = 'light',
+}
+
+export type ThemeType = Theme.Dark | Theme.Light;

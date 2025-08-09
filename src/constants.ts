@@ -19,13 +19,23 @@ export const TMDB_API_KEY: string | null = USE_PROXY
   : import.meta.env.VITE_TMDB_API_ACCESS_KEY;
 
 export const LS_SEARCHTERM_KEY = 'searchTerm';
+export const LS_THEME_KEY = 'theme';
 
 export const QUERY_KEY = 'q';
 
+export enum CSV_Separators {
+  comma = ',',
+  semicolon = ';',
+}
+
+export const CSV_SEPARATOR = CSV_Separators.comma;
+
 export const TASK = {
-  title: '#Task 3',
+  title: '#Task 4',
   git: 'https://github.com/SunSundr/rsschool-react-course-tasks',
   avatar: 'https://avatars.githubusercontent.com/u/160144047',
+  task: 'https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/state-management.md',
+  course: 'https://rs.school/courses/reactjs',
 };
 
 export const APP_NAME = 'TMDB Movie\u25CFSearcher';

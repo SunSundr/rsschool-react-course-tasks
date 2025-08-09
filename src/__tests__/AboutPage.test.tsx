@@ -1,6 +1,7 @@
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { TASK } from '~/constants';
 import { AboutPage } from '../pages/About/AboutPage';
 
 vi.mock('~/constants', () => ({
@@ -47,7 +48,7 @@ describe('AboutPage', () => {
   it('renders humorous description paragraphs', () => {
     renderWithRouter();
     expect(
-      screen.getByText(/Hello! I'm Alexander, a passionate beginner fullstack developer/),
+      screen.getByText(/Hello! I'm Aleksandr, a passionate beginner fullstack developer/),
     ).toBeInTheDocument();
     expect(screen.getByText(/I love programming because it's the only place/)).toBeInTheDocument();
     expect(screen.getByText(/When I'm not coding, I enjoy having a good time/)).toBeInTheDocument();
@@ -57,7 +58,7 @@ describe('AboutPage', () => {
     renderWithRouter();
     const courseLink = screen.getByText('RS School React course');
     expect(courseLink).toBeInTheDocument();
-    expect(courseLink).toHaveAttribute('href', 'https://rs.school/courses/reactjs');
+    expect(courseLink).toHaveAttribute('href', TASK.course);
     expect(courseLink).toHaveAttribute('target', '_blank');
   });
 
@@ -65,10 +66,7 @@ describe('AboutPage', () => {
     renderWithRouter();
     const taskLink = screen.getByText('📚 View Task Requirements');
     expect(taskLink).toBeInTheDocument();
-    expect(taskLink).toHaveAttribute(
-      'href',
-      'https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/functional-routing.md',
-    );
+    expect(taskLink).toHaveAttribute('href', TASK.task);
     expect(taskLink).toHaveAttribute('target', '_blank');
   });
 

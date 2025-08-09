@@ -2,17 +2,20 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 2rem;
+}
+
+.overlay {
+  background-color: rgba(0, 0, 0, 0.4);
+}
+
+.fullPage {
   position: fixed;
   height: 100vh;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
-  padding: 2rem;
-}
-
-.overlay {
-  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .spinner {
@@ -26,6 +29,7 @@
   align-items: center;
   justify-content: center;
   position: relative;
+  background-color: var(--spinner-background);
 }
 
 .text {

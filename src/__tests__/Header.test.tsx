@@ -2,7 +2,29 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { APP_NAME } from '~/constants';
+import { ThemeProvider } from '~/context/ThemeContext';
+import { Theme } from '~/types';
 import { Header } from '../components/Header/Header';
+
+const mockSetTheme = vi.fn();
+const mockClearVideos = vi.fn();
+
+vi.mock('~/store/store', () => ({
+  useStore: () => ({
+    clearVideos: mockClearVideos,
+  }),
+}));
+
+vi.mock('~/hooks/useLocalStorage', () => ({
+  useLocalStorage: () => [null, vi.fn()],
+}));
+
+vi.mock('~/context/useTheme', () => ({
+  default: () => ({
+    theme: Theme.Dark,
+    setTheme: mockSetTheme,
+  }),
+}));
 
 describe('Header', () => {
   const defaultProps = {
@@ -13,7 +35,7 @@ describe('Header', () => {
     const router = createMemoryRouter([
       {
         path: '/',
-        element: component,
+        element: <ThemeProvider>{component}</ThemeProvider>,
       },
       {
         path: '/about',
@@ -111,5 +133,48 @@ describe('Header', () => {
     await new Promise((resolve) => setTimeout(resolve, 100));
     expect(router.state.location.pathname).toBe('/');
     expect(router.state.location.search).toBe('?q=popular');
+  });
+
+  it('renders theme dropdown trigger', () => {
+    renderWithRouter(<Header {...defaultProps} />);
+    const themeDropdown = screen.getByRole('img', { hidden: true });
+    expect(themeDropdown).toBeInTheDocument();
+  });
+
+  it('toggles dropdown when theme trigger is clicked', () => {
+    const { container } = renderWithRouter(<Header {...defaultProps} />);
+    const themeDropdown = container.querySelector('[class*="dropdownMenu"]');
+    const dropdownContent = container.querySelector('[class*="dropdownContent"]');
+    expect(dropdownContent?.className).not.toMatch(/show/);
+    fireEvent.click(themeDropdown!);
+    expect(dropdownContent?.className).toMatch(/show/);
+  });
+
+  it('calls setTheme when Dark theme is selected', () => {
+    const { container } = renderWithRouter(<Header {...defaultProps} />);
+    const themeDropdown = container.querySelector('[class*="dropdownMenu"]');
+    fireEvent.click(themeDropdown!);
+    const darkOption = screen.getByText('Dark');
+    fireEvent.click(darkOption);
+    expect(mockSetTheme).toHaveBeenCalledWith(Theme.Dark);
+  });
+
+  it('calls setTheme when Light theme is selected', () => {
+    const { container } = renderWithRouter(<Header {...defaultProps} />);
+    const themeDropdown = container.querySelector('[class*="dropdownMenu"]');
+    fireEvent.click(themeDropdown!);
+    const lightOption = screen.getByText('Light');
+    fireEvent.click(lightOption);
+    expect(mockSetTheme).toHaveBeenCalledWith(Theme.Light);
+  });
+
+  it('closes dropdown after theme selection', () => {
+    const { container } = renderWithRouter(<Header {...defaultProps} />);
+    const themeDropdown = container.querySelector('[class*="dropdownMenu"]');
+    const dropdownContent = container.querySelector('[class*="dropdownContent"]');
+    fireEvent.click(themeDropdown!);
+    const darkOption = screen.getByText('Dark');
+    fireEvent.click(darkOption);
+    expect(dropdownContent?.className).not.toMatch(/show/);
   });
 });

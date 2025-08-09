@@ -1,6 +1,7 @@
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useCallback, useContext, useEffect, useRef, useState } from 'react';
 import { Outlet, useNavigate, useOutlet, useSearchParams } from 'react-router-dom';
 import { ITEMS_PER_PAGE, MAX_PAGES } from '~/constants';
+import { useStore } from '~/store/store';
 import { BackdropSize, ImageConfiguration, PosterSize, TMDBVideo } from '~/types';
 import { imageBaseUrl } from '~/utils/imageBaseUrl';
 import { Card } from '../Card/Card';
@@ -37,6 +38,14 @@ export const CardList: React.FC<CardListProps> = ({
   const [showOutlet, setShowOutlet] = useState(false);
   const detailOutletRef = useRef<HTMLDivElement>(null);
 
+  const [selectedDetealId, setelectedDetealId] = useState<null | number>(null);
+
+  const { videos, addVideo, removeVideo } = useStore();
+
+  const handleCheckboxChange = useCallback((video: TMDBVideo, isChecked: boolean) => {
+    isChecked ? addVideo(video) : removeVideo(video.id);
+  }, []);
+
   const navUrlWithCurrentParams = (url: string) => {
     const paramsString = searchParams.toString();
     return `${url}${paramsString ? `?${paramsString}` : ''}`;
@@ -47,18 +56,8 @@ export const CardList: React.FC<CardListProps> = ({
     setTimeout(() => navigate(navUrlWithCurrentParams('/')), 1000);
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    const isSmallScreen = window.innerWidth <= 700;
-    if (isSmallScreen) {
-      navigateHome();
-    } else {
-      if (detailOutletRef.current) {
-        const outletRect = detailOutletRef.current.getBoundingClientRect();
-        if (e.clientX < outletRect.left) {
-          navigateHome();
-        }
-      }
-    }
+  const handleBackdropClick = () => {
+    navigateHome();
   };
 
   const handleCardClick = (
@@ -66,12 +65,11 @@ export const CardList: React.FC<CardListProps> = ({
     _event: React.MouseEvent,
     ref: React.RefObject<HTMLElement | null>,
   ) => {
-    if (hasDetail) {
-      navigateHome();
-    } else {
-      navigate(navUrlWithCurrentParams(`/detailed/${video.id}`));
+    setelectedDetealId(video.id);
+    navigate(navUrlWithCurrentParams(`/detailed/${video.id}`), { state: { video } });
+    if (!hasDetail) {
+      setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 1100);
     }
-    setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 1100);
   };
 
   useEffect(() => {
@@ -81,11 +79,13 @@ export const CardList: React.FC<CardListProps> = ({
   useEffect(() => {
     if (closeTrigger && hasDetail) {
       handleCloseTrigger();
+      setelectedDetealId(null);
       navigateHome();
     }
   }, [closeTrigger, hasDetail, navigate]);
 
   const pageOffset = (currentPage - 1) * ITEMS_PER_PAGE;
+  const ids = videos.map((v) => v.id);
 
   return (
     <div
@@ -102,6 +102,9 @@ export const CardList: React.FC<CardListProps> = ({
               backdropUrl={backdropUrl}
               posterUrl={posterUrl}
               onClick={handleCardClick}
+              isActive={selectedDetealId === item.id}
+              isSelected={ids.includes(item.id)}
+              onCheckboxChange={(e) => handleCheckboxChange(item, e.target.checked)}
             />
           ))}
         </div>

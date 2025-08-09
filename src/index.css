@@ -17,6 +17,35 @@
 
   --border-light: #424445;
   --border-dark: #585a5c;
+
+  --hover-shadow: #3b4347;
+  --spinner-background: transparent;
+  --disabled-button: #353535;
+}
+
+.light {
+  --background-default: #e9e7e7;
+  --background-paper: #ffffff;
+  --background-elevated: #f0f2f5;
+
+  --text-primary: #1a1a1a;
+  --text-secondary: #4e4e4e;
+  --text-disabled: #b0b0b0;
+
+  --primary-main: #567896;
+  --primary-light: #7296b8;
+  --primary-dark: #254b6f;
+
+  --secondary-main: #a67c52;
+  --secondary-light: #c09870;
+  --secondary-dark: #8a6239;
+
+  --border-light: #e0e0e0;
+  --border-dark: #d0d0d0;
+
+  --hover-shadow: #d4d4d4;
+  --spinner-background: #7296b825;
+  --disabled-button: #5a5a5a;
 }
 
 :root {
@@ -29,6 +58,10 @@
   --error-secondary: #ff6666;
   --warn-primary: #ff8e53;
   --warn-secondary: #eca883;
+
+  --box-shadow-color: rgba(0, 0, 0, 0.1);
+  --white: rgba(255, 255, 255, 0.8);
+  --light-border: rgba(124, 124, 124, 0.377);
 }
 
 @supports (scrollbar-color: auto) {

@@ -6,7 +6,7 @@ A React application built with functional components and hooks for searching mov
 
 ## Overview
 
-This application was created as part of the RS School React course task: [React: Routing and Hooks](https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/functional-routing.md)
+This application was created as part of the RS School React course task: [State Management and Context API](https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/state-management.md)
 
 ## Features
 
@@ -14,6 +14,8 @@ This application was created as part of the RS School React course task: [React:
 - **Detailed View**: Click on any movie card to view detailed information with routing
 - **Pagination**: Navigate through multiple pages of results
 - **Persistent Search**: Automatically saves and restores search queries using localStorage
+- **Video Selection**: Select multiple video cards and download CSV of selected items (comma-separated)
+- **Theme Switching**: Toggle between dark and light themes with automatic system preference detection
 - **Loading States**: Loading spinner during data fetching
 - **Error Handling**: Error boundary with fallback UI and reset functionality
 - **Responsive Design**: Adaptive layout for different screen sizes
@@ -24,6 +26,7 @@ This application was created as part of the RS School React course task: [React:
 
 - **React** with Functional Components and Hooks
 - **React Router** for client-side routing
+- **Zustand** for state management
 - **TypeScript** for type safety
 - **CSS Modules** for styling (no external CSS frameworks)
 - **Vite** for build tooling
@@ -60,8 +63,10 @@ npm run build
 ## Architecture
 
 - **Functional Components**: All components use functional architecture with React hooks
-- **React Hooks**: useState, useEffect, useContext, and custom hooks for state management
+- **State Management**: Zustand store with video and theme slices for global state
+- **React Hooks**: useState, useEffect, useContext, and custom hooks for local state management
 - **React Router**: Client-side routing with nested routes and outlet patterns
+- **Theme System**: Automatic detection of system preference using `matchMedia('(prefers-color-scheme: dark)')`, with localStorage persistence for user selections
 - **Error Boundary**: Application-wide error handling with recovery mechanism
 - **CSS Modules**: Scoped styling without external frameworks
 - **TypeScript**: Full type coverage for better development experience
