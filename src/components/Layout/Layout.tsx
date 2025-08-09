@@ -1,6 +1,6 @@
 import { createContext, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import { useStore } from '~/store/store';
+import useTheme from '~/context/useTheme';
 import { ImageConfiguration } from '~/types';
 import { Footer } from '../Footer/Footer';
 import { Header } from '../Header/Header';
@@ -24,10 +24,11 @@ export const RefreshContext = createContext<RefreshContextType>({
 export const Layout: React.FC = () => {
   const [updateTrigger, setUpdateTrigger] = useState(false);
   const [closeTrigger, setCloseTrigger] = useState(false);
-  const { theme } = useStore();
+  const { theme } = useTheme();
 
   const handleUpdateTrigger = () => setUpdateTrigger((prev) => !prev);
   const handleCloseTrigger = () => setCloseTrigger((prev) => !prev);
+
   return (
     <RefreshContext.Provider
       value={{ updateTrigger, handleUpdateTrigger, closeTrigger, handleCloseTrigger }}

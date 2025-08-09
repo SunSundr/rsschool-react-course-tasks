@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useStore } from '~/store/store';
 import { downloadCSV } from '~/utils/downloadCSV';
 import styles from './Flyout.module.css';

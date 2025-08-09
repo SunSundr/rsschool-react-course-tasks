@@ -1,6 +1,7 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { RouterErrorFallback } from './components/ErrorBoundary/RouterErrorFallback';
 import { Layout } from './components/Layout/Layout';
+import { ThemeProvider } from './context/ThemeContext';
 import { AboutPage } from './pages/About/AboutPage';
 import { DetailPage } from './pages/DetailPage/DetailPage';
 import { MainPage } from './pages/MainPage/MainPage';
@@ -34,5 +35,9 @@ const router = createBrowserRouter([
 ]);
 
 export function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ThemeProvider>
+      <RouterProvider router={router} />
+    </ThemeProvider>
+  );
 }
