@@ -6,7 +6,7 @@ A React application built with functional components and hooks for searching mov
 
 ## Overview
 
-This application was created as part of the RS School React course task: [State Management and Context API](https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/state-management.md)
+This application was created as part of the RS School React course task: [API Querying in React](https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/queries.md)
 
 ## Features
 
@@ -16,6 +16,8 @@ This application was created as part of the RS School React course task: [State 
 - **Persistent Search**: Automatically saves and restores search queries using localStorage
 - **Video Selection**: Select multiple video cards and download CSV of selected items (comma-separated)
 - **Theme Switching**: Toggle between dark and light themes with automatic system preference detection
+- **Data Caching**: TanStack Query for efficient data fetching, caching, and synchronization
+- **Cache Management**: Refresh buttons to control cache invalidation and force new API calls
 - **Loading States**: Loading spinner during data fetching
 - **Error Handling**: Error boundary with fallback UI and reset functionality
 - **Responsive Design**: Adaptive layout for different screen sizes
@@ -26,7 +28,8 @@ This application was created as part of the RS School React course task: [State 
 
 - **React** with Functional Components and Hooks
 - **React Router** for client-side routing
-- **Zustand** for state management
+- **TanStack Query** for data fetching, caching, and server state management
+- **Zustand** for client-side state management
 - **TypeScript** for type safety
 - **CSS Modules** for styling (no external CSS frameworks)
 - **Vite** for build tooling
@@ -63,10 +66,12 @@ npm run build
 ## Architecture
 
 - **Functional Components**: All components use functional architecture with React hooks
-- **State Management**: Zustand store with video and theme slices for global state
+- **Data Management**: TanStack Query for server state with caching, background updates, and data invalidation strategies
+- **State Management**: Zustand store with video and theme slices for client-side global state
 - **React Hooks**: useState, useEffect, useContext, and custom hooks for local state management
 - **React Router**: Client-side routing with nested routes and outlet patterns
 - **Theme System**: Automatic detection of system preference using `matchMedia('(prefers-color-scheme: dark)')`, with localStorage persistence for user selections
+- **Cache Control**: Manual cache invalidation buttons in SearchBar and DetailPage for forced data refresh
 - **Error Boundary**: Application-wide error handling with recovery mechanism
 - **CSS Modules**: Scoped styling without external frameworks
 - **TypeScript**: Full type coverage for better development experience
