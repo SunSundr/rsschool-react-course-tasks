@@ -3,11 +3,20 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { Theme } from '~/types';
+import { mockImageConfig } from './common';
 import { Layout, RefreshContext } from '../components/Layout/Layout';
 
-vi.mock('~/context/useTheme', () => ({
+vi.mock('~/theme/useTheme', () => ({
   default: () => ({
     theme: Theme.Dark,
+  }),
+}));
+
+vi.mock('~/hooks/useImagesConfig', () => ({
+  useImagesConfig: () => ({
+    data: mockImageConfig,
+    isLoading: false,
+    error: null,
   }),
 }));
 
@@ -77,13 +86,18 @@ describe('Layout', () => {
           <div>
             <div data-testid="update-trigger">{this.context.updateTrigger.toString()}</div>
             <div data-testid="close-trigger">{this.context.closeTrigger.toString()}</div>
+            <div data-testid="images-config">
+              {this.context.imagesConfig ? 'present' : 'absent'}
+            </div>
           </div>
         );
       }
     }
+
     renderWithRouter(<ContextSpy />);
     expect(screen.getByTestId('update-trigger')).toHaveTextContent('false');
     expect(screen.getByTestId('close-trigger')).toHaveTextContent('false');
+    expect(screen.getByTestId('images-config')).toHaveTextContent('present');
     fireEvent.click(screen.getByText('Update Search'));
     expect(screen.getByTestId('update-trigger')).toHaveTextContent('true');
     fireEvent.click(screen.getByText('Update Search'));

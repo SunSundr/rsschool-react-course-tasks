@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { ThemeContext, ThemeProvider } from '~/context/ThemeContext';
+import { ThemeContext, ThemeProvider } from '~/theme/ThemeContext';
 import { Theme } from '~/types';
 
 const mockSetTheme = vi.fn();
@@ -36,7 +36,6 @@ describe('ThemeContext', () => {
         <TestComponent />
       </ThemeProvider>,
     );
-
     expect(screen.getByTestId('theme')).toHaveTextContent(Theme.Light);
   });
 
@@ -46,9 +45,7 @@ describe('ThemeContext', () => {
         <TestComponent />
       </ThemeProvider>,
     );
-
     fireEvent.click(screen.getByText('Set Dark'));
-
     expect(mockSetTheme).toHaveBeenCalledWith(Theme.Dark);
     expect(mockSetThemeLS).toHaveBeenCalledWith(Theme.Dark);
   });
@@ -59,9 +56,7 @@ describe('ThemeContext', () => {
         <TestComponent />
       </ThemeProvider>,
     );
-
     fireEvent.click(screen.getByText('Set Light'));
-
     expect(mockSetTheme).toHaveBeenCalledWith(Theme.Light);
     expect(mockSetThemeLS).toHaveBeenCalledWith(Theme.Light);
   });

@@ -1,6 +1,6 @@
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { APP_NAME } from '~/constants';
 import { ThemeProvider } from '~/theme/ThemeContext';
 import { Theme } from '~/types';
@@ -8,6 +8,7 @@ import { Header } from '../components/Header/Header';
 
 const mockSetTheme = vi.fn();
 const mockClearVideos = vi.fn();
+const mockResetMoviesQueries = vi.fn();
 
 vi.mock('~/store/store', () => ({
   useStore: () => ({
@@ -19,10 +20,16 @@ vi.mock('~/hooks/useLocalStorage', () => ({
   useLocalStorage: () => [null, vi.fn()],
 }));
 
-vi.mock('~/context/useTheme', () => ({
+vi.mock('~/theme/useTheme', () => ({
   default: () => ({
     theme: Theme.Dark,
     setTheme: mockSetTheme,
+  }),
+}));
+
+vi.mock('~/hooks/useRefreshData', () => ({
+  useResetQueries: () => ({
+    resetMoviesQueries: mockResetMoviesQueries,
   }),
 }));
 
@@ -30,6 +37,10 @@ describe('Header', () => {
   const defaultProps = {
     updateContext: vi.fn(),
   };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   const renderWithRouter = (component: React.ReactElement) => {
     const router = createMemoryRouter([

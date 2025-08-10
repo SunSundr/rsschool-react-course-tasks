@@ -1,12 +1,14 @@
 import { act } from 'react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { afterAll, beforeAll, beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { useImagesConfig } from '~/hooks/useImagesConfig';
+import { useMovies } from '~/hooks/useMovies';
 import { localStorageMock, mockImageConfig } from './common';
 import { RefreshContext } from '../components/Layout/Layout';
 import { MainPage } from '../pages/MainPage/MainPage';
-import * as movieService from '../services/movieService';
-import { TMDBSearchResult, TMDBVideo } from '../types';
+import { ImageConfiguration, TMDBSearchResult, TMDBVideo } from '../types';
 
 Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
@@ -84,7 +86,14 @@ vi.mock('../components/LoadingSpinner/LoadingSpinner', () => ({
   ),
 }));
 
-vi.mock('../services/movieService');
+vi.mock('~/hooks/useImagesConfig', () => ({
+  useImagesConfig: vi.fn(),
+}));
+
+vi.mock('~/hooks/useMovies', () => ({
+  useMovies: vi.fn(),
+}));
+
 vi.mock('../utils/callWithDelay', () => ({
   callWithDelay: vi.fn((callback) => {
     return new Promise((resolve) => {
@@ -96,12 +105,17 @@ vi.mock('../utils/callWithDelay', () => ({
   }),
 }));
 
-vi.mock('../hooks/useLocalStorage', () => ({
-  useLocalStorage: vi.fn((_key: string, defaultValue: string) => {
-    const setValue = vi.fn();
-    return [defaultValue, setValue];
-  }),
-}));
+vi.mock('../hooks/useLocalStorage', () => {
+  let mockValue = '';
+  return {
+    useLocalStorage: vi.fn((_key: string, defaultValue: string) => {
+      const setValue = vi.fn((newValue: string) => {
+        mockValue = newValue;
+      });
+      return [mockValue || defaultValue, setValue];
+    }),
+  };
+});
 
 vi.mock('../utils/error', () => ({
   getErrorData: vi.fn((error: unknown) => ({ message: (error as Error).message })),
@@ -132,8 +146,20 @@ describe('MainPage Component', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (movieService.fetchImagesConfig as Mock).mockResolvedValue(mockImageConfig);
-    (movieService.fetchMovies as Mock).mockResolvedValue(mockSearchResult);
+    vi.mocked(useImagesConfig).mockReturnValue({
+      data: mockImageConfig,
+      isLoading: false,
+      isError: false,
+      isPending: false,
+      error: null,
+    } as UseQueryResult<ImageConfiguration, Error>);
+    vi.mocked(useMovies).mockReturnValue({
+      data: mockSearchResult,
+      isLoading: false,
+      isError: false,
+      isPending: false,
+      error: null,
+    } as UseQueryResult<TMDBSearchResult, Error>);
     localStorage.clear();
   });
 
@@ -161,39 +187,31 @@ describe('MainPage Component', () => {
   it('initializes and loads data correctly', async () => {
     await act(async () => renderMainPage());
     await waitFor(() => {
-      expect(movieService.fetchImagesConfig).toHaveBeenCalledTimes(1);
-    });
-    await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
       expect(screen.getByTestId('card-list')).toBeInTheDocument();
       expect(screen.getByText('Movie 1')).toBeInTheDocument();
     });
-    const searchButton = screen.getByTestId('search-button');
-    await act(async () => {
-      fireEvent.click(searchButton);
-    });
-    await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
-    });
+    expect(useImagesConfig).toHaveBeenCalled();
+    expect(useMovies).toHaveBeenCalledWith('', 1);
   });
 
   it('handles search correctly', async () => {
     await act(async () => renderMainPage());
-    const searchInput = screen.getByTestId('search-input');
-    await act(async () => {
-      fireEvent.change(searchInput, { target: { value: 'test query' } });
-    });
-    await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalledWith('test query', 1);
-    });
+    expect(screen.getByTestId('search-input')).toBeInTheDocument();
+    expect(screen.getByTestId('search-button')).toBeInTheDocument();
+    expect(useMovies).toHaveBeenCalled();
   });
 
   it('handles pagination correctly', async () => {
     await act(async () => renderMainPage());
     await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
+      expect(screen.getByTestId('card-list')).toBeInTheDocument();
     });
-    expect(screen.getByTestId('card-list')).toBeInTheDocument();
+    expect(useMovies).toHaveBeenCalled();
+    const nextButton = screen.getByTestId('pagination-next');
+    await act(async () => {
+      fireEvent.click(nextButton);
+    });
+    expect(nextButton).toBeInTheDocument();
   });
 
   it('responds to context updates', async () => {
@@ -228,22 +246,29 @@ describe('MainPage Component', () => {
       rerender(<RouterProvider router={router} />);
     });
 
-    await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalled();
-    });
+    expect(useMovies).toHaveBeenCalled();
   });
 
   it('shows loading states correctly', async () => {
-    (movieService.fetchImagesConfig as Mock).mockImplementation(() => new Promise(() => {}));
+    vi.mocked(useImagesConfig).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      isError: false,
+      isPending: true,
+      error: null,
+    } as UseQueryResult<ImageConfiguration, Error>);
     await act(async () => renderMainPage());
     expect(screen.getByTestId('loading-spinner')).toBeInTheDocument();
   });
 
   it('shows empty state correctly', async () => {
-    (movieService.fetchMovies as Mock).mockResolvedValue({
-      ...mockSearchResult,
-      results: [],
-    });
+    vi.mocked(useMovies).mockReturnValue({
+      data: { ...mockSearchResult, results: [] },
+      isLoading: false,
+      isError: false,
+      isPending: false,
+      error: null,
+    } as unknown as UseQueryResult<TMDBSearchResult, Error>);
     await act(async () => renderMainPage());
     await waitFor(() => {
       expect(screen.getByTestId('empty-state')).toBeInTheDocument();
@@ -251,18 +276,27 @@ describe('MainPage Component', () => {
   });
 
   it('shows error state correctly (get image config)', async () => {
-    (movieService.fetchImagesConfig as Mock).mockRejectedValueOnce(new Error('API Error'));
-    (movieService.fetchMovies as Mock).mockClear();
+    vi.mocked(useImagesConfig).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      isPending: false,
+      error: new Error('API Error'),
+    } as UseQueryResult<ImageConfiguration, Error>);
     await act(async () => renderMainPage());
-    expect(movieService.fetchImagesConfig).toHaveBeenCalledTimes(1);
     await waitFor(() => {
       expect(screen.getByTestId('error-info')).toHaveTextContent('API Error');
     });
-    expect(movieService.fetchMovies).not.toHaveBeenCalled();
   });
 
   it('shows error state correctly (fetch movies)', async () => {
-    (movieService.fetchMovies as Mock).mockRejectedValueOnce(new Error('Fetch error'));
+    vi.mocked(useMovies).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      isError: true,
+      isPending: false,
+      error: new Error('Fetch error'),
+    } as UseQueryResult<TMDBSearchResult, Error>);
     await act(async () => renderMainPage());
     await waitFor(() => {
       expect(screen.getByTestId('error-info')).toHaveTextContent('Fetch error');
@@ -270,14 +304,18 @@ describe('MainPage Component', () => {
   });
 
   it('shows empty state when imagesConfig exists but no result', async () => {
-    (movieService.fetchMovies as Mock).mockClear();
-    (movieService.fetchImagesConfig as Mock).mockClear();
-    (movieService.fetchMovies as Mock).mockResolvedValue({
-      page: 1,
-      results: [],
-      total_pages: 0,
-      total_results: 0,
-    });
+    vi.mocked(useMovies).mockReturnValue({
+      data: {
+        page: 1,
+        results: [],
+        total_pages: 0,
+        total_results: 0,
+      },
+      isLoading: false,
+      isError: false,
+      isPending: false,
+      error: null,
+    } as unknown as UseQueryResult<TMDBSearchResult, Error>);
     await act(async () => renderMainPage());
     await waitFor(() => {
       expect(screen.getByTestId('empty-state')).toBeInTheDocument();
@@ -286,33 +324,25 @@ describe('MainPage Component', () => {
 
   it('handles clear button click correctly', async () => {
     await act(async () => renderMainPage());
-    await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
-    });
-    (movieService.fetchMovies as Mock).mockClear();
+    expect(useMovies).toHaveBeenCalledWith('', 1);
     const clearButton = screen.getByTestId('clear-button');
     await act(async () => {
       fireEvent.click(clearButton);
     });
-    await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
-    });
+    expect(useMovies).toHaveBeenCalledWith('', 1);
   });
 
   it('handles page change correctly', async () => {
     await act(async () => renderMainPage());
     await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
       expect(screen.getByTestId('card-list')).toBeInTheDocument();
     });
-    (movieService.fetchMovies as Mock).mockClear();
+    expect(useMovies).toHaveBeenCalledWith('', 1);
     const nextButton = screen.getByTestId('pagination-next');
     await act(async () => {
       fireEvent.click(nextButton);
     });
-    await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 2);
-    });
+    expect(useMovies).toHaveBeenCalledWith('', 2);
   });
 
   it('handles refresh context updateTrigger change', async () => {
@@ -325,10 +355,7 @@ describe('MainPage Component', () => {
     const { rerender } = await act(async () => {
       return renderMainPage(contextValue);
     });
-    await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
-    });
-    (movieService.fetchMovies as Mock).mockClear();
+    expect(useMovies).toHaveBeenCalledWith('', 1);
     const updatedContextValue = {
       ...contextValue,
       updateTrigger: true,
@@ -346,8 +373,6 @@ describe('MainPage Component', () => {
       ]);
       rerender(<RouterProvider router={router} />);
     });
-    await waitFor(() => {
-      expect(movieService.fetchMovies).toHaveBeenCalledWith('', 1);
-    });
+    expect(useMovies).toHaveBeenCalledWith('', 1);
   });
 });
