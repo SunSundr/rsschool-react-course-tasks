@@ -66,7 +66,7 @@ export const CardList: React.FC<CardListProps> = ({
     ref: React.RefObject<HTMLElement | null>,
   ) => {
     setelectedDetealId(video.id);
-    navigate(navUrlWithCurrentParams(`/detailed/${video.id}`), { state: { video } });
+    navigate(navUrlWithCurrentParams(`/detailed/${video.id}`));
     if (!hasDetail) {
       setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 1100);
     }

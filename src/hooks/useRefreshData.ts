@@ -1,28 +1,31 @@
 import { useQueryClient } from '@tanstack/react-query';
+import { QueryKeys } from '~/query/settings';
+import { TMDBSearchResult } from '~/types';
 
-export const useRefreshData = () => {
+export const useResetQueries = () => {
   const queryClient = useQueryClient();
 
-  const refreshMovies = (query: string, page: number) => {
-    queryClient.invalidateQueries({ queryKey: ['movies', query, page] });
+  const resetMovieQueries = async (id: number | undefined) => {
+    if (!id) return;
+    const allMoviesData = queryClient.getQueriesData<TMDBSearchResult[]>({
+      queryKey: [QueryKeys.movies],
+    });
+    queryClient.removeQueries({
+      queryKey: [QueryKeys.movies],
+      exact: false,
+    });
+    await queryClient.resetQueries({ queryKey: [QueryKeys.movie, id.toString()] });
+    allMoviesData.forEach(([queryKey, data]) => {
+      if (data) queryClient.setQueryData(queryKey, data);
+    });
   };
 
-  const refreshMovieDetail = (id: string) => {
-    queryClient.invalidateQueries({ queryKey: ['movie', id] });
-  };
-
-  const refreshImagesConfig = () => {
-    queryClient.invalidateQueries({ queryKey: ['imagesConfig'] });
-  };
-
-  const refreshAll = () => {
-    queryClient.invalidateQueries();
+  const resetMoviesQueries = async () => {
+    queryClient.resetQueries({ queryKey: [QueryKeys.movies], exact: false });
   };
 
   return {
-    refreshMovies,
-    refreshMovieDetail,
-    refreshImagesConfig,
-    refreshAll,
+    resetMovieQueries,
+    resetMoviesQueries,
   };
 };

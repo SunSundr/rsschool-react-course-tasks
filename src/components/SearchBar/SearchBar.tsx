@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useResetQueries } from '~/hooks/useRefreshData';
 import { useStore } from '~/store/store';
 import styles from './SearchBar.module.css';
 
@@ -7,7 +8,6 @@ interface SearchBarProps {
   onClear: () => void;
   initialValue: string;
   loading: boolean;
-  onRefresh?: () => void;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
@@ -15,10 +15,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({
   onClear,
   initialValue,
   loading,
-  onRefresh,
 }) => {
   const [query, setQuery] = useState(initialValue || '');
   const { clearVideos } = useStore();
+
+  const { resetMoviesQueries } = useResetQueries();
 
   useEffect(() => {
     setQuery(initialValue || '');
@@ -67,16 +68,14 @@ export const SearchBar: React.FC<SearchBarProps> = ({
       <button onClick={handleSubmit} className={styles.searchButton} disabled={loading}>
         Search
       </button>
-      {onRefresh && (
-        <button
-          onClick={onRefresh}
-          className={styles.refreshButton}
-          disabled={loading}
-          title="Refresh data"
-        >
-          ↻
-        </button>
-      )}
+      <button
+        onClick={resetMoviesQueries}
+        className={styles.refreshButton}
+        disabled={loading}
+        title="Refresh data"
+      >
+        ↻
+      </button>
     </div>
   );
 };

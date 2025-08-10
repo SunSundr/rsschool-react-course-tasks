@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { APP_NAME, QUERY_KEY } from '~/constants';
-import useTheme from '~/context/useTheme';
+import { useResetQueries } from '~/hooks/useRefreshData';
 import { useWindowEvent } from '~/hooks/useWindowEvent';
 import { useStore } from '~/store/store';
+import useTheme from '~/theme/useTheme';
 import { QueryType, Theme } from '~/types';
 import styles from './Header.module.css';
 
@@ -19,6 +20,7 @@ export const Header: React.FC<HeaderProps> = ({ updateContext }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { clearVideos } = useStore();
   const { theme, setTheme } = useTheme();
+  const { resetMoviesQueries } = useResetQueries();
 
   useWindowEvent(
     'scroll',
@@ -46,6 +48,7 @@ export const Header: React.FC<HeaderProps> = ({ updateContext }) => {
         }
         return params;
       });
+      resetMoviesQueries();
     } else {
       navigate('/');
       return;

@@ -10,7 +10,7 @@
   overflow: hidden;
 }
 
-.closeButton {
+.roundButton {
   position: absolute;
   top: 1rem;
   right: 1rem;
@@ -29,7 +29,11 @@
   transition: background-color 0.2s ease;
 }
 
-.closeButton:hover {
+.right {
+  right: 3.5rem;
+}
+
+.roundButton:hover {
   background-color: var(--hover-shadow);
 }
 

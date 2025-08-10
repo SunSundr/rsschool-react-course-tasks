@@ -2,7 +2,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { APP_NAME } from '~/constants';
-import { ThemeProvider } from '~/context/ThemeContext';
+import { ThemeProvider } from '~/theme/ThemeContext';
 import { Theme } from '~/types';
 import { Header } from '../components/Header/Header';
 

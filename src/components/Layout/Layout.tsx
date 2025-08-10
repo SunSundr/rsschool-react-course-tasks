@@ -1,7 +1,7 @@
 import { createContext, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import useTheme from '~/context/useTheme';
 import { useImagesConfig } from '~/hooks/useImagesConfig';
+import useTheme from '~/theme/useTheme';
 import { ImageConfiguration } from '~/types';
 import { Footer } from '../Footer/Footer';
 import { Header } from '../Header/Header';

@@ -11,7 +11,6 @@ import { LS_SEARCHTERM_KEY } from '~/constants';
 import { useImagesConfig } from '~/hooks/useImagesConfig';
 import { useLocalStorage } from '~/hooks/useLocalStorage';
 import { useMovies } from '~/hooks/useMovies';
-import { useRefreshData } from '~/hooks/useRefreshData';
 import { callWithDelay } from '~/utils/callWithDelay';
 import { errorLog } from '~/utils/error';
 import styles from './MainPage.module.css';
@@ -24,7 +23,6 @@ export const MainPage: React.FC = () => {
 
   const refreshContext = useContext(RefreshContext);
   const location = useLocation();
-  const { refreshMovies } = useRefreshData();
 
   const { data: imagesConfig, isLoading: imagesLoading, error: imagesError } = useImagesConfig();
   const {
@@ -83,10 +81,6 @@ export const MainPage: React.FC = () => {
     updateParams({ page: page.toString() });
   };
 
-  const handleRefresh = () => {
-    refreshMovies(searchTerm, currentPage);
-  };
-
   useEffect(() => {
     if (refreshContext.updateTrigger !== updateTrigger) {
       handleClear();
@@ -122,7 +116,6 @@ export const MainPage: React.FC = () => {
         onClear={handleClear}
         initialValue={searchTerm}
         loading={loading}
-        onRefresh={handleRefresh}
       />
       <div className={styles.paper}>{getContent()}</div>
       {result && <Flyout />}
