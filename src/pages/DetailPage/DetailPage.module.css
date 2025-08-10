@@ -2,7 +2,7 @@
   position: relative;
   width: 50vw;
   max-width: 600px;
-  top: 175px;
+  top: 180px;
   right: 20px;
   background-color: var(--background-paper);
   border-radius: 8px;
@@ -29,8 +29,8 @@
   transition: background-color 0.2s ease;
 }
 
-.right {
-  right: 3.5rem;
+.rightPlace {
+  top: 3.5rem;
 }
 
 .roundButton:hover {
@@ -167,6 +167,11 @@
     width: 400px;
   }
 
+  .rightPlace {
+    right: 3.5rem;
+    top: 1rem;
+  }
+
   .topBlock {
     flex-direction: column;
     align-items: center;
@@ -189,6 +194,7 @@
 @media (max-width: 900px) {
   .container {
     width: 350px;
+    top: 200px;
   }
 }
 

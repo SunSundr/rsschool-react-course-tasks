@@ -79,7 +79,7 @@ export const DetailPage = () => {
         <span className={styles.closeCrossText}>&#xD7;</span>
       </button>
       <button
-        className={`${styles.roundButton} ${styles.right}`}
+        className={`${styles.roundButton} ${styles.rightPlace}`}
         onClick={() => resetMovieQueries(video?.id)}
       >
         <span>↻</span>

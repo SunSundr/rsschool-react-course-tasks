@@ -65,17 +65,19 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           </button>
         )}
       </div>
-      <button onClick={handleSubmit} className={styles.searchButton} disabled={loading}>
-        Search
-      </button>
-      <button
-        onClick={resetMoviesQueries}
-        className={styles.refreshButton}
-        disabled={loading}
-        title="Refresh data"
-      >
-        ↻
-      </button>
+      <div className={styles.searchContainer}>
+        <button onClick={handleSubmit} className={styles.searchButton} disabled={loading}>
+          Search
+        </button>
+        <button
+          onClick={resetMoviesQueries}
+          className={styles.refreshButton}
+          disabled={loading}
+          title="Refresh data"
+        >
+          ↻
+        </button>
+      </div>
     </div>
   );
 };
