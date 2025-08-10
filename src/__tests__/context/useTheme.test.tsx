@@ -1,7 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { ThemeProvider } from '~/context/ThemeContext';
-import useTheme from '~/context/useTheme';
+import { ThemeProvider } from '~/theme/ThemeContext';
+import useTheme from '~/theme/useTheme';
 import { Theme } from '~/types';
 
 vi.mock('~/store/store', () => ({

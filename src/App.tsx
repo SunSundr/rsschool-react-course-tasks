@@ -1,11 +1,12 @@
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { RouterErrorFallback } from './components/ErrorBoundary/RouterErrorFallback';
 import { Layout } from './components/Layout/Layout';
-import { ThemeProvider } from './context/ThemeContext';
 import { AboutPage } from './pages/About/AboutPage';
 import { DetailPage } from './pages/DetailPage/DetailPage';
 import { MainPage } from './pages/MainPage/MainPage';
 import { NotFoundPage } from './pages/NotFoundPage/NotFoundPage';
+import { QueryProvider } from './query/QueryProvider';
+import { ThemeProvider } from './theme/ThemeContext';
 
 const router = createBrowserRouter([
   {
@@ -36,8 +37,10 @@ const router = createBrowserRouter([
 
 export function App() {
   return (
-    <ThemeProvider>
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <QueryProvider>
+      <ThemeProvider>
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </QueryProvider>
   );
 }

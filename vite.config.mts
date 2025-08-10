@@ -27,6 +27,7 @@ export default defineConfig({
         'src/App.tsx',
         'src/types.ts',
         'src/constants.ts',
+        'src/query/settings.ts',
         'src/**/*.d.ts',
         'src/__tests__/**/*.ts',
       ],

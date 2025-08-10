@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useResetQueries } from '~/hooks/useRefreshData';
 import { useStore } from '~/store/store';
 import styles from './SearchBar.module.css';
 
@@ -17,6 +18,8 @@ export const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   const [query, setQuery] = useState(initialValue || '');
   const { clearVideos } = useStore();
+
+  const { resetMoviesQueries } = useResetQueries();
 
   useEffect(() => {
     setQuery(initialValue || '');
@@ -62,9 +65,19 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           </button>
         )}
       </div>
-      <button onClick={handleSubmit} className={styles.searchButton} disabled={loading}>
-        Search
-      </button>
+      <div className={styles.searchContainer}>
+        <button onClick={handleSubmit} className={styles.searchButton} disabled={loading}>
+          Search
+        </button>
+        <button
+          onClick={resetMoviesQueries}
+          className={styles.refreshButton}
+          disabled={loading}
+          title="Refresh data"
+        >
+          ↻
+        </button>
+      </div>
     </div>
   );
 };

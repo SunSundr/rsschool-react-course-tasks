@@ -1,12 +1,12 @@
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
+import { UseQueryResult } from '@tanstack/react-query';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { beforeEach, describe, expect, it, Mock, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { useMovieDetail } from '~/hooks/useMovieDetail';
 import { Theme, TMDBVideo } from '~/types';
-import { ResponseError } from '~/utils/error';
 import { createMockVideo, mockImageConfig } from './common';
 import { RefreshContext } from '../components/Layout/Layout';
 import { DetailPage } from '../pages/DetailPage/DetailPage';
-import * as movieService from '../services/movieService';
 
 vi.mock('~/store/store', () => ({
   useStore: () => ({
@@ -14,7 +14,16 @@ vi.mock('~/store/store', () => ({
   }),
 }));
 
-vi.mock('../services/movieService');
+const mockResetMovieQueries = vi.fn();
+vi.mock('~/hooks/useRefreshData', () => ({
+  useResetQueries: () => ({
+    resetMovieQueries: mockResetMovieQueries,
+  }),
+}));
+
+vi.mock('~/hooks/useMovieDetail', () => ({
+  useMovieDetail: vi.fn(),
+}));
 vi.mock('../helpers/renderImage', () => ({
   renderImage: () => <img data-testid="movie-image" alt="Movie poster" />,
 }));
@@ -33,12 +42,6 @@ vi.mock('../utils/safeCall', () => ({
 }));
 vi.mock('../utils/imageBaseUrl', () => ({
   imageBaseUrl: vi.fn(() => 'https://test-image-url.com'),
-}));
-vi.mock('../utils/error', () => ({
-  getErrorData: vi.fn((error: unknown) => {
-    const err = error as ResponseError;
-    return { message: err.message, statusCode: err.statusCode };
-  }),
 }));
 
 vi.mock('react-router-dom', async (importOriginal) => {
@@ -59,7 +62,7 @@ describe('DetailPage', () => {
     handleCloseTrigger: vi.fn(),
   };
 
-  const renderDetailPage = (locationState?: { video: TMDBVideo }) => {
+  const renderDetailPage = () => {
     const router = createMemoryRouter(
       [
         {
@@ -76,20 +79,24 @@ describe('DetailPage', () => {
       },
     );
 
-    if (locationState) {
-      router.navigate('/detailed/123', { state: locationState, replace: true });
-    }
-
     return render(<RouterProvider router={router} />);
   };
 
   beforeEach(() => {
     vi.clearAllMocks();
-    (movieService.fetchDetailMovie as Mock).mockResolvedValue(mockVideo);
+    vi.mocked(useMovieDetail).mockReturnValue({
+      data: mockVideo,
+      isLoading: false,
+      error: null,
+    } as UseQueryResult<TMDBVideo, Error>);
   });
 
   it('renders loading state initially', async () => {
-    (movieService.fetchDetailMovie as Mock).mockImplementation(() => new Promise(() => {}));
+    vi.mocked(useMovieDetail).mockReturnValue({
+      data: undefined,
+      isLoading: true,
+      error: null,
+    } as UseQueryResult<TMDBVideo, Error>);
     await act(async () => {
       renderDetailPage();
     });
@@ -106,15 +113,6 @@ describe('DetailPage', () => {
       expect(screen.getByText('Test overview')).toBeInTheDocument();
     });
   });
-
-  // it('renders movie details from location state', async () => {
-  //   await act(async () => {
-  //     renderDetailPage({ video: mockVideo });
-  //   });
-  //   expect(screen.getByText('Test Movie')).toBeInTheDocument();
-  //   expect(screen.getByText('Original Test Movie')).toBeInTheDocument();
-  //   expect(screen.getByText('Test overview')).toBeInTheDocument();
-  // });
 
   it('renders metadata chips', async () => {
     await act(async () => {
@@ -139,9 +137,9 @@ describe('DetailPage', () => {
 
   it('renders close button and calls handleCloseTrigger when clicked', async () => {
     await act(async () => {
-      renderDetailPage({ video: mockVideo });
+      renderDetailPage();
     });
-    const closeButton = screen.getByRole('button');
+    const closeButton = screen.getAllByRole('button')[0];
     await act(async () => {
       fireEvent.click(closeButton);
     });
@@ -149,7 +147,11 @@ describe('DetailPage', () => {
   });
 
   it('renders error state when fetch fails', async () => {
-    (movieService.fetchDetailMovie as Mock).mockRejectedValue(new Error('Fetch failed'));
+    vi.mocked(useMovieDetail).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: new Error('Fetch failed'),
+    } as UseQueryResult<TMDBVideo, Error>);
     await act(async () => {
       renderDetailPage();
     });
@@ -158,22 +160,26 @@ describe('DetailPage', () => {
     });
   });
 
-  it('renders error with status code', async () => {
-    (movieService.fetchDetailMovie as Mock).mockRejectedValue({
-      message: 'Not found',
-      statusCode: 404,
-    });
+  it('renders error message', async () => {
+    vi.mocked(useMovieDetail).mockReturnValue({
+      data: undefined,
+      isLoading: false,
+      error: { message: 'Not found' },
+    } as UseQueryResult<TMDBVideo, Error>);
     await act(async () => {
       renderDetailPage();
     });
     await waitFor(() => {
-      expect(screen.getByText('Error 404')).toBeInTheDocument();
       expect(screen.getByText('Not found')).toBeInTheDocument();
     });
   });
 
   it('renders "Movie not found" when no video data', async () => {
-    (movieService.fetchDetailMovie as Mock).mockResolvedValue(null);
+    vi.mocked(useMovieDetail).mockReturnValue({
+      data: null,
+      isLoading: false,
+      error: null,
+    } as unknown as UseQueryResult<TMDBVideo, Error>);
     await act(async () => {
       renderDetailPage();
     });
@@ -182,19 +188,21 @@ describe('DetailPage', () => {
     });
   });
 
-  it('fetches movie data when id is provided and no video in state', async () => {
+  it('calls useMovieDetail hook with correct id', async () => {
     await act(async () => {
       renderDetailPage();
     });
-    await waitFor(() => {
-      expect(movieService.fetchDetailMovie).toHaveBeenCalledWith('123');
-    });
+    expect(useMovieDetail).toHaveBeenCalledWith('123');
   });
 
-  it('does not fetch when video is provided in location state', async () => {
+  it('renders refresh button and calls resetMovieQueries when clicked', async () => {
     await act(async () => {
-      renderDetailPage({ video: mockVideo });
+      renderDetailPage();
     });
-    expect(movieService.fetchDetailMovie).not.toHaveBeenCalled();
+    const refreshButton = screen.getAllByRole('button')[1];
+    await act(async () => {
+      fireEvent.click(refreshButton);
+    });
+    expect(mockResetMovieQueries).toHaveBeenCalledWith(mockVideo.id);
   });
 });

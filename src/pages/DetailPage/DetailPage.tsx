@@ -1,11 +1,11 @@
-import { useContext, useEffect, useState } from 'react';
-import { useLocation, useOutletContext, useParams } from 'react-router-dom';
+import { useContext } from 'react';
+import { useOutletContext, useParams } from 'react-router-dom';
 import { RefreshContext } from '~/components/Layout/Layout';
 import { LoadingSpinner } from '~/components/LoadingSpinner/LoadingSpinner';
 import { renderImage } from '~/helpers/renderImage';
-import { fetchDetailMovie } from '~/services/movieService';
-import { BackdropSize, ImageConfiguration, PosterSize, TMDBVideo } from '~/types';
-import { getErrorData } from '~/utils/error';
+import { useMovieDetail } from '~/hooks/useMovieDetail';
+import { useResetQueries } from '~/hooks/useRefreshData';
+import { BackdropSize, ImageConfiguration, PosterSize } from '~/types';
 import { formatReleaseDate } from '~/utils/formatReleaseDate';
 import { imageBaseUrl } from '~/utils/imageBaseUrl';
 import { safeCall } from '~/utils/safeCall';
@@ -13,50 +13,17 @@ import styles from './DetailPage.module.css';
 
 export const DetailPage = () => {
   const { id } = useParams();
-  const location = useLocation();
   const { handleCloseTrigger } = useContext(RefreshContext);
   const { imagesConfig } = useOutletContext<{ imagesConfig: ImageConfiguration }>();
-  const [video, setVideo] = useState<TMDBVideo | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<{ msg: string; statusCode?: number } | null>(null);
-
-  const locationState = location.state as { video?: TMDBVideo };
-
-  useEffect(() => {
-    setLoading(true);
-    if (locationState?.video) {
-      setVideo(locationState.video);
-      setTimeout(() => setLoading(false), 400);
-      return;
-    }
-
-    if (id) {
-      const loadData = async () => {
-        try {
-          const data = await fetchDetailMovie(id);
-          setVideo(data);
-        } catch (err) {
-          const errData = getErrorData(err);
-          setError({ msg: errData.message, statusCode: errData.statusCode });
-        } finally {
-          setTimeout(() => setLoading(false), 400);
-        }
-      };
-
-      loadData();
-    }
-  }, [id, locationState]);
-
-  const handleClose = () => {
-    handleCloseTrigger();
-  };
+  const { data: video, isLoading: loading, error } = useMovieDetail(id || '');
+  const { resetMovieQueries } = useResetQueries();
 
   const getContent = () => {
     if (error) {
       return (
         <div className={styles.emptyWrapper}>
-          <h2>Error {error.statusCode}</h2>
-          <div className={styles.error}>{error.msg}</div>
+          <h2>Error</h2>
+          <div className={styles.error}>{error.message || 'Unknown error'}</div>
         </div>
       );
     } else if (loading) {
@@ -108,8 +75,14 @@ export const DetailPage = () => {
 
   return (
     <div className={styles.container}>
-      <button className={styles.closeButton} onClick={handleClose}>
+      <button className={styles.roundButton} onClick={handleCloseTrigger}>
         <span className={styles.closeCrossText}>&#xD7;</span>
+      </button>
+      <button
+        className={`${styles.roundButton} ${styles.rightPlace}`}
+        onClick={() => resetMovieQueries(video?.id)}
+      >
+        <span>↻</span>
       </button>
       <div className={styles.content}>{getContent()}</div>
     </div>

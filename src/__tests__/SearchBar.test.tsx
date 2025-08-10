@@ -1,10 +1,19 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { SearchBar } from '../components/SearchBar/SearchBar';
+
+const mockClearVideos = vi.fn();
+const mockResetMoviesQueries = vi.fn();
 
 vi.mock('~/store/store', () => ({
   useStore: () => ({
-    clearVideos: vi.fn(),
+    clearVideos: mockClearVideos,
+  }),
+}));
+
+vi.mock('~/hooks/useRefreshData', () => ({
+  useResetQueries: () => ({
+    resetMoviesQueries: mockResetMoviesQueries,
   }),
 }));
 
@@ -15,6 +24,10 @@ describe('SearchBar', () => {
     initialValue: '',
     loading: false,
   };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
 
   it('renders with placeholder text', () => {
     render(<SearchBar {...defaultProps} />);
@@ -76,5 +89,39 @@ describe('SearchBar', () => {
     const input = screen.getByPlaceholderText('Search for movies...');
     fireEvent.keyDown(input, { key: 'Enter' });
     expect(onSearch).not.toHaveBeenCalled();
+  });
+
+  it('renders refresh button', () => {
+    render(<SearchBar {...defaultProps} />);
+    expect(screen.getByText('↻')).toBeInTheDocument();
+  });
+
+  it('calls resetMoviesQueries when refresh button is clicked', () => {
+    render(<SearchBar {...defaultProps} />);
+    const refreshButton = screen.getByText('↻');
+    fireEvent.click(refreshButton);
+    expect(mockResetMoviesQueries).toHaveBeenCalled();
+  });
+
+  it('disables refresh button when loading', () => {
+    render(<SearchBar {...defaultProps} loading={true} />);
+    expect(screen.getByText('↻')).toBeDisabled();
+  });
+
+  it('calls clearVideos when search is performed', () => {
+    const onSearch = vi.fn();
+    render(<SearchBar {...defaultProps} onSearch={onSearch} />);
+    const input = screen.getByPlaceholderText('Search for movies...');
+    const searchButton = screen.getByText('Search');
+    fireEvent.change(input, { target: { value: 'Batman' } });
+    fireEvent.click(searchButton);
+    expect(mockClearVideos).toHaveBeenCalled();
+  });
+
+  it('calls clearVideos when clear button is clicked', () => {
+    render(<SearchBar {...defaultProps} initialValue="test" />);
+    const clearButton = screen.getByText('×');
+    fireEvent.click(clearButton);
+    expect(mockClearVideos).toHaveBeenCalled();
   });
 });
