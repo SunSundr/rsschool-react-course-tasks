@@ -21,7 +21,7 @@ export const useResetQueries = () => {
   };
 
   const resetMoviesQueries = async () => {
-    queryClient.resetQueries({ queryKey: [QueryKeys.movies], exact: false });
+    queryClient.resetQueries();
   };
 
   return {
