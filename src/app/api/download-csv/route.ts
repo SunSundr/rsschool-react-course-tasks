@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { CSV_Separators } from '~/constants';
 import { TMDBVideo } from '~/types';
 
 export async function POST(request: NextRequest) {
@@ -9,17 +10,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid videos data' }, { status: 400 });
     }
 
-    // Generate CSV content
     const headers = ['Title', 'Release Date', 'Vote Average', 'Overview'];
     const csvContent = [
-      headers.join(','),
+      headers.join(CSV_Separators.comma),
       ...videos.map((video) =>
         [
           `"${video.title?.replace(/"/g, '""') || ''}"`,
           video.release_date || '',
           video.vote_average?.toString() || '',
           `"${video.overview?.replace(/"/g, '""') || ''}"`,
-        ].join(','),
+        ].join(CSV_Separators.comma),
       ),
     ].join('\n');
 
