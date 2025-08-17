@@ -1,0 +1,53 @@
+{
+  "common": {
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error"
+  },
+  "example": {
+    "title": "Example Page",
+    "loadData": "Load Data",
+    "tryAgain": "Try Again",
+    "dataLoaded": "Data loaded successfully!",
+    "errorMessage": "Failed to load data. Please try again."
+  },
+  "about": {
+    "title": "About Me",
+    "name": "Aleksandr Kovalenko",
+    "nickname": "SunSundr",
+    "subtitle": "Beginner Fullstack Developer",
+    "description1": "Hello! I'm Aleksandr, a passionate beginner fullstack developer currently living in the beautiful city of Batumi 🌊. When I'm not busy turning coffee into code, you can find me exploring the latest web technologies or debugging why my CSS doesn't work (spoiler: it's usually a missing semicolon).",
+    "description2": "I love programming because it's the only place where you can create something from nothing, break it completely, fix it again, and call it \"learning experience\". My favorite debugging technique is explaining the problem to my rubber duck – surprisingly effective! 🦆",
+    "description3": "When I'm not coding, I enjoy having a good time with friends, exploring Batumi's amazing food scene, and pretending I understand what \"Big O notation\" really means. Fun fact: I once spent 3 hours debugging a problem that was solved by restarting the server. We've all been there, right? 😅",
+    "taskIntro": "This application was built as part of the",
+    "courseLink": "RS School React course",
+    "taskLink": "View Task Requirements"
+  },
+  "notFound": {
+    "title": "Oops! Page Not Found",
+    "message1": "This website has many different pages, but the one you're looking for, unfortunately, is not among them. 🤷♂️",
+    "message2": "Maybe such a page will be created someday... Don't despair! Perhaps tomorrow it will magically appear in our codebase. ✨",
+    "message3": "Until then, why not explore what we actually have? I promise the existing pages work (most of the time). 😊",
+    "homeButton": "Take Me Home"
+  },
+  "header": {
+    "dark": "Dark",
+    "light": "Light",
+    "about": "About"
+  },
+  "flyout": {
+    "itemsSelected": "{count, plural, =1 {# item is selected} other {# items are selected}}",
+    "unselectAll": "Unselect all",
+    "download": "Download",
+    "downloading": "Downloading..."
+  },
+  "error": {
+    "button": "Error Button"
+  },
+  "pagination": {
+    "next": "Next",
+    "previous": "Previous",
+    "page": "Page",
+    "of": "of"
+  }
+}

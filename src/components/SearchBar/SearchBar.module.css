@@ -78,7 +78,7 @@
 }
 
 .searchButton {
-  padding: 0.875rem 1.5rem;
+  padding: 0.875rem 1rem;
   font-size: 1rem;
   font-weight: 600;
   background-color: var(--primary-main);

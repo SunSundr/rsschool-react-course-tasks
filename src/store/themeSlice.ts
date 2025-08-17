@@ -8,6 +8,7 @@ export interface ThemeSlice {
 }
 
 const getDefaultTheme = (): ThemeType => {
+  if (typeof window === 'undefined') return Theme.Light;
   const savedTheme = localStorage.getItem(LS_THEME_KEY);
   if (savedTheme) {
     try {

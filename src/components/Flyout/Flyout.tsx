@@ -1,44 +1,61 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+'use client';
+
+import { useCallback, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useStore } from '~/store/store';
-import { downloadCSV } from '~/utils/downloadCSV';
 import styles from './Flyout.module.css';
 
 export const Flyout: React.FC = () => {
-  const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const linkRef = useRef<HTMLAnchorElement | null>(null);
+  const [isDownloading, setIsDownloading] = useState(false);
   const { videos, clearVideos } = useStore();
+  const t = useTranslations('flyout');
 
-  const handleDownload = () => downloadCSV(videos, setDownloadUrl);
-  const handleUnselectAll = useCallback(() => clearVideos(), []);
+  const handleDownload = async () => {
+    if (isDownloading || videos.length === 0) return;
 
-  useEffect(() => {
-    if (downloadUrl && linkRef.current) {
-      linkRef.current.click();
-      URL.revokeObjectURL(downloadUrl);
-      setDownloadUrl(null);
+    setIsDownloading(true);
+    try {
+      const response = await fetch('/api/download-csv', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ videos }),
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${videos.length}_items.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+    } catch (error) {
+      console.error('Download failed:', error);
+    } finally {
+      setIsDownloading(false);
     }
-  }, [downloadUrl]);
+  };
+
+  const handleUnselectAll = useCallback(() => clearVideos(), [clearVideos]);
 
   const selectedItemsCount = videos.length;
 
   return (
     <div className={`${styles.flyout} ${selectedItemsCount ? styles.show : ''}`}>
-      <div>{selectedItemsCount} items are selected</div>
+      <div>{t('itemsSelected', { count: selectedItemsCount })}</div>
       <div className={styles.buttons}>
-        <button onClick={handleUnselectAll}>Unselect all</button>
-        <button onClick={handleDownload}>Download</button>
+        <button className={styles.button} onClick={handleUnselectAll}>
+          {t('unselectAll')}
+        </button>
+        <button className={styles.button} onClick={handleDownload} disabled={isDownloading}>
+          {isDownloading ? t('downloading') : t('download')}
+        </button>
       </div>
-      {downloadUrl && (
-        <a
-          href={downloadUrl || '#'}
-          download={`${selectedItemsCount}_items.csv`}
-          style={{ display: 'none' }}
-          ref={linkRef}
-          role="link"
-        >
-          Download
-        </a>
-      )}
     </div>
   );
 };

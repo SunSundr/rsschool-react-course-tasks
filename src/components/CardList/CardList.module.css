@@ -14,7 +14,9 @@
 }
 .withDetailFill {
   grid-template-columns: 1fr 1fr;
+  width: 100%;
 }
+
 .scaleZero {
   transform: translateX(calc(100% + 400px));
   opacity: 0;

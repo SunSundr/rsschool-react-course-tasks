@@ -1,4 +1,7 @@
+'use client';
+
 import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import style from './Pagination.module.css';
 
 export interface PaginationProps {
@@ -15,6 +18,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   const [inputValue, setInputValue] = useState(currentPage.toString());
   const inputRef = useRef<HTMLInputElement>(null);
   const changeTimeoutRef = useRef<NodeJS.Timeout>(null);
+  const t = useTranslations('pagination');
 
   useEffect(() => {
     setInputValue(currentPage.toString());
@@ -55,8 +59,10 @@ export const Pagination: React.FC<PaginationProps> = ({
   return (
     <div className={style.pagination}>
       <button onClick={handlePrev} disabled={currentPage === 1} className={style.button}>
-        Previous
+        {t('previous')}
       </button>
+
+      {t('page')}
 
       <div className={style.pageInputContainer}>
         <input
@@ -69,11 +75,13 @@ export const Pagination: React.FC<PaginationProps> = ({
           onKeyDown={handleKeyDown}
           className={style.pageInput}
         />
-        <span className={style.pageTotal}>of {totalPages}</span>
+        <span className={style.pageTotal}>
+          {t('of')} {totalPages}
+        </span>
       </div>
 
       <button onClick={handleNext} disabled={currentPage === totalPages} className={style.button}>
-        Next
+        {t('next')}
       </button>
     </div>
   );

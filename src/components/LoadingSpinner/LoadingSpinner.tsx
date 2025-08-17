@@ -1,4 +1,3 @@
-import React from 'react';
 import styles from './LoadingSpinner.module.css';
 
 interface LoadingSpinnerProps {
@@ -11,8 +10,12 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ overlay, inline 
     <div
       className={`${styles.container} ${overlay ? styles.overlay : ''} ${inline ? '' : styles.fullPage}`}
     >
-      <div className={styles.spinner}>
-        <div className={styles.text}>LOADING</div>
+      <div className={styles.clock}>
+        <div className={styles.clockFace}>
+          <div className={styles.hourHand}></div>
+          <div className={styles.minuteHand}></div>
+          <div className={styles.center}></div>
+        </div>
       </div>
     </div>
   );

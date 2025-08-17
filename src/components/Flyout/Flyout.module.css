@@ -64,3 +64,13 @@
     min-height: 100px;
   }
 }
+
+.buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.button {
+  min-width: 10rem;
+}
