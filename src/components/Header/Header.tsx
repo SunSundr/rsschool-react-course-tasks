@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { APP_NAME, QUERY_KEY, SEARCH_KEY } from '~/constants';
+import { Link } from '~/i18n/navigation';
 import useThemeNext from '~/theme/useTheme';
 import { Theme } from '~/types';
 import { LoadingSpinner } from '../LoadingSpinner/LoadingSpinner';
