@@ -3,20 +3,23 @@ import { getMovie, getMoviePopTop } from '~/utils/getMovie';
 import { getImagesConfig } from '~/utils/imagesConfigNext';
 import { CardList } from '../CardList/CardList';
 
-interface MovieGridNextProps {
+interface MovieGridProps {
   query: string;
   page: number;
   defaultQuery: QueryType;
   id?: string;
   loading?: boolean;
+  locale?: string;
 }
 
-export default async function MovieGridNext({ query, page, defaultQuery, id }: MovieGridNextProps) {
+export default async function MovieGrid({ query, page, defaultQuery, id, locale }: MovieGridProps) {
   const imagesConfig = await getImagesConfig();
 
+  const language = { en: 'en-US', ru: 'ru-RU', ua: 'uk-UA' }[locale || 'en'] || 'en';
+
   const data = query
-    ? await getMovie(query, { page: page.toString() })
-    : await getMoviePopTop(defaultQuery, { page: page.toString() });
+    ? await getMovie(query, { page: page.toString(), language })
+    : await getMoviePopTop(defaultQuery, { page: page.toString(), language });
 
   return (
     <CardList

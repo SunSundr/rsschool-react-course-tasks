@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState, useTransition } from 'react';
+import { useCallback, useEffect, useRef, useState, useTransition } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ITEMS_PER_PAGE, MAX_PAGES, PAGE_KEY } from '~/constants';
 import { useStore } from '~/store/store';
@@ -44,6 +44,7 @@ export const CardList: React.FC<CardListNextProps> = ({
     imageBaseUrl({ size: PosterSize.W342, type: 'poster' }, imagesConfig),
   );
 
+  const selectedRef = useRef<HTMLDivElement>(null);
   const { videos, addVideo, removeVideo } = useStore();
   const { pending, setCachedResult } = useStore();
 
@@ -97,6 +98,10 @@ export const CardList: React.FC<CardListNextProps> = ({
     return <Empty />;
   }
 
+  //  if (!hasDetail) {
+  //     setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 1100);
+  //   }
+
   return (
     <div
       className={`${styles.container} ${id ? styles.withDetail : ''} ${id ? styles.withDetailFill : ''}`}
@@ -115,6 +120,7 @@ export const CardList: React.FC<CardListNextProps> = ({
               isActive={false}
               isSelected={ids.includes(item.id)}
               onCheckboxChange={(e) => handleCheckboxChange(item, e.target.checked)}
+              scrolRef={id === item.id.toString() ? selectedRef : undefined}
             />
           ))}
         </div>

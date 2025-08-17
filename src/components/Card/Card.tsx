@@ -18,6 +18,7 @@ export interface CardProps {
   ) => void;
   onCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   isSelected: boolean;
+  scrolRef?: React.RefObject<HTMLDivElement | null>;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -29,15 +30,24 @@ export const Card: React.FC<CardProps> = ({
   isActive,
   onCheckboxChange,
   isSelected,
+  scrolRef,
 }) => {
   const ref = useRef(null);
+
+  if (scrolRef) {
+    setTimeout(
+      () => scrolRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }),
+      800,
+    );
+  }
+
   return (
     <article
       ref={ref}
       className={`${styles.card} ${isActive ? styles.detailSelected : ''}`}
       onClick={(event) => onClick(video, event, ref)}
     >
-      <div className={styles.imageContainer}>
+      <div className={styles.imageContainer} ref={scrolRef}>
         {renderImage(video, posterUrl, backdropUrl, styles)}
         <div className={styles.cardNumber}>{index}</div>
         <input

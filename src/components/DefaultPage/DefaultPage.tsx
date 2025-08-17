@@ -34,7 +34,13 @@ export default async function DefaultPage({ params, searchParams }: DefaultPageP
             />
           }
         >
-          <MovieGrid query={query} page={page} defaultQuery={defaultQuery} id={resolvedParams.id} />
+          <MovieGrid
+            query={query}
+            page={page}
+            defaultQuery={defaultQuery}
+            id={resolvedParams.id}
+            locale={resolvedParams.locale}
+          />
         </Suspense>
       </div>
 

@@ -6,7 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { APP_NAME, QUERY_KEY, SEARCH_KEY } from '~/constants';
 import { Link } from '~/i18n/navigation';
-import useThemeNext from '~/theme/useTheme';
+import useTheme from '~/theme/useTheme';
 import { Theme } from '~/types';
 import { LoadingSpinner } from '../LoadingSpinner/LoadingSpinner';
 import styles from './Header.module.css';
@@ -16,7 +16,7 @@ export const Header: React.FC = () => {
   const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
   const themeDropdownRef = useRef<HTMLDivElement>(null);
   const langDropdownRef = useRef<HTMLDivElement>(null);
-  const { theme, setTheme } = useThemeNext();
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
@@ -82,7 +82,8 @@ export const Header: React.FC = () => {
 
   const handleLanguageChange = (newLocale: string) => {
     const newPath = pathname.replace(`/${locale}`, `/${newLocale}`);
-    router.push(newPath);
+    const params = new URLSearchParams(searchParams);
+    router.push(`${newPath}/?${params.toString()}`);
     setIsLangDropdownOpen(false);
   };
 
