@@ -2,9 +2,9 @@
   "name": "rsschool-react-app",
   "version": "1.0.0",
   "scripts": {
-    "dev:next": "next dev",
-    "build:next": "next build",
-    "start:next": "next start",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "eslint .",
     "format:fix": "prettier --write .",
     "prepare": "husky",
