@@ -1,38 +1,38 @@
 # TMDB Movie•Searcher
 
-A React application built with functional components and hooks for searching movies using The Movie Database ([TMDB](https://www.themoviedb.org)) API.
+A Next.js application with server-side rendering for searching movies using The Movie Database ([TMDB](https://www.themoviedb.org)) API.
 
 🔗 **[Live Demo](https://tmdbmoviesearcher.netlify.app)**
 
 ## Overview
 
-This application was created as part of the RS School React course task: [API Querying in React](https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/queries.md)
+This application was created as part of the RS School React course task: [Next.js. Server Side Rendering](https://github.com/rolling-scopes-school/tasks/blob/master/react/modules/tasks/nextjs-ssr-ssg.md)
 
 ## Features
 
 - **Movie Search**: Search for movies in the TMDB database
 - **Detailed View**: Click on any movie card to view detailed information with routing
 - **Pagination**: Navigate through multiple pages of results
-- **Persistent Search**: Automatically saves and restores search queries using localStorage
+- **Persistent Search**: Search queries preserved in URL parameters (search_query)
 - **Video Selection**: Select multiple video cards and download CSV of selected items (comma-separated)
 - **Theme Switching**: Toggle between dark and light themes with automatic system preference detection
-- **Data Caching**: TanStack Query for efficient data fetching, caching, and synchronization
-- **Cache Management**: Refresh buttons to control cache invalidation and force new API calls
+- **Server-Side Rendering**: Fast initial page loads with pre-rendered content
+- **Internationalization**: Multi-language support (English, Russian, Ukrainian)
 - **Loading States**: Loading spinner during data fetching
 - **Error Handling**: Error boundary with fallback UI and reset functionality
 - **Responsive Design**: Adaptive layout for different screen sizes
 - **Empty States**: User-friendly messages when no results are found
-- **Routing**: React Router for navigation between pages and detailed views
+- **Routing**: Next.js App Router for navigation between pages and detailed views
 
 ## Technology Stack
 
+- **Next.js** with App Router and Server Components
 - **React** with Functional Components and Hooks
-- **React Router** for client-side routing
-- **TanStack Query** for data fetching, caching, and server state management
+- **Server-Side Rendering** for optimal performance
 - **Zustand** for client-side state management
+- **next-intl** for internationalization
 - **TypeScript** for type safety
 - **CSS Modules** for styling (no external CSS frameworks)
-- **Vite** for build tooling
 
 ## API Access
 
@@ -65,13 +65,13 @@ npm run build
 
 ## Architecture
 
-- **Functional Components**: All components use functional architecture with React hooks
-- **Data Management**: TanStack Query for server state with caching, background updates, and data invalidation strategies
+- **Server Components**: Next.js server components for optimal performance
+- **Client Components**: React functional components with hooks for interactivity
+- **Server-Side Rendering**: Pre-rendered pages with dynamic data fetching
 - **State Management**: Zustand store with video and theme slices for client-side global state
-- **React Hooks**: useState, useEffect, useContext, and custom hooks for local state management
-- **React Router**: Client-side routing with nested routes and outlet patterns
-- **Theme System**: Automatic detection of system preference using `matchMedia('(prefers-color-scheme: dark)')`, with localStorage persistence for user selections
-- **Cache Control**: Manual cache invalidation buttons in SearchBar and DetailPage for forced data refresh
+- **App Router**: Next.js file-based routing with layouts and nested routes
+- **Theme System**: Automatic detection of system preference with localStorage persistence
+- **Internationalization**: next-intl for multi-language support with URL-based locale routing
 - **Error Boundary**: Application-wide error handling with recovery mechanism
 - **CSS Modules**: Scoped styling without external frameworks
 - **TypeScript**: Full type coverage for better development experience
@@ -86,9 +86,9 @@ npm run build
 
 ## Limitations
 
-- Configured for `en_US` locale only
+- Server-side CSV generation required for task compliance
 - No direct DOM manipulations within React components
-- Minimal external dependencies (React and React Router)
+- Minimal external dependencies (Next.js ecosystem)
 - Functional components with hooks used exclusively for state and lifecycle management
 
 ## Testing Error Handling
