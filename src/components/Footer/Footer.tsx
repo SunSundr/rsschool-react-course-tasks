@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import { TASK } from '~/constants';
+import { Link } from '~/i18n/navigation';
 import { ErrorButton } from '../ErrorButton/ErrorButton';
 import styles from './Footer.module.css';
 
@@ -8,14 +9,14 @@ export const Footer: React.FC = () => {
     <footer className={styles.footer}>
       <div className={styles.linksWrap}>
         <Image src="/github-mark.svg" alt="GitHub logo" height={32} width={32} />
-        <a className={styles.links} href={TASK.git}>
+        <Link href={TASK.git} className={styles.links} prefetch={true}>
           SunSundr/rsschool-react-course-tasks
-        </a>
+        </Link>
 
         <Image src="/rss-logo.svg" alt="RS School logo" height={32} width={32} />
-        <a className={styles.links} href="https://rs.school/">
+        <Link href="https://rs.school/" className={styles.links} prefetch={true}>
           Rolling Scopes School
-        </a>
+        </Link>
       </div>
       <ErrorButton />
     </footer>

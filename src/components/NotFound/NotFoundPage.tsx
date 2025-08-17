@@ -1,13 +1,10 @@
 'use client';
 
-import Link from 'next/link';
-import { useParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
+import { Link } from '~/i18n/navigation';
 import styles from './NotFoundPage.module.css';
 
 export default function NotFoundPage() {
-  const params = useParams();
-  const locale = (params?.locale as string) || 'en';
   const t = useTranslations('notFound');
 
   return (
@@ -20,7 +17,7 @@ export default function NotFoundPage() {
           <p>{t('message2')}</p>
           <p>{t('message3')}</p>
         </div>
-        <Link href={`/${locale}`} className={styles.homeButton}>
+        <Link href="/" className={styles.homeButton}>
           🏠 {t('homeButton')}
         </Link>
       </div>

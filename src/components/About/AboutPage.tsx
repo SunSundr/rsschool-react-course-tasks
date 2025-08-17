@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { TASK } from '~/constants';
+import { Link } from '~/i18n/navigation';
 import styles from './AboutPage.module.css';
 
 interface AboutPageProps {
@@ -49,25 +50,15 @@ export default function AboutPage({ locale }: AboutPageProps) {
           <div className={styles.taskLink}>
             <p>
               {t('taskIntro')}{' '}
-              <a
-                href={TASK?.course ?? ''}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.link}
-              >
+              <Link href={TASK?.course ?? ''} rel="noopener noreferrer" className={styles.link}>
                 {t('courseLink')}
-              </a>
+              </Link>
               :
             </p>
 
-            <a
-              href={TASK?.task ?? ''}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.link}
-            >
+            <Link href={TASK?.task ?? ''} rel="noopener noreferrer" className={styles.link}>
               📚 {t('taskLink')}
-            </a>
+            </Link>
           </div>
         </div>
       </div>
