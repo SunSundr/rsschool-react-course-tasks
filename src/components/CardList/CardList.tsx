@@ -8,6 +8,7 @@ import { BackdropSize, ImageConfiguration, PosterSize, QueryType, TMDBVideo } fr
 import { imageBaseUrl } from '~/utils/imageBaseUrl';
 import { Card } from '../Card/Card';
 import { DetailPage } from '../DetailPage/DetailPage';
+import { Empty } from '../Empty/Empty';
 import { LoadingSpinner } from '../LoadingSpinner/LoadingSpinner';
 import { Pagination } from '../Pagination/Pagination';
 import styles from './CardList.module.css';
@@ -91,6 +92,10 @@ export const CardList: React.FC<CardListNextProps> = ({
   const ids = videos.map((v) => v.id);
 
   if ((pending || isPending) && !id) return <LoadingSpinner />;
+
+  if (results.length === 0) {
+    return <Empty />;
+  }
 
   return (
     <div
