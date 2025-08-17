@@ -6,6 +6,7 @@ export const useLocalStorage = <T>(
 ): [T, (value: T | ((prevValue: T) => T)) => void] => {
   const [value, setValue] = useState<T>(() => {
     try {
+      if (typeof window === 'undefined') return initialValue;
       const storedValue = localStorage.getItem(key);
       return storedValue !== null ? JSON.parse(storedValue) : initialValue;
     } catch (error) {
