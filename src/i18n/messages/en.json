@@ -49,5 +49,16 @@
     "previous": "Previous",
     "page": "Page",
     "of": "of"
+  },
+  "empty": {
+    "title": "Sorry, nothing was found...",
+    "tip1": "Try searching for \"Avengers\"",
+    "tip2": "Try searching for \"Batman\"",
+    "tip3": "Try searching for \"Star Wars\"",
+    "tip4": "Try searching for \"Marvel\"",
+    "tip5": "Try searching for \"Disney\"",
+    "tip6": "Try searching for \"Comedy\"",
+    "tip7": "Try searching for \"Action\"",
+    "tip8": "Try searching for \"Horror\""
   }
 }
