@@ -1,4 +1,5 @@
 import { JSX } from 'react';
+import Image from 'next/image';
 import { TMDBVideo } from '~/types';
 
 export const renderImage = (
@@ -7,21 +8,46 @@ export const renderImage = (
   backdropUrl: string,
   styles: Record<string, string>,
 ): JSX.Element => {
+  const sizes = '(max-width: 9999px) 100vw';
+
   if (video.poster_path) {
     return (
-      <img src={`${posterUrl}${video.poster_path}`} alt={video.title} className={styles.image} />
+      <Image
+        src={`${posterUrl}${video.poster_path}`}
+        alt={video.title}
+        fill
+        sizes={sizes}
+        priority={true}
+        fetchPriority="low"
+        className={styles.posterImage}
+      />
     );
   }
 
   if (video.backdrop_path) {
     return (
-      <img
+      <Image
         src={`${backdropUrl}${video.backdrop_path}`}
         alt={video.title}
-        className={`${styles.image} ${styles.backdropImage}`}
+        fill
+        sizes={sizes}
+        priority={true}
+        fetchPriority="low"
+        className={styles.backdropImage}
       />
     );
   }
 
-  return <img src="/noImage.png" alt="No image available" className={styles.image} />;
+  return (
+    <Image
+      src="/noImage.png"
+      alt="No image available"
+      className={styles.image}
+      placeholder="empty"
+      priority={true}
+      fetchPriority="low"
+      fill
+      sizes={sizes}
+    />
+  );
 };

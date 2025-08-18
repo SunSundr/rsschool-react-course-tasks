@@ -1,50 +1,57 @@
-import React, { useEffect, useState } from 'react';
-import { useResetQueries } from '~/hooks/useRefreshData';
+'use client';
+
+import { useEffect, useState, useTransition } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useTranslations } from 'next-intl';
+import { PAGE_KEY, SEARCH_KEY } from '~/constants';
 import { useStore } from '~/store/store';
 import styles from './SearchBar.module.css';
 
-interface SearchBarProps {
-  onSearch: (query: string) => void;
-  onClear: () => void;
-  initialValue: string;
-  loading: boolean;
+interface SearchBarNextProps {
+  initialQuery: string;
 }
 
-export const SearchBar: React.FC<SearchBarProps> = ({
-  onSearch,
-  onClear,
-  initialValue,
-  loading,
-}) => {
-  const [query, setQuery] = useState(initialValue || '');
-  const { clearVideos } = useStore();
-
-  const { resetMoviesQueries } = useResetQueries();
+export default function SearchBar({ initialQuery }: SearchBarNextProps) {
+  const [query, setQuery] = useState(initialQuery);
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { setPending } = useStore();
+  const t = useTranslations('common');
 
   useEffect(() => {
-    setQuery(initialValue || '');
-  }, [initialValue]);
+    setPending(isPending);
+  }, [isPending, setPending]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(event.target.value);
-  };
+  const handleSearch = () => {
+    const trimmedQuery = query.trim();
+    const params = new URLSearchParams(searchParams);
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && query.trim()) {
-      handleSubmit();
+    if (trimmedQuery) {
+      params.set(SEARCH_KEY, trimmedQuery);
+    } else {
+      params.delete(SEARCH_KEY);
     }
-  };
+    params.set(PAGE_KEY, '1');
 
-  const handleSubmit = () => {
-    setQuery(query.trim());
-    onSearch(query);
-    clearVideos();
+    startTransition(() => {
+      router.push(`?${params.toString()}`);
+    });
   };
 
   const handleClear = () => {
     setQuery('');
-    clearVideos();
-    onClear();
+    const params = new URLSearchParams(searchParams);
+    params.delete('search_query');
+    params.set('page', '1');
+
+    startTransition(() => {
+      router.push(`?${params.toString()}`);
+    });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') handleSearch();
   };
 
   return (
@@ -53,31 +60,21 @@ export const SearchBar: React.FC<SearchBarProps> = ({
         <input
           type="text"
           value={query}
-          onChange={handleChange}
+          onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Search for movies..."
+          placeholder={t('search')}
           className={styles.input}
-          disabled={loading}
+          disabled={isPending}
         />
         {query && (
-          <button onClick={handleClear} className={styles.clearButton} disabled={loading}>
+          <button onClick={handleClear} className={styles.clearButton} disabled={isPending}>
             &#xD7;
           </button>
         )}
       </div>
-      <div className={styles.searchContainer}>
-        <button onClick={handleSubmit} className={styles.searchButton} disabled={loading}>
-          Search
-        </button>
-        <button
-          onClick={resetMoviesQueries}
-          className={styles.refreshButton}
-          disabled={loading}
-          title="Refresh data"
-        >
-          ↻
-        </button>
-      </div>
+      <button onClick={handleSearch} className={styles.searchButton} disabled={isPending}>
+        {t('search')}
+      </button>
     </div>
   );
-};
+}

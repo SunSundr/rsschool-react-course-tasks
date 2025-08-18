@@ -3,6 +3,7 @@
   justify-content: center;
   align-items: center;
   padding: 2rem;
+  z-index: 2000;
 }
 
 .overlay {
@@ -18,38 +19,72 @@
   bottom: 0;
 }
 
-.spinner {
-  width: 150px;
-  height: 150px;
-  border: 3px solid var(--border-light);
-  border-top: 3px solid var(--primary-main);
-  border-radius: 50%;
-  animation: spin 1.5s linear infinite;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.clock {
+  width: 120px;
+  height: 120px;
   position: relative;
-  background-color: var(--spinner-background);
 }
 
-.text {
-  font-size: 1.2rem;
-  font-weight: bold;
-  color: var(--text-primary);
-  text-align: center;
+.clockFace {
+  width: 100%;
+  height: 100%;
+  border: 3px solid var(--primary-main);
+  border-radius: 50%;
+  position: relative;
+  background-color: var(--background-paper);
 }
 
-@supports (user-select: none) {
-  .text {
-    user-select: none;
-  }
+.hourHand {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 3px;
+  height: 35px;
+  background-color: var(--text-primary);
+  transform-origin: bottom center;
+  transform: translate(-50%, -100%) rotate(0deg);
+  border-radius: 2px;
+  animation: hourRotate 2s linear infinite;
 }
 
-@keyframes spin {
+.minuteHand {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  height: 50px;
+  background-color: var(--primary-main);
+  transform-origin: bottom center;
+  transform: translate(-50%, -100%) rotate(0deg);
+  border-radius: 1px;
+  animation: minuteRotate 1s linear infinite;
+}
+
+.center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background-color: var(--primary-main);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes hourRotate {
   0% {
-    transform: rotate(0deg);
+    transform: translate(-50%, -100%) rotate(0deg);
   }
   100% {
-    transform: rotate(360deg);
+    transform: translate(-50%, -100%) rotate(360deg);
+  }
+}
+
+@keyframes minuteRotate {
+  0% {
+    transform: translate(-50%, -100%) rotate(0deg);
+  }
+  100% {
+    transform: translate(-50%, -100%) rotate(360deg);
   }
 }

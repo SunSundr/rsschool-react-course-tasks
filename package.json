@@ -2,10 +2,10 @@
   "name": "rsschool-react-app",
   "version": "1.0.0",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "eslint .",
-    "preview": "vite preview",
     "format:fix": "prettier --write .",
     "prepare": "husky",
     "test": "vitest",
@@ -13,10 +13,10 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@tanstack/react-query": "^5.84.2",
+    "next": "^15.4.6",
+    "next-intl": "^4.3.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router-dom": "^7.7.0",
     "zustand": "^5.0.7"
   },
   "devDependencies": {
@@ -27,6 +27,7 @@
     "@types/node": "^24.0.11",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
+    "@types/webpack": "^5.28.5",
     "@vitejs/plugin-react": "^4.6.0",
     "@vitest/coverage-istanbul": "^3.2.4",
     "@vitest/coverage-v8": "^3.2.4",
