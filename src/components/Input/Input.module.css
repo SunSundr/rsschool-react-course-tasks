@@ -1,0 +1,151 @@
+.inputContainer {
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.inputContainer.fullWidth {
+  width: 100%;
+}
+
+.inputWrapper {
+  position: relative;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  background-color: var(--input-background);
+  transition: all 0.2s ease;
+  padding: 1px;
+}
+
+.inputWrapper:focus-within {
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 2px var(--primary-light);
+  border: 1px solid transparent;
+}
+
+.inputWrapper.error {
+  border-color: var(--error-primary);
+}
+
+.inputWrapper.error:focus-within {
+  border-color: var(--error-primary);
+  box-shadow: 0 0 0 1px var(--error-secondary);
+}
+
+.inputWrapper.disabled {
+  background-color: var(--background-elevated);
+  border-color: var(--border-dark);
+  opacity: 0.6;
+}
+
+.inputField {
+  width: 100%;
+  padding: 16px 14px;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+  transition: all 0.2s ease;
+  padding-right: 40px;
+}
+
+.inputField::placeholder {
+  color: transparent;
+}
+
+.inputField:disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.inputLabel {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: var(--text-secondary);
+  background-color: var(--input-background);
+  padding: 0 4px;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  line-height: 1.2;
+}
+
+.inputField:focus ~ .inputLabel,
+.inputField:not(:placeholder-shown) ~ .inputLabel {
+  top: 0;
+  transform: translateY(-50%) scale(0.85);
+  color: var(--primary-light);
+}
+
+.inputField:focus ~ .inputLabel {
+  color: var(--primary-light);
+}
+
+.inputWrapper.error .inputLabel {
+  color: var(--error-primary);
+}
+
+.inputField:disabled ~ .inputLabel {
+  color: var(--text-disabled);
+}
+
+.clearButton {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.clearButton:hover {
+  color: var(--text-primary);
+  background-color: var(--hover-shadow);
+}
+
+.clearButton:active {
+  transform: translateY(-50%) scale(0.9);
+}
+
+.inputError {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.875rem;
+  color: var(--error-primary);
+  min-height: 1.25rem;  
+}
+
+.inputField[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.inputField[type="number"]::-webkit-outer-spin-button,
+.inputField[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.inputField[type="password"] {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: 0.1em;
+}
+
+.inputField[type="email"] {
+  text-transform: lowercase;
+}

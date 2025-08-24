@@ -1,0 +1,194 @@
+.button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  font-family: inherit;
+  font-weight: 500;
+  line-height: 1.2;
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  outline: none;
+  user-select: none;
+}
+
+.button:focus-visible {
+  box-shadow: 0 0 0 3px var(--hover-shadow);
+}
+
+.button--full-width {
+  width: 100%;
+}
+
+/* size */
+.button--small {
+  padding: 8px 16px;
+  font-size: 0.875rem;
+  min-height: 36px;
+}
+
+.button--medium {
+  padding: 12px 24px;
+  font-size: 1rem;
+  min-height: 44px;
+}
+
+.button--large {
+  padding: 16px 32px;
+  font-size: 1.125rem;
+  min-height: 52px;
+}
+
+/* default colors */
+.button--contained.button--default {
+  background-color: var(--primary-main);
+  color: white;
+  border-color: var(--primary-main);
+}
+
+.button--contained.button--default:hover:not(.button--disabled) {
+  background-color: var(--primary-light);
+  border-color: var(--primary-light);
+}
+
+.button--contained.button--default:active:not(.button--disabled) {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+}
+
+.button--outlined.button--default {
+  background-color: transparent;
+  color: var(--primary-main);
+  border-color: var(--primary-main);
+}
+
+.button--outlined.button--default:hover:not(.button--disabled) {
+  background-color: var(--primary-main);
+  color: white;
+}
+
+.button--outlined.button--default:active:not(.button--disabled) {
+  background-color: var(--primary-dark);
+  border-color: var(--primary-dark);
+  color: white;
+}
+
+/* error colors */
+.button--contained.button--error {
+  background-color: var(--error-primary);
+  color: white;
+  border-color: var(--error-primary);
+}
+
+.button--contained.button--error:hover:not(.button--disabled) {
+  background-color: var(--error-secondary);
+  border-color: var(--error-secondary);
+}
+
+.button--contained.button--error:active:not(.button--disabled) {
+  background-color: #d32f2f;
+  border-color: #d32f2f;
+}
+
+.button--outlined.button--error {
+  background-color: transparent;
+  color: var(--error-primary);
+  border-color: var(--error-primary);
+}
+
+.button--outlined.button--error:hover:not(.button--disabled) {
+  background-color: var(--error-primary);
+  color: white;
+}
+
+.button--outlined.button--error:active:not(.button--disabled) {
+  background-color: #d32f2f;
+  border-color: #d32f2f;
+  color: white;
+}
+
+/* warn colors */
+.button--contained.button--warn {
+  background-color: var(--warn-primary);
+  color: white;
+  border-color: var(--warn-primary);
+}
+
+.button--contained.button--warn:hover:not(.button--disabled) {
+  background-color: var(--warn-secondary);
+  border-color: var(--warn-secondary);
+}
+
+.button--contained.button--warn:active:not(.button--disabled) {
+  background-color: #f57c00;
+  border-color: #f57c00;
+}
+
+.button--outlined.button--warn {
+  background-color: transparent;
+  color: var(--warn-primary);
+  border-color: var(--warn-primary);
+}
+
+.button--outlined.button--warn:hover:not(.button--disabled) {
+  background-color: var(--warn-primary);
+  color: white;
+}
+
+.button--outlined.button--warn:active:not(.button--disabled) {
+  background-color: #f57c00;
+  border-color: #f57c00;
+  color: white;
+}
+
+/* disabled */
+.button--disabled {
+  background-color: var(--disabled-button) !important;
+  border-color: var(--border-dark) !important;
+  color: var(--text-disabled) !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
+.button--outlined.button--disabled {
+  background-color: transparent !important;
+}
+
+/* Loading */
+.button--loading {
+  cursor: wait;
+}
+
+.button--loading .button__content {
+  opacity: 0.7;
+}
+
+.button__spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid currentColor;
+  border-radius: 50%;
+  animation: button-spin 0.8s linear infinite;
+}
+
+@keyframes button-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.button__content {
+  transition: opacity 0.2s ease;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

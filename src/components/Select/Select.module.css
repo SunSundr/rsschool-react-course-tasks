@@ -1,0 +1,235 @@
+.selectContainer {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.selectContainer.fullWidth {
+  width: 100%;
+}
+
+.selectWrapper {
+  position: relative;
+  border: 1px solid var(--border-light);
+  border-radius: 4px;
+  background-color: var(--background-paper);
+  transition: all 0.2s ease;
+  padding: 0;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.selectWrapper:focus-within {
+  border-color: var(--primary-main);
+  box-shadow: 0 0 0 2px var(--hover-shadow);
+}
+
+.selectWrapper.error {
+  border-color: var(--error-primary);
+}
+
+.selectWrapper.error:focus-within {
+  border-color: var(--error-primary);
+  box-shadow: 0 0 0 2px var(--error-secondary);
+}
+
+.selectWrapper.disabled {
+  background-color: var(--background-elevated);
+  border-color: var(--border-dark);
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.selectInput {
+  width: 100%;
+  padding: 16px 14px;
+  font-size: 1rem;
+  line-height: 1.2;
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  outline: none;
+  padding-right: 60px;
+  height: 100%;
+  cursor: inherit;
+}
+
+.selectInput:read-only {
+  cursor: pointer;
+}
+
+.selectInput::placeholder {
+  color: transparent;
+}
+
+.selectInput:disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.selectLabel {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: var(--text-secondary);
+  background-color: var(--background-paper);
+  padding: 0 4px;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  line-height: 1.2;
+  z-index: 2;
+}
+
+.selectLabel.floating {
+  top: 0;
+  transform: translateY(-50%) scale(0.85);
+  color: var(--primary-main);
+}
+
+.selectWrapper:focus-within .selectLabel {
+  color: var(--primary-main);
+}
+
+.selectWrapper.error .selectLabel {
+  color: var(--error-primary);
+}
+
+.selectInput:disabled ~ .selectLabel {
+  color: var(--text-disabled);
+}
+
+.selectArrows {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  z-index: 2;
+}
+
+.clearButton {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.clearButton:hover {
+  color: var(--text-primary);
+  background-color: var(--hover-shadow);
+}
+
+.dropdownArrow {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  transition: transform 0.2s ease;
+  user-select: none;
+}
+
+.selectWrapper.open .dropdownArrow {
+  transform: rotate(180deg);
+}
+
+.up {
+  bottom: calc(100% + 10px);
+  transform-origin: bottom;
+  border-radius: 4px 4px 0 0;
+}
+
+.down {
+  top: 4rem;
+  transform-origin: top;
+  border-radius: 0 0 4px 4px;
+}
+
+.selectWrapper.open.open-up {
+  border-radius: 0 0 4px 4px;
+}
+
+.selectWrapper.open.open-down {
+  border-radius: 4px 4px 0 0;
+}
+
+.selectWrapper {
+  border-radius: 4px;
+}
+
+.selectDropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  max-height: 320px;
+  overflow-y: auto;
+  background-color: var(--background-paper);
+  border: 1px solid var(--border-light);
+  box-shadow: 0 4px 8px var(--box-shadow-color);
+  transform: scaleY(1);
+  opacity: 1;
+  transition: transform 0.2s ease, opacity 0.3s ease;
+  z-index: 1000;
+}
+
+.selectOption {
+  padding: 12px 16px;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: background-color 0.2s ease;
+}
+
+.selectOption:hover {
+  background-color: var(--background-elevated);
+}
+
+.selectOption.selected {
+  background-color: var(--primary-main);
+  color: white;
+}
+
+.selectOption:not(:last-child) {
+  border-bottom: 1px solid var(--border-light);
+}
+
+.selectError {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.875rem;
+  color: var(--error-primary);
+  min-height: 1.25rem;
+}
+
+.selectDropdown::-webkit-scrollbar {
+  width: 6px;
+}
+
+.selectDropdown::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+.selectDropdown::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+
+.selectDropdown::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+.hidden {
+  visibility: hidden;
+  transform: scaleY(0);
+  opacity: 0;
+}
