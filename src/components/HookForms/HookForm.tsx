@@ -29,7 +29,7 @@ export const HookForm = ({ onClose }: HookFormProps) => {
     setValue,
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
-    mode: 'onBlur',
+    mode: 'onChange',
   });
 
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,6 +69,7 @@ export const HookForm = ({ onClose }: HookFormProps) => {
         data: {
           ...data,
           picture: imageSrc,
+          gender: data.gender === 'male' ? 'Male' : 'Female',
         },
       }),
     );
