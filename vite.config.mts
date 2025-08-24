@@ -41,19 +41,4 @@ export default defineConfig({
       },
     },
   },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            const chname = id.toString().split('node_modules/')[1].split('/')[0].toString();
-            if (chname.includes('react') || chname.includes('scheduler')) {
-              return 'react';
-            }
-            return chname;
-          }
-        },
-      },
-    },
-  },
 });
