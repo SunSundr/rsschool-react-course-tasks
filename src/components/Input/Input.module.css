@@ -45,9 +45,14 @@
   color: var(--text-primary);
   background: transparent;
   border: none;
-  outline: none;
   transition: all 0.2s ease;
   padding-right: 40px;
+}
+
+@supports (outline: none) {
+  .inputField {
+    outline: none;
+  }
 }
 
 .inputField::placeholder {
@@ -110,7 +115,12 @@
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
-  outline: none;
+}
+
+@supports (outline: none) {
+  .clearButton {
+    outline: none;
+  }
 }
 
 .clearButton:hover {
@@ -127,25 +137,25 @@
   margin-top: 4px;
   font-size: 0.875rem;
   color: var(--error-primary);
-  min-height: 1.25rem;  
+  min-height: 1.25rem;
 }
 
-.inputField[type="number"] {
+.inputField[type='number'] {
   -moz-appearance: textfield;
   appearance: textfield;
 }
 
-.inputField[type="number"]::-webkit-outer-spin-button,
-.inputField[type="number"]::-webkit-inner-spin-button {
+.inputField[type='number']::-webkit-outer-spin-button,
+.inputField[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
 
-.inputField[type="password"] {
+.inputField[type='password'] {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   letter-spacing: 0.1em;
 }
 
-.inputField[type="email"] {
+.inputField[type='email'] {
   text-transform: lowercase;
 }

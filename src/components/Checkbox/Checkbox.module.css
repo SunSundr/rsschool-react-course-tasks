@@ -90,7 +90,12 @@
 .checkbox-text {
   font-size: 1rem;
   line-height: 1.2;
-  user-select: none;
+}
+
+@supports (user-select: none) {
+  .checkbox-text {
+    user-select: none;
+  }
 }
 
 .checkbox-label:hover .checkbox-custom {

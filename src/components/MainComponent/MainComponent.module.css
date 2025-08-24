@@ -44,7 +44,9 @@
   border-radius: 12px;
   border: 1px solid var(--border-light);
   overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .card:hover {
@@ -133,35 +135,35 @@
   .container {
     padding: 1rem;
   }
-  
+
   .header {
     flex-direction: column;
     align-items: stretch;
     text-align: center;
   }
-  
+
   .header h1 {
     font-size: 1.5rem;
   }
-  
+
   .buttonGroup {
     justify-content: center;
   }
-  
+
   .cardsContainer {
     grid-template-columns: 1fr;
   }
-  
+
   .fieldRow {
     grid-template-columns: 1fr;
   }
-  
+
   .field {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
   }
-  
+
   .value {
     text-align: left;
   }
@@ -171,11 +173,11 @@
   .container {
     padding: 0.5rem;
   }
-  
+
   .cardBody {
     padding: 1rem;
   }
-  
+
   .cardHeader {
     padding: 1rem;
   }

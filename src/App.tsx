@@ -1,11 +1,11 @@
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
-import { Main } from './components/Main/Main';
+import { MainComponent } from './components/MainComponent/MainComponent';
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Main />} />
+        <Route path="/" element={<MainComponent />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

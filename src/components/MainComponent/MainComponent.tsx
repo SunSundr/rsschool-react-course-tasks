@@ -6,9 +6,9 @@ import { Button } from '../Button/Button';
 import { HookForm } from '../HookForms/HookForm';
 import { Modal } from '../Modal/Modal';
 import { UncontrolledForm } from '../UncontrolledForm/UncontrolledForm';
-import styles from './Main.module.css';
+import styles from './MainComponent.module.css';
 
-export const Main = () => {
+export const MainComponent = () => {
   const [isUncontrolledModalOpen, setIsUncontrolledModalOpen] = useState(false);
   const [isHookModalOpen, setIsHookModalOpen] = useState(false);
   const dispatch = useDispatch();

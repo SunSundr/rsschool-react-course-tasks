@@ -58,10 +58,8 @@ export const HookForm = ({ onClose }: HookFormProps) => {
       }
       window.removeEventListener('focus', handleWindowClick);
     };
-    uploadInputRef.current.click();
-    setTimeout(() => {
-      window.addEventListener('focus', handleWindowClick);
-    }, 10);
+    uploadInputRef.current?.click();
+    setTimeout(() => window.addEventListener('focus', handleWindowClick), 10);
   };
 
   const onSubmit = (data: FormValues) => {

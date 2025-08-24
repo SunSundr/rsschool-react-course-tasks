@@ -13,8 +13,18 @@
   text-align: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  outline: none;
-  user-select: none;
+}
+
+@supports (outline: none) {
+  .button {
+    outline: none;
+  }
+}
+
+@supports (user-select: none) {
+  .button {
+    user-select: none;
+  }
 }
 
 .button:focus-visible {

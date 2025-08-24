@@ -49,10 +49,15 @@
   color: var(--text-primary);
   background: transparent;
   border: none;
-  outline: none;
   padding-right: 60px;
   height: 100%;
   cursor: inherit;
+}
+
+@supports (outline: none) {
+  .selectInput {
+    outline: none;
+  }
 }
 
 .selectInput:read-only {
@@ -137,7 +142,12 @@
   color: var(--text-secondary);
   font-size: 0.8rem;
   transition: transform 0.2s ease;
-  user-select: none;
+}
+
+@supports (user-select: none) {
+  .dropdownArrow {
+    user-select: none;
+  }
 }
 
 .selectWrapper.open .dropdownArrow {
@@ -179,7 +189,9 @@
   box-shadow: 0 4px 8px var(--box-shadow-color);
   transform: scaleY(1);
   opacity: 1;
-  transition: transform 0.2s ease, opacity 0.3s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.3s ease;
   z-index: 1000;
 }
 

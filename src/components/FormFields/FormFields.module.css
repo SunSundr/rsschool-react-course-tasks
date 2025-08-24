@@ -85,19 +85,19 @@
   .leftColumn {
     width: 100%;
   }
-  
+
   .rightColumn {
     order: -1;
   }
-  
+
   .rowWrapper {
     flex-direction: column;
   }
-  
+
   .avatarSection {
     max-width: 100%;
   }
-  
+
   .imagePreview {
     width: 100px;
     height: 100px;

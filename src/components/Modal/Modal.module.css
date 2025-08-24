@@ -16,8 +16,18 @@
   border-radius: 8px;
   box-shadow: 0 4px 20px var(--box-shadow-color);
   width: min(800px, 90vw);
-  outline: none;
-  user-select: none;
+}
+
+@supports (outline: none) {
+  .modalContent {
+    outline: none;
+  }
+}
+
+@supports (user-select: none) {
+  .modalContent {
+    user-select: none;
+  }
 }
 
 .modalHeader {
@@ -63,11 +73,11 @@
     width: 95vw;
     margin: 1rem;
   }
-  
+
   .modalHeader {
     padding: 1rem;
   }
-  
+
   .modalBody {
     padding: 1rem;
   }
@@ -80,7 +90,7 @@
     margin: 0;
     border-radius: 0;
   }
-  
+
   .modalBackdrop {
     padding: 0;
   }

@@ -25,10 +25,10 @@ export default defineConfig({
       exclude: [
         'src/index.tsx',
         'src/App.tsx',
+        'src/Main.tsx',
         'src/types.ts',
-        'src/constants.ts',
+        'src/__tests__/**/*.*',
         'src/**/*.d.ts',
-        'src/__tests__/**/*.ts',
       ],
       all: true,
       thresholds: {
