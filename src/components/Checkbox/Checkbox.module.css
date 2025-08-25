@@ -1,0 +1,116 @@
+.checkbox-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.checkbox-container.full-width {
+  width: 100%;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  color: var(--text-primary);
+  transition: color 0.2s ease;
+}
+
+.checkbox-label:hover {
+  color: var(--primary-main);
+}
+
+.checkbox-label.disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.checkbox-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkbox-custom {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-light);
+  border-radius: 4px;
+  background-color: var(--background-paper);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkbox-input:checked ~ .checkbox-custom {
+  background-color: var(--primary-main);
+  border-color: var(--primary-main);
+}
+
+.checkbox-input:checked ~ .checkbox-custom::after {
+  content: '';
+  width: 6px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  position: relative;
+  top: -1px;
+}
+
+.checkbox-input:focus ~ .checkbox-custom {
+  border-color: var(--primary-main);
+  box-shadow: 0 0 0 2px var(--hover-shadow);
+}
+
+.checkbox-input:disabled ~ .checkbox-custom {
+  background-color: var(--background-elevated);
+  border-color: var(--border-dark);
+  opacity: 0.6;
+}
+
+.checkbox-input:checked:disabled ~ .checkbox-custom {
+  background-color: var(--primary-light);
+  border-color: var(--primary-light);
+}
+
+.checkbox-input:checked:disabled ~ .checkbox-custom::after {
+  border-color: var(--text-disabled);
+}
+
+.checkbox-text {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+@supports (user-select: none) {
+  .checkbox-text {
+    user-select: none;
+  }
+}
+
+.checkbox-label:hover .checkbox-custom {
+  border-color: var(--primary-main);
+}
+
+.checkbox-label.disabled .checkbox-text {
+  color: var(--text-disabled);
+}
+
+.checkbox-error {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.875rem;
+  color: var(--error-primary);
+  min-height: 1.25rem;
+  margin-left: 32px;
+}
