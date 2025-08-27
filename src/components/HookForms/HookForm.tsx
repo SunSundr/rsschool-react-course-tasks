@@ -27,6 +27,7 @@ export const HookForm = ({ onClose }: HookFormProps) => {
     formState: { errors, isValid, isSubmitting },
     trigger,
     setValue,
+    watch,
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
     mode: 'onChange',
@@ -84,6 +85,7 @@ export const HookForm = ({ onClose }: HookFormProps) => {
         errors={errors}
         trigger={trigger}
         setValue={setValue}
+        watch={watch}
         file={file}
         imageSrc={imageSrc}
         onFileChange={onFileChange}

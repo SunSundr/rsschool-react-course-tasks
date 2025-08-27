@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { UseFormWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
 import { FormType, FormValues } from '~/types';
@@ -18,10 +19,19 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
   const dispatch = useDispatch();
   const { countries } = useSelector((state: RootState) => state.form);
   const [errors, setErrors] = useState<Record<string, { message?: string }>>({});
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [showPasswordStrength, setShowPasswordStrength] = useState(false);
 
   const [file, setFile] = useState<File>();
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
+
+  const mockWatch = ((fieldName: keyof FormValues) => {
+    if (fieldName === 'password' && showPasswordStrength) {
+      return currentPassword;
+    }
+    return '';
+  }) as UseFormWatch<FormValues>;
 
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -61,6 +71,9 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
       country: formData.get('country') as string,
     };
 
+    setCurrentPassword(data.password);
+    setShowPasswordStrength(true);
+
     try {
       await schema.validate(data, { abortEarly: false });
       dispatch(
@@ -86,6 +99,7 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
     <form ref={formRef} onSubmit={handleSubmit}>
       <FormFields
         errors={errors}
+        watch={showPasswordStrength ? mockWatch : undefined}
         file={file}
         imageSrc={imageSrc}
         onFileChange={onFileChange}

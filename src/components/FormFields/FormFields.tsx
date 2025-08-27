@@ -1,7 +1,14 @@
-import { FieldErrors, UseFormRegister, UseFormSetValue, UseFormTrigger } from 'react-hook-form';
+import {
+  FieldErrors,
+  UseFormRegister,
+  UseFormSetValue,
+  UseFormTrigger,
+  UseFormWatch,
+} from 'react-hook-form';
 import { FormValues } from '~/types';
+import { checkPasswordStrength } from '~/utils/passwordStrength';
 import { Button } from '../Button/Button';
-import Checkbox from '../Checkbox/Checkbox';
+import { Checkbox } from '../Checkbox/Checkbox';
 import { Input } from '../Input/Input';
 import { Select } from '../Select/Select';
 import styles from './FormFields.module.css';
@@ -11,6 +18,7 @@ interface FormFieldsProps {
   errors?: FieldErrors<FormValues> | Record<string, { message?: string }>;
   trigger?: UseFormTrigger<FormValues>;
   setValue?: UseFormSetValue<FormValues>;
+  watch?: UseFormWatch<FormValues>;
   file?: File | null;
   imageSrc: string | null;
   onFileChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -24,6 +32,7 @@ export const FormFields: React.FC<FormFieldsProps> = ({
   errors,
   trigger,
   setValue,
+  watch,
   file,
   imageSrc,
   onFileChange,
@@ -31,6 +40,28 @@ export const FormFields: React.FC<FormFieldsProps> = ({
   uploadInputRef,
   countries,
 }) => {
+  const renderPasswordStrength = () => {
+    const password = watch ? watch('password') || '' : '';
+    const strength = checkPasswordStrength(password);
+    return (
+      <div className={styles.strengthIndicator}>
+        <div className={styles.strengthBar}>
+          <div
+            className={styles.strengthFill}
+            style={{
+              width: `${(strength.score / 5) * 100}%`,
+              backgroundColor: strength.color,
+            }}
+          />
+        </div>
+        {password && (
+          <span className={styles.strengthLabel} style={{ color: strength.color }}>
+            {strength.label}
+          </span>
+        )}
+      </div>
+    );
+  };
   const commonInputProps = (name: keyof FormValues, type: React.HTMLInputTypeAttribute | null) => ({
     id: name,
     label: name.charAt(0).toUpperCase() + name.slice(1),
@@ -40,14 +71,16 @@ export const FormFields: React.FC<FormFieldsProps> = ({
     ...(type && type !== 'checkbox' && { fixedHeight: true }),
     ...(register ? register(name) : { name }),
     onBlur: register && trigger ? () => trigger(name) : undefined,
-    onClear:
-      trigger && setValue
-        ? () => {
-            console.log(name);
-            setValue(name, '');
-            trigger(name);
-          }
-        : undefined,
+    ...(type &&
+      type !== 'checkbox' && {
+        onClear:
+          trigger && setValue
+            ? () => {
+                setValue(name, '');
+                trigger(name);
+              }
+            : undefined,
+      }),
   });
 
   const genderOptions = [
@@ -66,22 +99,7 @@ export const FormFields: React.FC<FormFieldsProps> = ({
         <div className={styles.leftColumn}>
           <Input {...commonInputProps('name', 'text')} />
           <Input {...commonInputProps('email', 'email')} />
-          <Input
-            {...commonInputProps('age', 'text')}
-            onChange={(v) => {
-              setTimeout(() => {
-                const val = v.target.value.replace(/\D/g, '');
-                if (val !== v.target.value) {
-                  v.target.value = val;
-                  return;
-                }
-                if (setValue && trigger) {
-                  setValue('age', Number(val));
-                  trigger('age');
-                }
-              }, 0);
-            }}
-          />
+          <Input {...commonInputProps('age', 'number')} />
         </div>
 
         <div className={styles.rightColumn}>
@@ -146,7 +164,10 @@ export const FormFields: React.FC<FormFieldsProps> = ({
       </div>
 
       <div className={styles.rowWrapper}>
-        <Input {...commonInputProps('password', 'password')} />
+        <div className={styles.passwordField}>
+          <Input {...commonInputProps('password', 'password')} />
+          {renderPasswordStrength()}
+        </div>
         <Input {...commonInputProps('confirmPassword', 'password')} label="Confirm Password" />
       </div>
 
