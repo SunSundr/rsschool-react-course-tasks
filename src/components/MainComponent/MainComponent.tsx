@@ -28,13 +28,10 @@ export const MainComponent = () => {
       <div className={styles.header}>
         <h1>Form Submissions</h1>
         <div className={styles.buttonGroup}>
-          <Button
-            onClick={() => setIsUncontrolledModalOpen(true)}
-            {...{ style: { minWidth: '200px' } }}
-          >
+          <Button onClick={() => setIsUncontrolledModalOpen(true)} className={styles.mainButtons}>
             Uncontrolled Form
           </Button>
-          <Button onClick={() => setIsHookModalOpen(true)} {...{ style: { minWidth: '200px' } }}>
+          <Button onClick={() => setIsHookModalOpen(true)} className={styles.mainButtons}>
             Hook Form
           </Button>
         </div>

@@ -1,0 +1,5 @@
+{
+  "color-picker-universal.languages": ["*", "!css", "!scss"],
+  "color-picker-universal.disable": false,
+  "eslint.validate": ["css"]
+}

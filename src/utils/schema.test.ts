@@ -103,24 +103,20 @@ describe('Form Validation Schema', () => {
     });
 
     test('should reject password without required character types', async () => {
-      // No uppercase
-      await expect(schema.validateAt('password', { password: 'lowercase1!' })).rejects.toThrow(
-        'Password must contain 1 number, 1 uppercase, 1 lowercase, and 1 special character',
-      );
-
-      // No lowercase
-      await expect(schema.validateAt('password', { password: 'UPPERCASE1!' })).rejects.toThrow(
-        'Password must contain 1 number, 1 uppercase, 1 lowercase, and 1 special character',
-      );
-
-      // No number
       await expect(schema.validateAt('password', { password: 'NoNumber!' })).rejects.toThrow(
-        'Password must contain 1 number, 1 uppercase, 1 lowercase, and 1 special character',
+        'Password must contain: 1\u00A0number',
       );
-
-      // No special character
+      await expect(schema.validateAt('password', { password: 'UPPERCASE1!' })).rejects.toThrow(
+        'Password must contain: 1\u00A0lowercase\u00A0letter',
+      );
+      await expect(schema.validateAt('password', { password: 'lowercase1!' })).rejects.toThrow(
+        'Password must contain: 1\u00A0uppercase\u00A0letter',
+      );
       await expect(schema.validateAt('password', { password: 'NoSpecial1' })).rejects.toThrow(
-        'Password must contain 1 number, 1 uppercase, 1 lowercase, and 1 special character',
+        'Password must contain: 1\u00A0special\u00A0character',
+      );
+      await expect(schema.validateAt('password', { password: '12345678' })).rejects.toThrow(
+        'Password must contain: 1\u00A0lowercase\u00A0letter, 1\u00A0uppercase\u00A0letter, 1\u00A0special\u00A0character',
       );
     });
 

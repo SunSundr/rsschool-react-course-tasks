@@ -1,4 +1,11 @@
-import React, { InputHTMLAttributes, useEffect, useRef, useState } from 'react';
+import {
+  InputHTMLAttributes,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import styles from './Select.module.css';
 
 interface SelectOption {
@@ -44,15 +51,38 @@ export const Select = ({
   const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
   const wrapperRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const selectedRef = useRef<HTMLInputElement>(null);
+  useImperativeHandle(ref, () => {
+    return inputRef.current as HTMLInputElement;
+  });
   const hasValue = selectedValue !== '' || inputValue !== '';
 
-  useEffect(() => {
-    setSelectedValue(value || '');
-    if (!autoComplete && value) {
-      const selected = options.find((opt) => opt.value === value);
-      setInputValue(selected?.label || '');
-    }
-  }, [value, options, autoComplete]);
+  const [scroll, setScroll] = useState(false);
+  const scrollTimer = useRef<NodeJS.Timeout>(undefined);
+
+  const handleTouchEnd = useCallback(() => {
+    clearTimeout(scrollTimer.current);
+    scrollTimer.current = setTimeout(() => setScroll(false), 100);
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    setScroll(true);
+    if (inputRef.current && document.activeElement !== inputRef.current) inputRef.current.focus();
+    clearTimeout(scrollTimer.current);
+    scrollTimer.current = setTimeout(() => setScroll(false), 350);
+  }, []);
+
+  const closeOptions = (value: string) => {
+    setSelectedValue(value);
+    setIsOpen(false);
+    onChange?.(value);
+    inputRef.current?.blur();
+  };
+
+  const handleSelectOption = (option: SelectOption) => {
+    setInputValue(option.label);
+    closeOptions(option.value);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
@@ -62,51 +92,53 @@ export const Select = ({
       const filtered = options.filter((opt) =>
         opt.label.toLowerCase().includes(newValue.toLowerCase()),
       );
+      if (filtered.length === 0) {
+        setFilteredOptions(options);
+        return;
+      }
       setFilteredOptions(filtered);
+      if (filtered.length === 1 && filtered[0].label === newValue) {
+        setIsOpen(false);
+        setSelectedValue(newValue);
+        onChange?.(newValue);
+      }
     } else {
       setFilteredOptions(options);
     }
-    setSelectedValue('');
-    onChange?.(newValue);
-  };
-
-  const handleSelectOption = (option: SelectOption) => {
-    setInputValue(option.label);
-    setSelectedValue(option.value);
-    setIsOpen(false);
-    onChange?.(option.value);
   };
 
   const handleClear = () => {
     setInputValue('');
     setSelectedValue('');
     setFilteredOptions(options);
-    onChange?.('');
     onClear?.();
-    setIsOpen(false);
+    closeOptions('');
   };
 
   const handleFocus = () => {
     setTimeout(() => {
-      if (!isOpen) setIsOpen(true);
-    }, 200);
+      selectedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
   };
 
   const handleClick = () => {
     setIsOpen(!isOpen);
-    isOpen ? inputRef.current?.blur() : inputRef.current?.focus();
+    setFilteredOptions(options);
+    isOpen ? closeOptions(inputValue) : inputRef.current?.focus();
   };
 
   const handleClickOutside = (event: MouseEvent) => {
-    if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
-      setIsOpen(false);
+    if (isOpen && wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
+      closeOptions(inputValue);
     }
   };
 
   useEffect(() => {
     document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, inputValue]);
 
   return (
     <div
@@ -120,7 +152,7 @@ export const Select = ({
         onClick={handleClick}
       >
         <input
-          ref={ref}
+          ref={inputRef}
           type="text"
           id={selectId}
           className={styles.selectInput}
@@ -168,17 +200,22 @@ export const Select = ({
 
       {filteredOptions.length > 0 && (
         <div
-          className={`${styles.selectDropdown} ${styles[direction]} ${isOpen ? '' : styles.hidden}`}
+          className={`${styles.selectDropdown} ${styles[direction]}
+            ${isOpen ? '' : styles.hidden} ${scroll ? styles.disableScrollSnap : ''}`}
+          onScroll={handleScroll}
+          onTouchEnd={handleTouchEnd}
         >
-          {filteredOptions.map((option) => (
-            <div
-              key={option.value}
-              className={`${styles.selectOption} ${selectedValue === option.value ? styles.selected : ''}`}
-              onClick={() => handleSelectOption(option)}
-            >
-              {option.label}
-            </div>
-          ))}
+          {isOpen &&
+            filteredOptions.map((option) => (
+              <div
+                key={option.value}
+                ref={option.value === selectedValue ? selectedRef : null}
+                className={`${styles.selectOption} ${selectedValue === option.value ? styles.selected : ''}`}
+                onClick={() => handleSelectOption(option)}
+              >
+                {option.label}
+              </div>
+            ))}
         </div>
       )}
     </div>

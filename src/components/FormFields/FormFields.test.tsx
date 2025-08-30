@@ -54,7 +54,7 @@ vi.mock('../Button/Button', () => ({
 }));
 
 vi.mock('../Checkbox/Checkbox', () => ({
-  Checkbox: vi.fn(({ label, onClear, fullWidth, ...props }) => (
+  Checkbox: vi.fn(({ label, onClear, fullWidth, fixedHeight, ...props }) => (
     <input type="checkbox" data-testid="checkbox-terms" aria-label={label} {...props} />
   )),
 }));

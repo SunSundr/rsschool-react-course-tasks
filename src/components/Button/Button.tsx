@@ -7,11 +7,9 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean;
   loading?: boolean;
   size?: 'small' | 'medium' | 'large';
-  ref?: React.Ref<HTMLButtonElement | null>;
 }
 
 export const Button = ({
-  ref,
   color = 'default',
   variant = 'contained',
   fullWidth = false,
@@ -36,11 +34,9 @@ export const Button = ({
     .join(' ');
 
   return (
-    <button ref={ref} className={buttonClasses} disabled={disabled || loading} {...props}>
+    <button className={buttonClasses} disabled={disabled || loading} {...props}>
       {loading && <span className={styles.button__spinner}></span>}
       <span className={styles.button__content}>{children}</span>
     </button>
   );
 };
-
-Button.displayName = 'Button';

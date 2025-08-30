@@ -46,7 +46,6 @@
   background: transparent;
   border: none;
   transition: all 0.2s ease;
-  padding-right: 40px;
 }
 
 @supports (outline: none) {
@@ -97,24 +96,61 @@
   color: var(--text-disabled);
 }
 
-.clearButton {
+.inputWrapper.error .inputField {
+  caret-color: var(--error-secondary);
+}
+
+.controlButtonsWrapper {
   position: absolute;
-  right: 8px;
+  right: 6px;
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+}
+
+.clearButton {
   background: none;
   border: none;
   color: var(--text-secondary);
-  font-size: 1.5rem;
+  font-size: 1.54rem;
   cursor: pointer;
   padding: 4px;
   border-radius: 50%;
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
+  line-height: 1.3rem;
+  transition: all 0.2s ease;
+}
+
+.showPassword {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0 !important;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.2s ease;
+}
+
+.showPassword:hover {
+  color: var(--text-primary);
+  background-color: var(--hover-shadow);
+}
+
+.showPassword:active {
+  transform: scale(0.75);
+}
+
+.showPassword svg {
+  width: 18px;
+  height: 18px;
 }
 
 @supports (outline: none) {
@@ -129,7 +165,12 @@
 }
 
 .clearButton:active {
-  transform: translateY(-50%) scale(0.9);
+  transform: scale(0.75);
+}
+
+.inputField[type='password'],
+.inputField[type='text'] {
+  padding-right: 44px;
 }
 
 .inputError {

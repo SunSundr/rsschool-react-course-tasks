@@ -5,42 +5,41 @@ interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'typ
   label?: string;
   error?: string;
   fullWidth?: boolean;
-  ref?: React.Ref<HTMLInputElement | null>;
+  fixedHeight?: boolean;
 }
 
 export const Checkbox = ({
-  ref,
   id,
   label,
   className = '',
   error,
   disabled,
+  fixedHeight = false,
   fullWidth = true,
   ...props
 }: CheckboxProps) => {
   const checkboxId = id || label?.toLowerCase().replace(/\s+/g, '-');
   return (
     <div
-      className={`${styles['checkbox-container']} ${fullWidth ? styles['full-width'] : ''} ${className}`}
+      className={`${styles.checkboxContainer} ${fullWidth ? styles.fullWidth : ''} ${className}`}
     >
       <label
         htmlFor={checkboxId}
-        className={`${styles['checkbox-label']} ${disabled ? styles.disabled : ''}`}
+        className={`${styles.checkboxLabel} ${disabled ? styles.disabled : ''}`}
       >
-        <div className={styles['checkbox-wrapper']}>
+        <div className={styles.checkboxWrapper}>
           <input
-            ref={ref}
             id={checkboxId}
             type="checkbox"
-            className={styles['checkbox-input']}
+            className={styles.checkboxInput}
             disabled={disabled}
             {...props}
           />
-          <span className={styles['checkbox-custom']}></span>
+          <span className={styles.checkboxCustom}></span>
         </div>
-        {label && <span className={styles['checkbox-text']}>{label}</span>}
+        {label && <span className={styles.checkboxText}>{label}</span>}
       </label>
-      {error && <span className={styles['checkbox-error']}>{error}</span>}
+      {(error || fixedHeight) && <span className={styles.checkboxError}>{error}</span>}
     </div>
   );
 };

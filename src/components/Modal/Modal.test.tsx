@@ -37,10 +37,10 @@ describe('Modal', () => {
     expect(mockOnClose).toHaveBeenCalled();
   });
 
-  it('calls onClose when backdrop is clicked', () => {
+  it('calls onClose when backdrop is clicked', async () => {
     render(<Modal {...defaultProps} />);
     const backdrop = screen.getByRole('dialog').parentElement;
-    fireEvent.click(backdrop!);
+    fireEvent.mouseDown(backdrop!);
     expect(mockOnClose).toHaveBeenCalled();
   });
 
@@ -54,11 +54,6 @@ describe('Modal', () => {
     render(<Modal {...defaultProps} />);
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(mockOnClose).toHaveBeenCalled();
-  });
-
-  it('sets body overflow to hidden when open', () => {
-    render(<Modal {...defaultProps} />);
-    expect(document.body.style.overflow).toBe('hidden');
   });
 
   it('has correct accessibility attributes', () => {

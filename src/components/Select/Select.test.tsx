@@ -39,8 +39,8 @@ describe('Select', () => {
     render(<Select options={mockOptions} autoComplete />);
     const input = screen.getByRole('textbox');
 
-    fireEvent.change(input, { target: { value: '1' } });
     fireEvent.click(input);
+    fireEvent.change(input, { target: { value: '1' } });
 
     expect(screen.getByText('Option 1')).toBeInTheDocument();
     expect(screen.queryByText('Option 2')).not.toBeInTheDocument();

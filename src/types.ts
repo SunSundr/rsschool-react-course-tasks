@@ -11,7 +11,7 @@ export interface FormValues {
   confirmPassword: string;
   gender: string;
   terms: boolean;
-  picture: File;
+  picture: File | null;
   country: string;
   type?: FormType;
 }

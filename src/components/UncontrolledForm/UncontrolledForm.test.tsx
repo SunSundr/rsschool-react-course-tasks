@@ -75,20 +75,6 @@ describe('UncontrolledForm', () => {
     expect(mockOnClose).toHaveBeenCalled();
   });
 
-  it('handles file selection', async () => {
-    const { getBase64 } = await import('../../utils/getBase64');
-    renderWithProvider(<UncontrolledForm onClose={mockOnClose} />);
-
-    const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
-    const fileInput = screen.getByTestId('file-input');
-
-    fireEvent.change(fileInput, { target: { files: [file] } });
-
-    await waitFor(() => {
-      expect(getBase64).toHaveBeenCalledWith(file);
-    });
-  });
-
   it('submits form with valid data', async () => {
     const { schema } = await import('~/utils/schema');
     (schema.validate as Mock).mockResolvedValue({});

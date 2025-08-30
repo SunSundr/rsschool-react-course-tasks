@@ -28,6 +28,6 @@ describe('Checkbox', () => {
 
   it('applies fullWidth class by default', () => {
     const { container } = render(<Checkbox label="Test" />);
-    expect((container.firstChild as HTMLElement).className).toMatch('full-width');
+    expect((container.firstChild as HTMLElement).className).toMatch('fullWidth');
   });
 });

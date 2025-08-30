@@ -21,7 +21,6 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
   const [errors, setErrors] = useState<Record<string, { message?: string }>>({});
   const [currentPassword, setCurrentPassword] = useState('');
   const [showPasswordStrength, setShowPasswordStrength] = useState(false);
-
   const [file, setFile] = useState<File>();
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
@@ -38,10 +37,8 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
     if (files && files.length > 0) {
       const file = files[0];
       setFile(file);
-      setImageSrc((await getBase64(file)) as string);
     } else {
       setFile(undefined);
-      setImageSrc(null);
     }
   };
 
@@ -75,11 +72,13 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
     setShowPasswordStrength(true);
 
     try {
+      const img64 = file ? ((await getBase64(file)) as string) : null;
+      setImageSrc(img64);
       await schema.validate(data, { abortEarly: false });
       dispatch(
         setFormData({
           type: FormType.uncontrolled,
-          data: { ...data, picture: imageSrc },
+          data: { ...data, picture: img64 },
         }),
       );
       setErrors({});
@@ -115,7 +114,7 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
           onClick={onCancel}
           color="warn"
           size="medium"
-          {...{ style: { minWidth: '160px' } }}
+          className="btn"
         >
           Cancel
         </Button>
@@ -126,7 +125,7 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
           color="default"
           size="medium"
           fullWidth
-          {...{ style: { minWidth: '160px' } }}
+          className="btn"
         >
           Submit
         </Button>

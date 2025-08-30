@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   FieldErrors,
   UseFormRegister,
@@ -7,6 +8,7 @@ import {
 } from 'react-hook-form';
 import { FormValues } from '~/types';
 import { checkPasswordStrength } from '~/utils/passwordStrength';
+import Avatar from '../../assets/avatar.svg?react';
 import { Button } from '../Button/Button';
 import { Checkbox } from '../Checkbox/Checkbox';
 import { Input } from '../Input/Input';
@@ -40,6 +42,7 @@ export const FormFields: React.FC<FormFieldsProps> = ({
   uploadInputRef,
   countries,
 }) => {
+  const [dragHover, setDragHover] = useState(false);
   const renderPasswordStrength = () => {
     const password = watch ? watch('password') || '' : '';
     const strength = checkPasswordStrength(password);
@@ -70,7 +73,7 @@ export const FormFields: React.FC<FormFieldsProps> = ({
     ...(type && type !== 'checkbox' && { showClearButton: true }),
     ...(type && type !== 'checkbox' && { fixedHeight: true }),
     ...(register ? register(name) : { name }),
-    onBlur: register && trigger ? () => trigger(name) : undefined,
+    onBlur: type && register && trigger ? () => trigger(name) : undefined,
     ...(type &&
       type !== 'checkbox' && {
         onClear:
@@ -86,12 +89,54 @@ export const FormFields: React.FC<FormFieldsProps> = ({
   const genderOptions = [
     { value: 'male', label: 'Male' },
     { value: 'female', label: 'Female' },
+    { value: 'other', label: 'Other' },
   ];
 
   const countryOptions = countries.map((country) => ({
     value: country,
     label: country,
   }));
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = e.dataTransfer.files;
+    if (files && files.length === 1) {
+      onFileChange?.({ target: { files } } as React.ChangeEvent<HTMLInputElement>);
+      if (trigger) {
+        trigger('picture');
+      } else if (uploadInputRef?.current) {
+        uploadInputRef.current.files = files;
+        uploadInputRef.current.value = files[0].name;
+      }
+    }
+  };
+
+  const handleDropClear = () => {
+    onFileChange?.({ target: { files: null } } as React.ChangeEvent<HTMLInputElement>);
+    if (trigger) {
+      trigger('picture');
+    } else if (uploadInputRef?.current) {
+      uploadInputRef.current.files = null;
+      uploadInputRef.current.value = '';
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragHover(true);
+  };
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragHover(true);
+  };
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragHover(false);
+  };
 
   return (
     <div className={styles.formContainer}>
@@ -110,25 +155,51 @@ export const FormFields: React.FC<FormFieldsProps> = ({
               type="file"
               id="picture"
               {...(register ? register('picture') : { name: 'picture' })}
+              ref={uploadInputRef}
               accept="image/jpeg, image/png"
               onChange={onFileChange}
-              ref={uploadInputRef}
             />
             <Button
               type="button"
               variant="outlined"
-              color="default"
+              color={errors?.picture ? 'error' : 'default'}
               onClick={onSelectPicture}
               fullWidth
               size="small"
             >
               {file ? file.name : 'Select File'}
             </Button>
-            {!errors?.picture && imageSrc && (
-              <div className={styles.imagePreview}>
+
+            {imageSrc && !errors?.picture ? (
+              <div
+                className={styles.imagePreview}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDragEnd={handleDropClear}
+              >
                 <img src={imageSrc} alt="Preview" />
               </div>
+            ) : (
+              <div
+                className={`${styles.imagePreview} ${dragHover ? styles.dragHover : ''}`}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+              >
+                <div className={styles.avatarWrapper}>
+                  <Avatar className={styles.avatar} />
+                  <span>
+                    Drag and Drop image file
+                    <br />
+                    here
+                  </span>
+                </div>
+              </div>
             )}
+
             {errors?.picture && <p className={styles.error}>{errors.picture.message}</p>}
           </div>
         </div>
@@ -165,10 +236,14 @@ export const FormFields: React.FC<FormFieldsProps> = ({
 
       <div className={styles.rowWrapper}>
         <div className={styles.passwordField}>
-          <Input {...commonInputProps('password', 'password')} />
+          <Input {...commonInputProps('password', 'password')} autoComplete="off" />
           {renderPasswordStrength()}
         </div>
-        <Input {...commonInputProps('confirmPassword', 'password')} label="Confirm Password" />
+        <Input
+          {...commonInputProps('confirmPassword', 'password')}
+          label="Confirm Password"
+          autoComplete="off"
+        />
       </div>
 
       <div className={styles.checkboxWrapper}>
@@ -176,6 +251,7 @@ export const FormFields: React.FC<FormFieldsProps> = ({
           {...commonInputProps('terms', 'checkbox')}
           label="Accept Terms and Conditions"
           fullWidth={false}
+          fixedHeight={true}
         />
       </div>
     </div>

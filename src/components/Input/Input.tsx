@@ -1,4 +1,6 @@
 import { InputHTMLAttributes, useState } from 'react';
+import EyeOff from '../../assets/eye-off.svg?react';
+import EyeOn from '../../assets/eye-on.svg?react';
 import styles from './Input.module.css';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -27,6 +29,7 @@ export const Input = ({
   ...props
 }: InputProps) => {
   const [internalValue, setInternalValue] = useState(value || '');
+  const [inputType, setInputType] = useState(type);
   const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
   const isControlled = value !== undefined;
   const displayValue = isControlled ? value : internalValue;
@@ -55,29 +58,44 @@ export const Input = ({
         <input
           ref={ref}
           id={inputId}
-          type={type}
+          type={inputType}
           className={styles.inputField}
           placeholder=" "
           value={displayValue}
           onChange={handleChange}
           {...props}
+          style={{ paddingRight: type === 'password' && hasValue ? '64px' : '36px' }}
         />
         {label && (
           <label htmlFor={inputId} className={styles.inputLabel}>
             {label}
           </label>
         )}
-        {showClearButton && hasValue && !props.disabled && (
-          <button
-            type="button"
-            className={styles.clearButton}
-            onClick={handleClear}
-            aria-label="Clear input"
-          >
-            &#215;
-          </button>
-        )}
+
+        <div className={styles.controlButtonsWrapper}>
+          {hasValue && !props.disabled && type === 'password' && (
+            <button
+              type="button"
+              className={styles.showPassword}
+              onClick={() => setInputType(inputType === 'password' ? 'text' : 'password')}
+              aria-label={inputType === 'password' ? 'Show password' : 'Hide password'}
+            >
+              {inputType === 'password' ? <EyeOn /> : <EyeOff />}
+            </button>
+          )}
+          {showClearButton && hasValue && !props.disabled && (
+            <button
+              type="button"
+              className={styles.clearButton}
+              onClick={handleClear}
+              aria-label="Clear input"
+            >
+              &#215;
+            </button>
+          )}
+        </div>
       </div>
+
       {(fixedHeight || error) && <span className={styles.inputError}>{error}</span>}
     </div>
   );
