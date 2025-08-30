@@ -25,6 +25,8 @@ interface FormFieldsProps {
   imageSrc: string | null;
   onFileChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSelectPicture?: () => void;
+  handleDrop?: (e: React.DragEvent<HTMLDivElement>) => void;
+  handleDropClear?: () => void;
   uploadInputRef?: React.RefObject<HTMLInputElement | null>;
   countries: string[];
 }
@@ -39,6 +41,8 @@ export const FormFields: React.FC<FormFieldsProps> = ({
   imageSrc,
   onFileChange,
   onSelectPicture,
+  handleDrop,
+  handleDropClear,
   uploadInputRef,
   countries,
 }) => {
@@ -97,41 +101,17 @@ export const FormFields: React.FC<FormFieldsProps> = ({
     label: country,
   }));
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const files = e.dataTransfer.files;
-    if (files && files.length === 1) {
-      onFileChange?.({ target: { files } } as React.ChangeEvent<HTMLInputElement>);
-      if (trigger) {
-        trigger('picture');
-      } else if (uploadInputRef?.current) {
-        uploadInputRef.current.files = files;
-        uploadInputRef.current.value = files[0].name;
-      }
-    }
+  const handleDropFile = (e: React.DragEvent<HTMLDivElement>) => {
+    handleDrop?.(e);
+    setDragHover(false);
   };
 
-  const handleDropClear = () => {
-    onFileChange?.({ target: { files: null } } as React.ChangeEvent<HTMLInputElement>);
-    if (trigger) {
-      trigger('picture');
-    } else if (uploadInputRef?.current) {
-      uploadInputRef.current.files = null;
-      uploadInputRef.current.value = '';
-    }
-  };
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     setDragHover(true);
   };
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setDragHover(true);
-  };
+
   const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -173,9 +153,9 @@ export const FormFields: React.FC<FormFieldsProps> = ({
             {imageSrc && !errors?.picture ? (
               <div
                 className={styles.imagePreview}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragEnter={handleDragEnter}
+                onDrop={handleDropFile}
+                onDragOver={handleDragStart}
+                onDragEnter={handleDragStart}
                 onDragLeave={handleDragLeave}
                 onDragEnd={handleDropClear}
               >
@@ -184,9 +164,9 @@ export const FormFields: React.FC<FormFieldsProps> = ({
             ) : (
               <div
                 className={`${styles.imagePreview} ${dragHover ? styles.dragHover : ''}`}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragEnter={handleDragEnter}
+                onDrop={handleDropFile}
+                onDragOver={handleDragStart}
+                onDragEnter={handleDragStart}
                 onDragLeave={handleDragLeave}
               >
                 <div className={styles.avatarWrapper}>

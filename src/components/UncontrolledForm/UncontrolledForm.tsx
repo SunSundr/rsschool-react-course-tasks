@@ -42,6 +42,27 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
     }
   };
 
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = e.dataTransfer.files;
+    if (files && files.length === 1) {
+      onFileChange({ target: { files } } as React.ChangeEvent<HTMLInputElement>);
+      if (uploadInputRef?.current) {
+        uploadInputRef.current.files = files;
+        uploadInputRef.current.value = files[0].name;
+      }
+    }
+  };
+
+  const handleDropClear = () => {
+    onFileChange({ target: { files: null } } as React.ChangeEvent<HTMLInputElement>);
+    if (uploadInputRef?.current) {
+      uploadInputRef.current.files = null;
+      uploadInputRef.current.value = '';
+    }
+  };
+
   const onCancel = () => {
     setErrors({});
     onClose();
@@ -103,6 +124,8 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
         imageSrc={imageSrc}
         onFileChange={onFileChange}
         onSelectPicture={() => uploadInputRef.current?.click()}
+        handleDrop={handleDrop}
+        handleDropClear={handleDropClear}
         uploadInputRef={uploadInputRef}
         countries={countries}
       />

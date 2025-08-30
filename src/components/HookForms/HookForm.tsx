@@ -52,6 +52,21 @@ export const HookForm = ({ onClose }: HookFormProps) => {
     awaitFileChange.current = false;
   };
 
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = e.dataTransfer.files;
+    if (files && files.length === 1) {
+      onFileChange({ target: { files } } as React.ChangeEvent<HTMLInputElement>);
+      trigger('picture');
+    }
+  };
+
+  const handleDropClear = () => {
+    onFileChange({ target: { files: null } } as React.ChangeEvent<HTMLInputElement>);
+    trigger('picture');
+  };
+
   const onSelectPicture = () => {
     if (!uploadInputRef.current) return;
     uploadInputRef.current.files = null;
@@ -115,6 +130,8 @@ export const HookForm = ({ onClose }: HookFormProps) => {
         imageSrc={imageSrc}
         onFileChange={onFileChange}
         onSelectPicture={onSelectPicture}
+        handleDrop={handleDrop}
+        handleDropClear={handleDropClear}
         uploadInputRef={uploadInputRef}
         countries={countries}
       />
