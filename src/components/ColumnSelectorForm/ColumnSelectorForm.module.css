@@ -1,0 +1,24 @@
+.columnsWrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  margin-top: 2rem;
+  overflow-y: auto;
+  max-height: calc(100vh - 240px);
+}
+
+.buttonsWrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form {
+  padding-left: 20px;
+}
+
+@supports (scrollbar-color: var(--scrollbar-thumb) transparent) {
+  .form {
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+}

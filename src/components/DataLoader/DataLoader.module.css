@@ -1,0 +1,31 @@
+.container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 1.4rem;
+  margin-top: 0.4rem;
+  text-align: center;
+}
+
+.error {
+  color: var(--error-primary);
+  text-align: center;
+  padding: 20px;
+  background-color: var(--background-paper);
+  border: 1px solid var(--error-primary);
+  border-radius: 8px;
+  margin: 20px 0;
+}
+
+.controls {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}

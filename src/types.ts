@@ -1,0 +1,36 @@
+export interface CountryData {
+  year?: number;
+  population?: number;
+  gdp?: number;
+  co2?: number;
+  co2_per_capita?: number;
+  [key: string]: number | string | undefined;
+}
+
+export interface Country {
+  iso_code: string;
+  data: CountryData[];
+}
+
+export interface CountriesData {
+  [countryName: string]: Country;
+}
+
+export interface TableColumn {
+  key: string;
+  label: string;
+  sortable: boolean;
+}
+
+export type SortDirection = 'asc' | 'desc' | null;
+
+export interface SortConfig {
+  key: string;
+  direction: SortDirection;
+}
+
+export interface FilterConfig {
+  selectedYear: number | null;
+  countrySearch: string;
+  selectedRegion: string;
+}

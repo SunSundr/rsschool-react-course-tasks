@@ -15,6 +15,7 @@ export default tseslint.config(
     rules: {
       'css/no-invalid-properties': ['error', { allowUnknownVariables: true }],
       'css/no-important': 'off',
+      'css/no-invalid-at-rules': 'off',
     },
   },
   {
