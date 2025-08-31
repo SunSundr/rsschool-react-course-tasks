@@ -1,4 +1,4 @@
-export const USE_OPTIMIZATIONS = true;
+export const USE_OPTIMIZATIONS = false;
 
 export const TITLE = 'CO2 Emissions Data';
 

@@ -150,7 +150,15 @@ export const DataLoader: React.FC = () => {
   };
 
   const filteredAndSortedData = USE_OPTIMIZATIONS
-    ? useMemo(getFilteredAndSortedData, [flattenedData, filters, sortConfig, defaultYear])
+    ? useMemo(getFilteredAndSortedData, [
+        flattenedData,
+        filters.selectedYear,
+        filters.selectedRegion,
+        filters.countrySearch,
+        sortConfig.key,
+        sortConfig.direction,
+        defaultYear,
+      ])
     : getFilteredAndSortedData();
 
   const getDisplayColumns = () => {
@@ -169,53 +177,96 @@ export const DataLoader: React.FC = () => {
         setFilters(newFilters);
       };
 
-  const getSortConfig = (key: string) => {
-    setSortConfig((prev) => ({
-      key,
-      direction:
-        prev.key === key && prev.direction === 'asc'
-          ? 'desc'
-          : prev.key === key && prev.direction === 'desc'
-            ? null
-            : 'asc',
-    }));
-  };
+  const handleSort = USE_OPTIMIZATIONS
+    ? useCallback((key: string) => {
+        setSortConfig((prev) => ({
+          key,
+          direction:
+            prev.key === key && prev.direction === 'asc'
+              ? 'desc'
+              : prev.key === key && prev.direction === 'desc'
+                ? null
+                : 'asc',
+        }));
+      }, [])
+    : (key: string) => {
+        setSortConfig((prev) => ({
+          key,
+          direction:
+            prev.key === key && prev.direction === 'asc'
+              ? 'desc'
+              : prev.key === key && prev.direction === 'desc'
+                ? null
+                : 'asc',
+        }));
+      };
 
-  const handleSort = USE_OPTIMIZATIONS ? useCallback(getSortConfig, []) : getSortConfig;
-
-  const controls = (disabled: boolean) => {
-    return (
-      <>
-        <h1 className={styles.title}>{TITLE}</h1>
-        <div className={styles.controls}>
-          {disabled ? (
-            <Filters disabled={true} />
-          ) : (
-            <Filters
-              filters={filters}
-              availableYears={availableYears}
-              availableRegions={availableRegions}
-              onFilterChange={handleFilterChange}
-            />
-          )}
-
-          <Button
-            style={{ lineHeight: 1, minHeight: '42px', marginTop: '10px' }}
-            onClick={() => setColumnSelectorModalOpen(true)}
-            size="small"
-            disabled={disabled}
-          >
-            Select Columns
-          </Button>
-        </div>
-      </>
-    );
-  };
+  const renderControls = USE_OPTIMIZATIONS
+    ? useMemo(() => {
+        const getControls = (disabled: boolean) => (
+          <>
+            <h1 className={styles.title}>{TITLE}</h1>
+            <div className={styles.controls}>
+              {disabled ? (
+                <Filters disabled={true} />
+              ) : (
+                <Filters
+                  filters={filters}
+                  availableYears={availableYears}
+                  availableRegions={availableRegions}
+                  onFilterChange={handleFilterChange}
+                />
+              )}
+              <Button
+                style={{ lineHeight: 1, minHeight: '42px', marginTop: '10px' }}
+                onClick={() => setColumnSelectorModalOpen(true)}
+                size="small"
+                disabled={disabled}
+              >
+                Select Columns
+              </Button>
+            </div>
+          </>
+        );
+        return getControls;
+      }, [
+        filters.selectedYear,
+        filters.selectedRegion,
+        filters.countrySearch,
+        availableYears,
+        availableRegions,
+        handleFilterChange,
+      ])
+    : (disabled: boolean) => (
+        <>
+          <h1 className={styles.title}>{TITLE}</h1>
+          <div className={styles.controls}>
+            {disabled ? (
+              <Filters disabled={true} />
+            ) : (
+              <Filters
+                filters={filters}
+                availableYears={availableYears}
+                availableRegions={availableRegions}
+                onFilterChange={handleFilterChange}
+              />
+            )}
+            <Button
+              style={{ lineHeight: 1, minHeight: '42px', marginTop: '10px' }}
+              onClick={() => setColumnSelectorModalOpen(true)}
+              size="small"
+              disabled={disabled}
+            >
+              Select Columns
+            </Button>
+          </div>
+        </>
+      );
 
   if (!data || error) {
     return (
       <div className={styles.container}>
-        {controls(true)}
+        {renderControls(true)}
         {error ? <div className={styles.error}>Error loading data: {error}</div> : <Skeleton />}
       </div>
     );
@@ -223,7 +274,7 @@ export const DataLoader: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      {controls(false)}
+      {renderControls(false)}
       <DataTable
         data={filteredAndSortedData}
         columns={displayColumns}

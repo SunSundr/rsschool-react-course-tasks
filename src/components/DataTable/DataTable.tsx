@@ -27,12 +27,14 @@ const DataTableComponent: React.FC<DataTableProps> = ({
 
   useEffect(() => {
     if (previousYearRef.current === null || previousYearRef.current === selectedYear) {
-      const dataMap = new Map();
-      data.forEach((row) => {
-        dataMap.set(`${row.country}-${row.iso_code}`, row);
-      });
-      previousDataRef.current = dataMap;
-      previousYearRef.current = selectedYear;
+      if (previousYearRef.current !== selectedYear) {
+        const dataMap = new Map();
+        data.forEach((row) => {
+          dataMap.set(`${row.country}-${row.iso_code}`, row);
+        });
+        previousDataRef.current = dataMap;
+        previousYearRef.current = selectedYear;
+      }
       return;
     }
 
@@ -62,19 +64,11 @@ const DataTableComponent: React.FC<DataTableProps> = ({
       }
     });
 
-    if (newChangedCells.size > 0) {
-      setChangedCells(newChangedCells);
-      const timer = setTimeout(() => {
-        setChangedCells(new Map());
-      }, 3000);
-      const dataMap = new Map();
-      data.forEach((row) => {
-        dataMap.set(`${row.country}-${row.iso_code}`, row);
-      });
-      previousDataRef.current = dataMap;
-      previousYearRef.current = selectedYear;
-      return () => clearTimeout(timer);
-    }
+    setChangedCells(newChangedCells);
+
+    const timer = setTimeout(() => {
+      setChangedCells(new Map());
+    }, 3000);
 
     const dataMap = new Map();
     data.forEach((row) => {
@@ -82,7 +76,9 @@ const DataTableComponent: React.FC<DataTableProps> = ({
     });
     previousDataRef.current = dataMap;
     previousYearRef.current = selectedYear;
-  }, [data, columns, selectedYear]);
+
+    return () => clearTimeout(timer);
+  }, [selectedYear]);
 
   return (
     <div className={styles.tableWrapper}>
