@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import Checkbox from './Checkbox';
+import { Checkbox } from './Checkbox';
 
 describe('Checkbox', () => {
   it('renders with label', () => {
@@ -28,6 +28,6 @@ describe('Checkbox', () => {
 
   it('applies fullWidth class by default', () => {
     const { container } = render(<Checkbox label="Test" />);
-    expect((container.firstChild as HTMLElement).className).toMatch('full-width');
+    expect((container.firstChild as HTMLElement).className).toMatch('fullWidth');
   });
 });

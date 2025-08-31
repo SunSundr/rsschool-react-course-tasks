@@ -20,7 +20,6 @@ describe('Select', () => {
 
   it('opens dropdown on click', () => {
     render(<Select options={mockOptions} />);
-
     fireEvent.click(screen.getByRole('textbox'));
     expect(screen.getByText('Option 1')).toBeInTheDocument();
   });
@@ -28,20 +27,16 @@ describe('Select', () => {
   it('selects option when clicked', () => {
     const onChange = vi.fn();
     render(<Select options={mockOptions} onChange={onChange} />);
-
     fireEvent.click(screen.getByRole('textbox'));
     fireEvent.click(screen.getByText('Option 1'));
-
     expect(onChange).toHaveBeenCalledWith('option1');
   });
 
   it('filters options when autoComplete is enabled', () => {
     render(<Select options={mockOptions} autoComplete />);
     const input = screen.getByRole('textbox');
-
-    fireEvent.change(input, { target: { value: '1' } });
     fireEvent.click(input);
-
+    fireEvent.change(input, { target: { value: '1' } });
     expect(screen.getByText('Option 1')).toBeInTheDocument();
     expect(screen.queryByText('Option 2')).not.toBeInTheDocument();
   });
@@ -54,21 +49,45 @@ describe('Select', () => {
   it('calls onClear when clear button is clicked', () => {
     const onClear = vi.fn();
     render(<Select options={mockOptions} value="option1" onChange={() => {}} onClear={onClear} />);
-
     fireEvent.click(screen.getByRole('button', { name: 'Clear selection' }));
     expect(onClear).toHaveBeenCalled();
   });
 
   it('closes dropdown when clicking outside', async () => {
     const { container } = render(<Select options={mockOptions} />);
-
     fireEvent.click(screen.getByRole('textbox'));
     expect(screen.getByText('Option 1')).toBeInTheDocument();
-
     fireEvent.mouseDown(document.body);
     await waitFor(() => {
       const dropdown = container.querySelector('[class*="selectDropdown"]');
       expect(dropdown?.className).toMatch(/hidden/);
     });
+  });
+
+  it('handles touchEnd events on dropdown', () => {
+    const clearTimeoutSpy = vi.spyOn(globalThis, 'clearTimeout');
+    const { container } = render(<Select options={mockOptions} />);
+    fireEvent.click(screen.getByRole('textbox'));
+    const dropdown = container.querySelector('[class*="selectDropdown"]');
+    fireEvent.touchEnd(dropdown!);
+    expect(clearTimeoutSpy).toHaveBeenCalled();
+  });
+
+  it('auto-selects when filtered to single exact match', () => {
+    const onChange = vi.fn();
+    render(<Select options={mockOptions} autoComplete onChange={onChange} />);
+    const input = screen.getByRole('textbox');
+    fireEvent.click(input);
+    fireEvent.change(input, { target: { value: 'Option 1' } });
+    expect(onChange).toHaveBeenCalledWith('Option 1');
+  });
+
+  it('shows all options when no matches found in filter', () => {
+    render(<Select options={mockOptions} autoComplete />);
+    const input = screen.getByRole('textbox');
+    fireEvent.click(input);
+    fireEvent.change(input, { target: { value: 'xyz' } });
+    expect(screen.getByText('Option 1')).toBeInTheDocument();
+    expect(screen.getByText('Option 2')).toBeInTheDocument();
   });
 });

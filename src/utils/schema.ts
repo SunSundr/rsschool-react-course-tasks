@@ -16,12 +16,10 @@ export const schema = yup.object().shape({
     .integer('Age must be an integer')
     .positive('Age must be positive')
     .test('is-adult', 'You must be at least 18 years old', (value) => {
-      if (value) return value >= 18;
-      return true;
+      return !!value && value >= 18;
     })
     .test('over-adult', 'You are too old or have entered your age incorrectly', (value) => {
-      if (value) return value <= 100;
-      return true;
+      return !!value && value <= 100;
     }),
   email: yup
     .string()
@@ -34,10 +32,24 @@ export const schema = yup.object().shape({
     .string()
     .required('Password is required')
     .min(8, 'Password must be at least 8 characters')
-    .matches(
-      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*\W)/,
-      'Password must contain 1 number, 1 uppercase, 1 lowercase, and 1 special character',
-    ),
+    .test('password-strength', (value, { createError, path }) => {
+      if (!value) return true;
+      const checks = {
+        number: { regex: /\d/, message: 'number' },
+        lowercase: { regex: /[a-z]/, message: 'lowercase\u00A0letter' },
+        uppercase: { regex: /[A-Z]/, message: 'uppercase\u00A0letter' },
+        special: { regex: /\W/, message: 'special\u00A0character' },
+      };
+      const missing: string[] = [];
+      Object.values(checks).forEach((check) => {
+        if (!check.regex.test(value)) missing.push(`1\u00A0${check.message}`);
+      });
+      if (missing.length === 0) return true;
+      return createError({
+        message: `Password must contain: ${missing.join(', ')}`,
+        path,
+      });
+    }),
   confirmPassword: yup
     .string()
     .oneOf([yup.ref('password')], 'Passwords must match')
@@ -48,17 +60,17 @@ export const schema = yup.object().shape({
     .mixed<File>()
     .required('Picture is required')
     .test('Required', 'Picture is required', (file) => {
-      if (!file) return true;
-      return file.size > 0;
+      return file instanceof File && file.size > 0;
+    })
+    .test('fileType', 'Unsupported file type', (file) => {
+      if (!file || file.size === 0) return true;
+      return ['image/jpeg', 'image/png'].includes(file.type);
     })
     .test('fileSize', 'File too large', (file) => {
       if (!file) return true;
       return file.size <= 1024 * 1024;
     })
-    .test('fileType', 'Unsupported file type', (file) => {
-      if (!file || file.size === 0) return true;
-      return ['image/jpeg', 'image/png'].includes(file.type);
-    }),
+    .nullable(),
   country: yup
     .string()
     .required('Country is required')

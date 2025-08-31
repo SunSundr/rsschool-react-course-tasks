@@ -1,43 +1,45 @@
-import { forwardRef, InputHTMLAttributes } from 'react';
+import { InputHTMLAttributes } from 'react';
 import styles from './Checkbox.module.css';
 
 interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string;
   error?: string;
   fullWidth?: boolean;
+  fixedHeight?: boolean;
 }
 
-const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ label, error, fullWidth = true, id, className = '', disabled, ...props }, ref) => {
-    const checkboxId = id || label?.toLowerCase().replace(/\s+/g, '-');
-
-    return (
-      <div
-        className={`${styles['checkbox-container']} ${fullWidth ? styles['full-width'] : ''} ${className}`}
+export const Checkbox = ({
+  id,
+  label,
+  className = '',
+  error,
+  disabled,
+  fixedHeight = false,
+  fullWidth = true,
+  ...props
+}: CheckboxProps) => {
+  const checkboxId = id || label?.toLowerCase().replace(/\s+/g, '-');
+  return (
+    <div
+      className={`${styles.checkboxContainer} ${fullWidth ? styles.fullWidth : ''} ${className}`}
+    >
+      <label
+        htmlFor={checkboxId}
+        className={`${styles.checkboxLabel} ${disabled ? styles.disabled : ''}`}
       >
-        <label
-          htmlFor={checkboxId}
-          className={`${styles['checkbox-label']} ${disabled ? styles.disabled : ''}`}
-        >
-          <div className={styles['checkbox-wrapper']}>
-            <input
-              ref={ref}
-              id={checkboxId}
-              type="checkbox"
-              className={styles['checkbox-input']}
-              disabled={disabled}
-              {...props}
-            />
-            <span className={styles['checkbox-custom']}></span>
-          </div>
-          {label && <span className={styles['checkbox-text']}>{label}</span>}
-        </label>
-        {error && <span className={styles['checkbox-error']}>{error}</span>}
-      </div>
-    );
-  },
-);
-
-Checkbox.displayName = 'Checkbox';
-
-export default Checkbox;
+        <div className={styles.checkboxWrapper}>
+          <input
+            id={checkboxId}
+            type="checkbox"
+            className={styles.checkboxInput}
+            disabled={disabled}
+            {...props}
+          />
+          <span className={styles.checkboxCustom}></span>
+        </div>
+        {label && <span className={styles.checkboxText}>{label}</span>}
+      </label>
+      {(error || fixedHeight) && <span className={styles.checkboxError}>{error}</span>}
+    </div>
+  );
+};

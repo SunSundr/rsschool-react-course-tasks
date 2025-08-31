@@ -41,7 +41,7 @@ vi.mock('../UncontrolledForm/UncontrolledForm', () => ({
   )),
 }));
 
-vi.mock('../HookForms/HookForm', () => ({
+vi.mock('../HookForm/HookForm', () => ({
   HookForm: vi.fn(({ onClose }) => (
     <div data-testid="hook-form">
       <button onClick={onClose} data-testid="form-close">

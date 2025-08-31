@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { UseFormWatch } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import * as yup from 'yup';
 import { FormType, FormValues } from '~/types';
@@ -18,20 +19,47 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
   const dispatch = useDispatch();
   const { countries } = useSelector((state: RootState) => state.form);
   const [errors, setErrors] = useState<Record<string, { message?: string }>>({});
-
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [showPasswordStrength, setShowPasswordStrength] = useState(false);
   const [file, setFile] = useState<File>();
   const [imageSrc, setImageSrc] = useState<string | null>(null);
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
+
+  const mockWatch = ((fieldName: keyof FormValues) => {
+    if (fieldName === 'password' && showPasswordStrength) {
+      return currentPassword;
+    }
+    return '';
+  }) as UseFormWatch<FormValues>;
 
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       const file = files[0];
       setFile(file);
-      setImageSrc((await getBase64(file)) as string);
     } else {
       setFile(undefined);
-      setImageSrc(null);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = e.dataTransfer.files;
+    if (files && files.length === 1) {
+      onFileChange({ target: { files } } as React.ChangeEvent<HTMLInputElement>);
+      if (uploadInputRef?.current) {
+        uploadInputRef.current.files = files;
+        uploadInputRef.current.value = files[0].name;
+      }
+    }
+  };
+
+  const handleDropClear = () => {
+    onFileChange({ target: { files: null } } as React.ChangeEvent<HTMLInputElement>);
+    if (uploadInputRef?.current) {
+      uploadInputRef.current.files = null;
+      uploadInputRef.current.value = '';
     }
   };
 
@@ -61,12 +89,17 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
       country: formData.get('country') as string,
     };
 
+    setCurrentPassword(data.password);
+    setShowPasswordStrength(true);
+
     try {
+      const img64 = file ? ((await getBase64(file)) as string) : null;
+      setImageSrc(img64);
       await schema.validate(data, { abortEarly: false });
       dispatch(
         setFormData({
           type: FormType.uncontrolled,
-          data: { ...data, picture: imageSrc },
+          data: { ...data, picture: img64 },
         }),
       );
       setErrors({});
@@ -86,10 +119,13 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
     <form ref={formRef} onSubmit={handleSubmit}>
       <FormFields
         errors={errors}
+        watch={showPasswordStrength ? mockWatch : undefined}
         file={file}
         imageSrc={imageSrc}
         onFileChange={onFileChange}
         onSelectPicture={() => uploadInputRef.current?.click()}
+        handleDrop={handleDrop}
+        handleDropClear={handleDropClear}
         uploadInputRef={uploadInputRef}
         countries={countries}
       />
@@ -101,7 +137,7 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
           onClick={onCancel}
           color="warn"
           size="medium"
-          {...{ style: { minWidth: '160px' } }}
+          className="btn"
         >
           Cancel
         </Button>
@@ -112,7 +148,7 @@ export const UncontrolledForm = ({ onClose }: UncontrolledFormProps) => {
           color="default"
           size="medium"
           fullWidth
-          {...{ style: { minWidth: '160px' } }}
+          className="btn"
         >
           Submit
         </Button>

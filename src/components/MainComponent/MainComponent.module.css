@@ -2,6 +2,7 @@
   padding: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  overflow: hidden !important;
 }
 
 .header {
@@ -127,13 +128,18 @@
   color: #22c55e;
 }
 
+.mainButtons {
+  min-width: 200px;
+  transition: background-color 0.5s ease;
+}
+
 .rejected {
   color: var(--error-primary);
 }
 
 @media (max-width: 768px) {
   .container {
-    padding: 1rem;
+    padding: 1.4rem;
   }
 
   .header {
@@ -152,6 +158,7 @@
 
   .cardsContainer {
     grid-template-columns: 1fr;
+    padding: 8px;
   }
 
   .fieldRow {
@@ -170,8 +177,12 @@
 }
 
 @media (max-width: 480px) {
+  .mainButtons {
+    min-width: 160px;
+  }
+
   .container {
-    padding: 0.5rem;
+    padding: 1.4rem 0.5rem 1rem 0.5rem;
   }
 
   .cardBody {
@@ -180,5 +191,22 @@
 
   .cardHeader {
     padding: 1rem;
+  }
+
+  .cardsContainer {
+    padding: 0 20px 30px 20px;
+  }
+}
+
+@media (max-width: 420px) {
+  .mainButtons {
+    min-width: unset;
+  }
+
+  .buttonGroup {
+    margin-top: 10px;
+    margin-left: 20px;
+    margin-right: 20px;
+    flex-direction: column;
   }
 }

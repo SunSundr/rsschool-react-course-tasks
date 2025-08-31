@@ -37,6 +37,8 @@ A React application demonstrating controlled vs uncontrolled form approaches usi
 
 - **Responsive Design**: Mobile-first approach with CSS Grid and Flexbox
 - **Live Validation**: React Hook Form provides real-time validation feedback
+- **Dropzone Integration**: Drag-and-drop file upload with automatic validation in controlled form
+- **Interactive Controls**: Hide/show password button and clear button on all user input fields
 - **Submit Behavior**:
   - Hook Form: Submit button disabled during validation errors
   - Uncontrolled Form: Validation on submit only
@@ -47,7 +49,8 @@ A React application demonstrating controlled vs uncontrolled form approaches usi
 
 - **File Handling**: Image upload with base64 conversion and preview
 - **Autocomplete**: Country selection with search functionality
-- **Form Components**: Reusable Input, Select, Button, and Checkbox components
+- **MUI-Style Components**: Universal input components with Material-UI inspired design and adaptive responsive layout
+- **Form Components**: Reusable Input, Select, Button, and Checkbox components with consistent styling
 - **CSS Modules**: Scoped styling with CSS custom properties for theming
 - **TypeScript**: Full type safety throughout the application
 
@@ -66,7 +69,7 @@ src/
 │   ├── Button/           # Reusable button component
 │   ├── Checkbox/         # Custom checkbox with styling
 │   ├── FormFields/       # Shared form fields layout
-│   ├── HookForms/        # React Hook Form implementation
+│   ├── HookForm/         # React Hook Form implementation
 │   ├── Input/            # Custom input with validation
 │   ├── MainComponent/    # Main page with form history
 │   ├── Modal/            # Portal-based modal component
@@ -89,7 +92,7 @@ src/
 ## Running the Project
 
 ```bash
-npm install
+npm ci
 npm run dev        # Development server
 npm run test       # Run tests
 npm run build      # Production build

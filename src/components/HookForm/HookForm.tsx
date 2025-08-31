@@ -20,6 +20,7 @@ export const HookForm = ({ onClose }: HookFormProps) => {
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
   const { countries } = useSelector((state: RootState) => state.form);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const awaitFileChange = useRef(false);
 
   const {
     register,
@@ -27,35 +28,75 @@ export const HookForm = ({ onClose }: HookFormProps) => {
     formState: { errors, isValid, isSubmitting },
     trigger,
     setValue,
+    watch,
   } = useForm<FormValues>({
     resolver: yupResolver(schema),
     mode: 'onChange',
   });
 
   const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (awaitFileChange.current) return;
+    awaitFileChange.current = true;
     const files = e.target.files;
     if (files && files.length > 0) {
       const file = files[0];
       setFile(file);
       setValue('picture', file);
-      trigger('picture');
-      setImageSrc((await getBase64(file)) as string);
+      await trigger('picture');
+      errors.picture ? setImageSrc(null) : setImageSrc((await getBase64(file)) as string);
     } else {
       setFile(undefined);
       setImageSrc(null);
       trigger('picture');
     }
+    awaitFileChange.current = false;
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = e.dataTransfer.files;
+    if (files && files.length === 1) {
+      onFileChange({ target: { files } } as React.ChangeEvent<HTMLInputElement>);
+      trigger('picture');
+    }
+  };
+
+  const handleDropClear = () => {
+    onFileChange({ target: { files: null } } as React.ChangeEvent<HTMLInputElement>);
+    trigger('picture');
   };
 
   const onSelectPicture = () => {
     if (!uploadInputRef.current) return;
-    const handleWindowClick = () => {
-      if (
-        uploadInputRef.current &&
-        (!uploadInputRef.current.files || uploadInputRef.current.files.length === 0)
-      ) {
+    uploadInputRef.current.files = null;
+    uploadInputRef.current.value = '';
+    setValue('picture', null);
+    const handleWindowClick = async () => {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+      const clearFileData = () => {
+        setFile(undefined);
+        setImageSrc(null);
         trigger('picture');
-      }
+      };
+      let counter = 0;
+      const awaitFileChangeTimer = setInterval(() => {
+        counter++;
+        if (counter >= 20) {
+          clearInterval(awaitFileChangeTimer);
+          clearFileData();
+          return;
+        }
+        if (!awaitFileChange.current) {
+          clearInterval(awaitFileChangeTimer);
+          if (
+            uploadInputRef.current &&
+            (!uploadInputRef.current.files || uploadInputRef.current.files.length === 0)
+          ) {
+            clearFileData();
+          }
+        }
+      }, 50);
       window.removeEventListener('focus', handleWindowClick);
     };
     uploadInputRef.current?.click();
@@ -84,10 +125,13 @@ export const HookForm = ({ onClose }: HookFormProps) => {
         errors={errors}
         trigger={trigger}
         setValue={setValue}
+        watch={watch}
         file={file}
         imageSrc={imageSrc}
         onFileChange={onFileChange}
         onSelectPicture={onSelectPicture}
+        handleDrop={handleDrop}
+        handleDropClear={handleDropClear}
         uploadInputRef={uploadInputRef}
         countries={countries}
       />

@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { clearNewEntryId } from '~/store/formSlice';
 import { RootState } from '~/store/store';
 import { Button } from '../Button/Button';
-import { HookForm } from '../HookForms/HookForm';
+import { HookForm } from '../HookForm/HookForm';
 import { Modal } from '../Modal/Modal';
 import { UncontrolledForm } from '../UncontrolledForm/UncontrolledForm';
 import styles from './MainComponent.module.css';
@@ -28,13 +28,10 @@ export const MainComponent = () => {
       <div className={styles.header}>
         <h1>Form Submissions</h1>
         <div className={styles.buttonGroup}>
-          <Button
-            onClick={() => setIsUncontrolledModalOpen(true)}
-            {...{ style: { minWidth: '200px' } }}
-          >
+          <Button onClick={() => setIsUncontrolledModalOpen(true)} className={styles.mainButtons}>
             Uncontrolled Form
           </Button>
-          <Button onClick={() => setIsHookModalOpen(true)} {...{ style: { minWidth: '200px' } }}>
+          <Button onClick={() => setIsHookModalOpen(true)} className={styles.mainButtons}>
             Hook Form
           </Button>
         </div>

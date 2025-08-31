@@ -30,7 +30,7 @@
 
 .avatarSection label {
   font-weight: 500;
-  color: var(--text-primary);
+  color: var(--text-secondary);
   margin-bottom: 1rem;
 }
 
@@ -52,6 +52,32 @@
   object-fit: cover;
 }
 
+.imagePreview.dragHover {
+  border: 2px solid var(--primary-light);
+  transform: scale(105%);
+  transition: transform 0.3s ease;
+}
+
+.avatarWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 10px;
+  font-size: small;
+  pointer-events: none;
+}
+.avatarWrapper span {
+  color: var(--primary-light);
+  margin-top: 8px;
+}
+
+.avatar {
+  width: 50%;
+  height: 50%;
+  color: var(--text-disabled);
+}
+
 .rowWrapper {
   display: flex;
   gap: 1rem;
@@ -63,17 +89,54 @@
 }
 
 .checkboxWrapper {
-  margin-top: -1rem;
+  padding-right: 0.3rem;
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: right;
   width: 100%;
 }
 
 .error {
   color: var(--error-primary);
   font-size: 0.875rem;
-  margin-top: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.passwordField {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.strengthIndicator {
+  display: flex;
+  align-items: center;
+  height: 0.5rem;
+}
+
+.strengthBar {
+  flex: 1;
+  height: 4px;
+  background-color: var(--border-light);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.strengthFill {
+  height: 100%;
+  transition:
+    width 0.3s ease,
+    background-color 0.3s ease;
+  border-radius: 2px;
+}
+
+.strengthLabel {
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 4px;
+  display: block;
+  margin-left: 16px;
+  margin-right: 6px;
 }
 
 @media (max-width: 768px) {
@@ -94,12 +157,21 @@
     flex-direction: column;
   }
 
+  .checkboxWrapper {
+    justify-content: center;
+  }
+
   .avatarSection {
     max-width: 100%;
   }
 
   .imagePreview {
-    width: 100px;
-    height: 100px;
+    width: 110px;
+    height: 110px;
+  }
+
+  .avatar {
+    width: 40%;
+    height: 40%;
   }
 }
