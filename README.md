@@ -174,10 +174,24 @@ _Note: Performance data is approximate and may vary due to browser overhead, Dev
 
 **Screenshots:**
 
+_Initial Load_
+
 ![Initial Load Before](doc/before-optimization/initial-load.png)
+
+_Column Selection_
+
 ![Column Selection Before](doc/before-optimization/column-selection.png)
+
+_Year Change_
+
 ![Year Change Before](doc/before-optimization/year-change.png)
+
+_Sorting_
+
 ![Sorting Before](doc/before-optimization/sorting.png)
+
+_Search_
+
 ![Search Before](doc/before-optimization/search.png)
 
 #### After Optimization
@@ -194,12 +208,32 @@ _Note: Performance data is approximate and may vary due to browser overhead, Dev
 
 **Screenshots:**
 
+_Initial Load_
+
 ![Initial Load After](doc/after-optimization/initial-load.png)
+
+_Column Selection_
+
 ![Column Selection After](doc/after-optimization/column-selection.png)
+
+_Year Change_
+
 ![Year Change After](doc/after-optimization/year-change.png)
+
+_Sorting First_
+
 ![Sorting First After](doc/after-optimization/sorting-1.png)
+
+_Sorting Re-sorting_
+
 ![Sorting Re-sorting After](doc/after-optimization/sorting-2.png)
+
+_Search First_
+
 ![Search First After](doc/after-optimization/search-1.png)
+
+_Search Re-search_
+
 ![Search Re-search After](doc/after-optimization/search-2.png)
 
 ## Application Features
