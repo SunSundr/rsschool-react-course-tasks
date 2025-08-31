@@ -44,7 +44,6 @@
 
 .headerCell:first-child {
   border-top-left-radius: 12px;
-  position: sticky;
   left: 0;
   z-index: 11;
 }
