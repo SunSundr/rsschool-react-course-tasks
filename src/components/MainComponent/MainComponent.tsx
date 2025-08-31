@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { clearNewEntryId } from '~/store/formSlice';
 import { RootState } from '~/store/store';
 import { Button } from '../Button/Button';
-import { HookForm } from '../HookForms/HookForm';
+import { HookForm } from '../HookForm/HookForm';
 import { Modal } from '../Modal/Modal';
 import { UncontrolledForm } from '../UncontrolledForm/UncontrolledForm';
 import styles from './MainComponent.module.css';

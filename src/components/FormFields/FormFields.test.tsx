@@ -1,4 +1,4 @@
-import { UseFormRegister } from 'react-hook-form';
+import { UseFormRegister, UseFormWatch } from 'react-hook-form';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { FormValues } from '~/types';
@@ -70,7 +70,6 @@ const mockProps = {
 describe('FormFields', () => {
   it('renders all form fields', () => {
     render(<FormFields {...mockProps} />);
-
     expect(screen.getByTestId('input-name')).toBeInTheDocument();
     expect(screen.getByTestId('input-email')).toBeInTheDocument();
     expect(screen.getByTestId('input-age')).toBeInTheDocument();
@@ -116,7 +115,6 @@ describe('FormFields', () => {
     })) as unknown as UseFormRegister<FormValues>;
     const mockTrigger = vi.fn();
     render(<FormFields {...mockProps} register={mockRegister} trigger={mockTrigger} />);
-
     fireEvent.change(screen.getByTestId('select-gender'), { target: { value: 'male' } });
     expect(mockRegister).toHaveBeenCalledWith('gender');
   });
@@ -128,7 +126,6 @@ describe('FormFields', () => {
     })) as unknown as UseFormRegister<FormValues>;
     const mockTrigger = vi.fn();
     render(<FormFields {...mockProps} register={mockRegister} trigger={mockTrigger} />);
-
     fireEvent.change(screen.getByTestId('select-country'), { target: { value: 'USA' } });
     expect(mockRegister).toHaveBeenCalledWith('country');
   });
@@ -139,9 +136,41 @@ describe('FormFields', () => {
       onChange: vi.fn(),
     })) as unknown as UseFormRegister<FormValues>;
     render(<FormFields {...mockProps} register={mockRegister} />);
-
     expect(mockRegister).toHaveBeenCalledWith('name');
     expect(mockRegister).toHaveBeenCalledWith('email');
     expect(mockRegister).toHaveBeenCalledWith('age');
+  });
+
+  it('handles drag and drop events', () => {
+    const mockHandleDrop = vi.fn();
+    const mockHandleDropClear = vi.fn();
+    const { container } = render(
+      <FormFields
+        {...mockProps}
+        handleDrop={mockHandleDrop}
+        handleDropClear={mockHandleDropClear}
+      />,
+    );
+    const dropZone = container.querySelector('[class*="imagePreview"]');
+    expect(dropZone).toBeInTheDocument();
+    fireEvent.drop(dropZone!, { dataTransfer: { files: [] } });
+    expect(mockHandleDrop).toHaveBeenCalled();
+  });
+
+  it('shows drag hover state', () => {
+    const { container } = render(<FormFields {...mockProps} />);
+    const dropZone = container.querySelector('[class*="imagePreview"]');
+    fireEvent.dragEnter(dropZone!);
+    fireEvent.dragLeave(dropZone!);
+    expect(dropZone).toBeInTheDocument();
+  });
+
+  it('renders password strength indicator when watch is provided', () => {
+    const mockWatch = vi.fn((field) =>
+      field === 'password' ? 'TestPass123!' : '',
+    ) as unknown as UseFormWatch<FormValues>;
+    const { container } = render(<FormFields {...mockProps} watch={mockWatch} />);
+    const strengthIndicator = container.querySelector('[class*="strengthIndicator"]');
+    expect(strengthIndicator).toBeInTheDocument();
   });
 });
