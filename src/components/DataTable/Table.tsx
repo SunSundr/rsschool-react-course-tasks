@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { calculateMaxWidth } from '~/utils/calculateMaxWidth';
 import { Row } from './Row';
+import { USE_OPTIMIZATIONS } from '../../constants';
 import { CountryData, SortConfig, TableColumn } from '../../types';
 import styles from './DataTable.module.css';
 
@@ -12,7 +13,7 @@ interface TableProps {
   changedCells: Map<string, Set<string>>;
 }
 
-export const Table: React.FC<TableProps> = ({
+const TableComponent: React.FC<TableProps> = ({
   data,
   columns,
   sortConfig,
@@ -35,7 +36,7 @@ export const Table: React.FC<TableProps> = ({
     return sortConfig.direction === 'asc' ? '↑' : '↓';
   };
 
-  const tableContent = () => {
+  const tbodyContent = () => {
     return (
       <tbody>
         {data.map((row, index) => {
@@ -55,7 +56,11 @@ export const Table: React.FC<TableProps> = ({
     );
   };
 
-  const columnStyles = () => {
+  const tableContent = USE_OPTIMIZATIONS
+    ? useMemo(tbodyContent, [data, columns, changedCells, columnWidths])
+    : tbodyContent();
+
+  const generateColumnStyles = () => {
     return Object.entries(columnWidths)
       .map(
         ([key, width]) => `
@@ -70,10 +75,14 @@ export const Table: React.FC<TableProps> = ({
       .join('');
   };
 
+  const columnStyles = USE_OPTIMIZATIONS
+    ? useMemo(generateColumnStyles, [columnWidths])
+    : generateColumnStyles();
+
   return (
     <div className={styles.tableWrapper}>
       <style>
-        {columnStyles()}{' '}
+        {columnStyles}{' '}
         {data.length > 14
           ? `.${styles.tableWrapper} { height: calc(100vh - 235px); } .${styles.headerCell}:last-child { border-top-right-radius: unset; }`
           : ''}
@@ -96,8 +105,10 @@ export const Table: React.FC<TableProps> = ({
             ))}
           </tr>
         </thead>
-        {tableContent()}
+        {tableContent}
       </table>
     </div>
   );
 };
+
+export const Table = USE_OPTIMIZATIONS ? memo(TableComponent) : TableComponent;

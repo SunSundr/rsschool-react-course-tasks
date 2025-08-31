@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { TITLE } from '../../constants';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { TITLE, USE_OPTIMIZATIONS } from '../../constants';
 import { fetchCountriesData } from '../../services/dataService';
 import { useColumnStore } from '../../store/columnStore';
 import { CountriesData, CountryData, FilterConfig, SortConfig, TableColumn } from '../../types';
@@ -80,7 +80,7 @@ export const DataLoader: React.FC = () => {
     return result;
   }, [data]);
 
-  const availableYears = () => {
+  const getAvailableYears = () => {
     const years = new Set<number>();
     flattenedData.forEach((item) => {
       if (item.year) years.add(item.year);
@@ -88,7 +88,11 @@ export const DataLoader: React.FC = () => {
     return Array.from(years).sort((a, b) => b - a);
   };
 
-  const availableRegions = () => {
+  const availableYears = USE_OPTIMIZATIONS
+    ? useMemo(getAvailableYears, [flattenedData])
+    : getAvailableYears();
+
+  const getAvailableRegions = () => {
     const regions = new Set<string>();
     flattenedData.forEach((item) => {
       if (item.country) regions.add(item.country);
@@ -96,7 +100,11 @@ export const DataLoader: React.FC = () => {
     return Array.from(regions).sort();
   };
 
-  const filteredAndSortedData = () => {
+  const availableRegions = USE_OPTIMIZATIONS
+    ? useMemo(getAvailableRegions, [flattenedData])
+    : getAvailableRegions();
+
+  const getFilteredAndSortedData = () => {
     let filtered = flattenedData;
 
     if (filters.selectedYear) {
@@ -141,15 +149,27 @@ export const DataLoader: React.FC = () => {
     return filtered;
   };
 
-  const displayColumns = () => {
+  const filteredAndSortedData = USE_OPTIMIZATIONS
+    ? useMemo(getFilteredAndSortedData, [flattenedData, filters, sortConfig, defaultYear])
+    : getFilteredAndSortedData();
+
+  const getDisplayColumns = () => {
     return availableColumns.filter((col) => selectedColumns.includes(col.key));
   };
 
-  const handleFilterChange = (newFilters: FilterConfig) => {
-    setFilters(newFilters);
-  };
+  const displayColumns = USE_OPTIMIZATIONS
+    ? useMemo(getDisplayColumns, [availableColumns, selectedColumns])
+    : getDisplayColumns();
 
-  const handleSort = (key: string) => {
+  const handleFilterChange = USE_OPTIMIZATIONS
+    ? useCallback((newFilters: FilterConfig) => {
+        setFilters(newFilters);
+      }, [])
+    : (newFilters: FilterConfig) => {
+        setFilters(newFilters);
+      };
+
+  const getSortConfig = (key: string) => {
     setSortConfig((prev) => ({
       key,
       direction:
@@ -161,6 +181,8 @@ export const DataLoader: React.FC = () => {
     }));
   };
 
+  const handleSort = USE_OPTIMIZATIONS ? useCallback(getSortConfig, []) : getSortConfig;
+
   const controls = (disabled: boolean) => {
     return (
       <>
@@ -171,8 +193,8 @@ export const DataLoader: React.FC = () => {
           ) : (
             <Filters
               filters={filters}
-              availableYears={availableYears()}
-              availableRegions={availableRegions()}
+              availableYears={availableYears}
+              availableRegions={availableRegions}
               onFilterChange={handleFilterChange}
             />
           )}
@@ -203,8 +225,8 @@ export const DataLoader: React.FC = () => {
     <div className={styles.container}>
       {controls(false)}
       <DataTable
-        data={filteredAndSortedData()}
-        columns={displayColumns()}
+        data={filteredAndSortedData}
+        columns={displayColumns}
         sortConfig={sortConfig}
         onSort={handleSort}
         selectedYear={filters.selectedYear}

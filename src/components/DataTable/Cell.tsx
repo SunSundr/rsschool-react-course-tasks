@@ -1,4 +1,5 @@
 import React from 'react';
+import { USE_OPTIMIZATIONS } from '../../constants';
 import styles from './DataTable.module.css';
 
 interface CellProps {
@@ -8,7 +9,7 @@ interface CellProps {
   loading?: boolean;
 }
 
-export const Cell: React.FC<CellProps> = ({ value, isChanged, columnKey, loading = false }) => {
+const CellComponent: React.FC<CellProps> = ({ value, isChanged, columnKey, loading = false }) => {
   const formatValue = (value: unknown): string => {
     if (value === undefined || value === null) return '-';
     if (typeof value === 'number' && columnKey !== 'year') {
@@ -31,3 +32,5 @@ export const Cell: React.FC<CellProps> = ({ value, isChanged, columnKey, loading
     </td>
   );
 };
+
+export const Cell = USE_OPTIMIZATIONS ? React.memo(CellComponent) : CellComponent;

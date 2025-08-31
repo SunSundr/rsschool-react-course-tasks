@@ -1,5 +1,6 @@
 import React from 'react';
 import { Cell } from './Cell';
+import { USE_OPTIMIZATIONS } from '../../constants';
 import { CountryData, TableColumn } from '../../types';
 import styles from './DataTable.module.css';
 
@@ -11,7 +12,7 @@ interface RowProps {
   loading?: boolean;
 }
 
-export const Row: React.FC<RowProps> = ({ row, columns, changedColumns, loading = false }) => {
+const RowComponent: React.FC<RowProps> = ({ row, columns, changedColumns, loading = false }) => {
   return (
     <tr className={styles.row}>
       {columns.map((column) => (
@@ -26,3 +27,5 @@ export const Row: React.FC<RowProps> = ({ row, columns, changedColumns, loading 
     </tr>
   );
 };
+
+export const Row = USE_OPTIMIZATIONS ? React.memo(RowComponent) : RowComponent;

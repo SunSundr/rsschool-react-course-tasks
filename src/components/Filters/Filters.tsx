@@ -1,4 +1,5 @@
 import React from 'react';
+import { USE_OPTIMIZATIONS } from '../../constants';
 import { FilterConfig } from '../../types';
 import styles from './Filters.module.css';
 
@@ -18,7 +19,7 @@ type FiltersProps =
       onFilterChange: (filters: FilterConfig) => void;
     };
 
-export const Filters: React.FC<FiltersProps> = ({
+const FiltersComponent: React.FC<FiltersProps> = ({
   filters = { selectedYear: null, selectedRegion: '', countrySearch: '' },
   availableYears = [],
   availableRegions = [],
@@ -97,3 +98,5 @@ export const Filters: React.FC<FiltersProps> = ({
     </div>
   );
 };
+
+export const Filters = USE_OPTIMIZATIONS ? React.memo(FiltersComponent) : FiltersComponent;

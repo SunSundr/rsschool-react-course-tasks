@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Table } from './Table';
+import { USE_OPTIMIZATIONS } from '../../constants';
 import { CountryData, SortConfig, TableColumn } from '../../types';
 import styles from './DataTable.module.css';
 
@@ -11,7 +12,7 @@ interface DataTableProps {
   selectedYear: number | null;
 }
 
-export const DataTable: React.FC<DataTableProps> = ({
+const DataTableComponent: React.FC<DataTableProps> = ({
   data,
   columns,
   sortConfig,
@@ -95,3 +96,5 @@ export const DataTable: React.FC<DataTableProps> = ({
     </div>
   );
 };
+
+export const DataTable = USE_OPTIMIZATIONS ? React.memo(DataTableComponent) : DataTableComponent;
