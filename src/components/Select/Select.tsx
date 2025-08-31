@@ -163,6 +163,7 @@ export const Select = ({
           disabled={disabled}
           readOnly={!autoComplete}
           autoComplete="on"
+          style={{ cursor: autoComplete && isOpen ? 'text' : 'pointer' }}
           {...props}
         />
 
