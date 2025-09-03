@@ -1,12 +1,12 @@
-import { use, useState } from 'react';
+import { use, useCallback, useMemo, useState } from 'react';
 import { BATCH_SIZE_UPDATE_COLUMNS, REQUIRED_COLUMNS } from '~/constants';
 import { getCountriesData } from '../../services/dataService';
 import { useColumnStore } from '../../store/columnStore';
 import { FilterConfig, SortConfig, TableColumn } from '../../types';
 import { Button } from '../Button/Button';
 import { ColumnSelector } from '../ColumnSelector/ColumnSelector';
-import { DataTable } from '../DataTable/DataTable';
-import { Filters } from '../Filters/Filters';
+import { DataTable } from '../DataTable/DataTableOpt';
+import { Filters } from '../Filters/FiltersOpt';
 import { Modal } from '../Modal/Modal';
 import styles from './DataLoader.module.css';
 
@@ -31,7 +31,7 @@ const DataLoader = () => {
   const [localSelectedColumns, setLocalSelectedColumns] = useState(selectedColumns);
   const [isUpdatingColumns, setIsUpdatingColumns] = useState(false);
 
-  const filteredAndSortedData = () => {
+  const filteredAndSortedData = useMemo(() => {
     let filtered = sortedData[filters.selectedYear ?? defaultYear];
 
     if (filters.selectedRegion) {
@@ -67,9 +67,15 @@ const DataLoader = () => {
       });
     }
     return filtered;
-  };
+  }, [
+    filters.selectedYear,
+    filters.selectedRegion,
+    filters.countrySearch,
+    sortConfig.key,
+    sortConfig.direction,
+  ]);
 
-  const displayColumns = () => {
+  const displayColumns = useCallback(() => {
     const required: TableColumn[] = [];
     const rest: TableColumn[] = [];
     availableColumns.forEach((column) => {
@@ -80,25 +86,20 @@ const DataLoader = () => {
       }
     });
     return [...required, ...rest.filter((col) => selectedColumns.includes(col.key))];
-  };
+  }, [selectedColumns, availableColumns]);
 
-  const handleFilterChange = (newFilters: FilterConfig) => {
+  const handleFilterChange = useCallback((newFilters: FilterConfig) => {
     setFilters(newFilters);
-  };
+  }, []);
 
-  const handleSort = (key: string) => {
+  const handleSort = useCallback((key: string) => {
     setSortConfig((prev) => ({
       key,
-      direction:
-        prev.key === key && prev.direction === 'asc'
-          ? 'desc'
-          : prev.key === key && prev.direction === 'desc'
-            ? null
-            : 'asc',
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
     }));
-  };
+  }, []);
 
-  const modalClose = () => {
+  const modalClose = useCallback(() => {
     setColumnSelectorModalOpen(false);
     setIsUpdatingColumns(true);
     clearSelectedColumns();
@@ -115,39 +116,44 @@ const DataLoader = () => {
         if (currentIndex < newColumns.length) {
           setTimeout(processBatch, 10);
         } else {
-          setTimeout(() => setIsUpdatingColumns(false), 10);
+          setTimeout(() => setIsUpdatingColumns(false), 200);
         }
       };
       processBatch();
     };
 
     setTimeout(updateColumnsInBatches, 0);
-  };
+  }, [localSelectedColumns]);
 
   return (
     <div className={styles.container}>
-      <div className={styles.controls}>
-        <Filters
-          filters={filters}
-          availableYears={availableYears}
-          availableRegions={availableRegions}
-          onFilterChange={handleFilterChange}
+      <div className={styles.content}>
+        <div className={styles.controls}>
+          <Filters
+            filters={filters}
+            availableYears={availableYears}
+            availableRegions={availableRegions}
+            onFilterChange={handleFilterChange}
+            disabled={isUpdatingColumns}
+          />
+          <Button
+            className={styles.controlButton}
+            onClick={() => setColumnSelectorModalOpen(true)}
+            size="small"
+            disabled={isUpdatingColumns}
+          >
+            Select Columns
+          </Button>
+        </div>
+
+        <DataTable
+          data={filteredAndSortedData}
+          columns={displayColumns()}
+          sortConfig={sortConfig}
+          onSort={handleSort}
+          selectedYear={filters.selectedYear}
         />
-        <Button
-          className={styles.controlButton}
-          onClick={() => setColumnSelectorModalOpen(true)}
-          size="small"
-        >
-          Select Columns
-        </Button>
       </div>
-      <DataTable
-        data={filteredAndSortedData()}
-        columns={displayColumns()}
-        sortConfig={sortConfig}
-        onSort={handleSort}
-        selectedYear={filters.selectedYear}
-      />
 
       {isUpdatingColumns && (
         <div className={styles.loadingOverlay}>

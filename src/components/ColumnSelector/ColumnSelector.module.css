@@ -3,7 +3,8 @@
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   margin-top: 2rem;
   overflow-y: auto;
-  max-height: calc(100vh - 240px);
+  max-height: calc(100vh - 300px);
+  /* box-shadow: inset -30px 0 20px 30px red; */
 }
 
 .buttonsWrapper {
@@ -13,7 +14,7 @@
   margin-bottom: 1rem;
 }
 
-.form {
+.content {
   padding-left: 20px;
 }
 

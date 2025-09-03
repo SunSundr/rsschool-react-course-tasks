@@ -1,15 +1,25 @@
-import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
+import { RouterErrorFallback } from './components/ErrorBoundary/RouterErrorFallback';
+import { Layout } from './components/Layout/Layout';
 import { MainComponent } from './components/MainComponent/MainComponent';
 
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<MainComponent />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Router>
-  );
-}
+const router = createBrowserRouter([
+  {
+    element: <Layout />,
+    errorElement: <RouterErrorFallback />,
+    children: [
+      {
+        path: '/',
+        element: <MainComponent />,
+      },
+      {
+        path: '*',
+        element: <Navigate to="/" replace />,
+      },
+    ],
+  },
+]);
 
-export default App;
+export function App() {
+  return <RouterProvider router={router} />;
+}

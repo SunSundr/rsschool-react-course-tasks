@@ -1,8 +1,14 @@
+import { memo } from 'react';
 import { RowProps } from './@types';
-import { Cell } from './Cell';
+import { Cell } from './CellOpt';
 import styles from './DataTable.module.css';
 
-export const Row = ({ row, columns, changedColumns, loading = false }: RowProps) => {
+export const Row = memo(function RowOpt({
+  row,
+  columns,
+  changedColumns,
+  loading = false,
+}: RowProps) {
   return (
     <tr className={styles.row}>
       {columns.map((column) => (
@@ -16,4 +22,4 @@ export const Row = ({ row, columns, changedColumns, loading = false }: RowProps)
       ))}
     </tr>
   );
-};
+});

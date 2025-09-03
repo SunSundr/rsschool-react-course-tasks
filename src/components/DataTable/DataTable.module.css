@@ -48,8 +48,17 @@
   z-index: 11;
 }
 
+/* Year disable hover */
+.headerCell:nth-child(3) {
+  pointer-events: none;
+}
+
 .headerCell:last-child {
   border-top-right-radius: 12px;
+}
+
+.disabled {
+  pointer-events: none;
 }
 
 @supports (user-select: none) {
@@ -121,7 +130,6 @@ tbody {
   color: var(--text-primary);
   font-size: 14px;
   transition: background-color 0.2s ease;
-  /* min-width: 120px; */
 }
 
 .row:last-child .cell {
@@ -199,18 +207,26 @@ tbody {
   background: linear-gradient(
     90deg,
     var(--background-default) 0%,
-    var(--background-elevated) 50%,
+    var(--info-secondary) 50%,
     var(--background-default) 100%
   );
   background-size: 200% 100%;
-  animation: skeletonShimmer 1.5s infinite;
+  animation: skeletonShimmer 2s infinite;
   border-radius: 4px;
   margin: 2px 0;
+  position: absolute;
+  top: 10px;
 }
 
 .skeletonCell {
+  height: 41.8px;
+  padding: 12px 16px;
   position: relative;
   overflow: hidden;
+}
+
+.row .skeletonCell {
+  pointer-events: none;
 }
 
 @keyframes skeletonShimmer {

@@ -3,19 +3,23 @@ import { REQUIRED_COLUMNS } from '../constants';
 
 interface ColumnStore {
   selectedColumns: string[];
-  setSelectedColumns: (columns: string[]) => void;
+  setSelectedColumns: (columnKey: string[]) => void;
   toggleColumn: (columnKey: string) => void;
+  addSelectedColumns: (columnKey: string[]) => void;
+  clearSelectedColumns: () => void;
 }
 
 export const useColumnStore = create<ColumnStore>((set) => ({
   selectedColumns: [...REQUIRED_COLUMNS],
-  setSelectedColumns: (columns) =>
+  clearSelectedColumns: () => set({ selectedColumns: [...REQUIRED_COLUMNS] }),
+  setSelectedColumns: (columnKey) =>
     set({
-      selectedColumns: [
-        ...REQUIRED_COLUMNS,
-        ...columns.filter((col) => !REQUIRED_COLUMNS.includes(col)),
-      ],
+      selectedColumns: [...REQUIRED_COLUMNS, ...columnKey],
     }),
+  addSelectedColumns: (columnKey: string[]) =>
+    set((state) => ({
+      selectedColumns: [...state.selectedColumns, ...columnKey],
+    })),
   toggleColumn: (columnKey) =>
     set((state) => ({
       selectedColumns: state.selectedColumns.includes(columnKey)

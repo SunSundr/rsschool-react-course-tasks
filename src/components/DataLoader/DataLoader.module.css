@@ -4,14 +4,6 @@
   margin: 0 auto;
 }
 
-.title {
-  font-size: 32px;
-  font-weight: bold;
-  margin-bottom: 1.4rem;
-  margin-top: 0.4rem;
-  text-align: center;
-}
-
 .error {
   color: var(--error-primary);
   text-align: center;
@@ -28,4 +20,59 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
+}
+
+.controlButton {
+  min-height: 42px;
+  height: 42px;
+  margin-top: 5px;
+}
+
+.progressMessage {
+  margin: 14px;
+  color: var(--primary-light);
+}
+
+.content {
+  transition: filter 0.3s ease;
+}
+
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.loadingMessage {
+  background-color: var(--warn-primary);
+  color: var(--background-default);
+  padding: 20px 40px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px var(--box-shadow-color);
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@supports (user-select: none) {
+  .loadingMessage {
+    user-select: none;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }

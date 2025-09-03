@@ -1,11 +1,18 @@
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { calculateMaxWidth } from '~/utils/calculateMaxWidth';
+import { getSortIcon } from '~/utils/getSortIcon';
 import { TableProps } from './@types';
-import { Row } from './Row';
+import { Row } from './RowOpt';
 import { MAX_ROWS } from '../../constants';
 import styles from './DataTable.module.css';
 
-export const Table = ({ data, columns, sortConfig, onSort, changedCells }: TableProps) => {
+export const Table = memo(function TableOpt({
+  data,
+  columns,
+  sortConfig,
+  onSort,
+  changedCells,
+}: TableProps) {
   const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
 
   useEffect(() => {
@@ -17,12 +24,27 @@ export const Table = ({ data, columns, sortConfig, onSort, changedCells }: Table
     setColumnWidths(widths);
   }, [data, columns]);
 
-  const getSortIcon = (columnKey: string) => {
-    if (sortConfig.key !== columnKey) return '';
-    return sortConfig.direction === 'asc' ? '↑' : '↓';
-  };
+  const tableContent = useMemo(() => {
+    return (
+      <tbody>
+        {data.map((row, index) => {
+          const rowKey = `${row.country}-${row.iso_code}`;
+          const changedColumns = changedCells.get(rowKey) || new Set();
+          return (
+            <Row
+              key={`${row.country}-${row.year}-${index}`}
+              row={row}
+              columns={columns}
+              changedColumns={changedColumns}
+              columnWidths={columnWidths}
+            />
+          );
+        })}
+      </tbody>
+    );
+  }, [data, columns, changedCells, columnWidths]);
 
-  const columnStyles = () => {
+  const columnStyles = useMemo(() => {
     return Object.entries(columnWidths)
       .map(
         ([key, width]) => `
@@ -35,12 +57,12 @@ export const Table = ({ data, columns, sortConfig, onSort, changedCells }: Table
     `,
       )
       .join('');
-  };
+  }, [columnWidths]);
 
   return (
     <div className={styles.tableWrapper}>
       <style>
-        {columnStyles()}{' '}
+        {columnStyles}{' '}
         {data.length > MAX_ROWS
           ? `.${styles.tableWrapper} { height: calc(100vh - 235px); } .${styles.headerCell}:last-child { border-top-right-radius: unset; }`
           : ''}
@@ -57,28 +79,14 @@ export const Table = ({ data, columns, sortConfig, onSort, changedCells }: Table
               >
                 {column.label}
                 {column.sortable && (
-                  <span className={styles.sortIcon}>{getSortIcon(column.key)}</span>
+                  <span className={styles.sortIcon}>{getSortIcon(sortConfig, column.key)}</span>
                 )}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody>
-          {data.map((row, index) => {
-            const rowKey = `${row.country}-${row.iso_code}`;
-            const changedColumns = changedCells.get(rowKey) || new Set();
-            return (
-              <Row
-                key={`${row.country}-${row.year}-${index}`}
-                row={row}
-                columns={columns}
-                changedColumns={changedColumns}
-                columnWidths={columnWidths}
-              />
-            );
-          })}
-        </tbody>
+        {tableContent}
       </table>
     </div>
   );
-};
+});

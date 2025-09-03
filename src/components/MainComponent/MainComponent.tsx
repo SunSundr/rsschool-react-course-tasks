@@ -1,21 +1,10 @@
 import { Suspense } from 'react';
-import { TITLE } from '~/constants';
-import { DataLoader } from '../DataLoader/DataLoader';
-import { Filters } from '../Filters/Filters';
-import { Skeleton } from '../Skeleton/Skeleton';
-import styles from './MainComponent.module.css';
+import { DataLoader } from '../DataLoader';
+import { Fallback } from '../Fallback/Fallback';
 
 export const MainComponent = () => {
   return (
-    <Suspense
-      fallback={
-        <div className={styles.container}>
-          <h1 className={styles.title}>{TITLE}</h1>
-          <Filters disabled={true} />
-          <Skeleton />
-        </div>
-      }
-    >
+    <Suspense fallback={<Fallback />}>
       <DataLoader />
     </Suspense>
   );

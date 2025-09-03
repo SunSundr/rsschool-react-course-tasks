@@ -1,15 +1,14 @@
-import { REQUIRED_COLUMNS } from '~/constants';
+import { MAX_ROWS, REQUIRED_COLUMNS } from '~/constants';
 import { CountryData, TableColumn } from '~/types';
-import { snakeToTitleCase } from '~/utils/snakeToTitleCase';
+import { classNames } from '~/utils/classNames';
+import { formatLabel } from '~/utils/labelFormatter';
 import { Row } from '../DataTable/Row';
 import styles from '../DataTable/DataTable.module.css';
 
 export const Skeleton = () => {
   const columns: TableColumn[] = REQUIRED_COLUMNS.map((column) => ({
     key: column,
-    label: column.includes('_')
-      ? snakeToTitleCase(column)
-      : column.charAt(0).toUpperCase() + column.slice(1),
+    label: formatLabel(column),
     sortable: true,
   }));
 
@@ -19,7 +18,7 @@ export const Skeleton = () => {
     return acc;
   }, {} as CountryData);
 
-  const rows = Array.from({ length: 14 }, (_, i) => i);
+  const rows = Array.from({ length: MAX_ROWS }, (_, i) => i);
 
   return (
     <div className={styles.tableWrapper}>
@@ -27,7 +26,7 @@ export const Skeleton = () => {
         <thead>
           <tr>
             {columns.map((col, index) => (
-              <th key={index} className={styles.headerCell}>
+              <th key={index} className={classNames(styles.headerCell, styles.disabled)}>
                 {col.label}
               </th>
             ))}

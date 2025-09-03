@@ -1,14 +1,15 @@
+import { memo } from 'react';
 import { FiltersProps } from './@types';
 import { FilterConfig } from '../../types';
 import styles from './Filters.module.css';
 
-export const Filters = ({
+export const Filters = memo(function FiltersOpt({
   filters = { selectedYear: null, selectedRegion: '', countrySearch: '' },
   availableYears = [],
   availableRegions = [],
   onFilterChange = () => {},
   disabled = false,
-}: FiltersProps) => {
+}: FiltersProps) {
   const safeFilters: FilterConfig = {
     selectedYear: filters?.selectedYear ?? null,
     selectedRegion: filters?.selectedRegion ?? '',
@@ -80,4 +81,4 @@ export const Filters = ({
       </div>
     </div>
   );
-};
+});

@@ -12,6 +12,7 @@ export default defineConfig({
       '~': path.resolve(__dirname, 'src'),
     },
   },
+  base: './',
   plugins: [
     react(),
     svgr({
@@ -20,6 +21,14 @@ export default defineConfig({
       },
     }),
   ],
+  worker: {
+    format: 'es',
+    rollupOptions: {
+      output: {
+        entryFileNames: 'assets/[name]-[hash].js',
+      },
+    },
+  },
   test: {
     environment: 'jsdom',
     globals: true,

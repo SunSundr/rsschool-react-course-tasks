@@ -81,7 +81,6 @@ Development and maintenance scripts for the project.
 
 - **Components**: Use **PascalCase** for React component names and files
 - **Constants**: Use **UPPER_SNAKE_CASE** for constant values
-- **Files**: Use **kebab-case** for general file names
 - **Variables**: Use **camelCase** for variables and functions
 - **CSS Modules**: Use **ComponentName.module.css** pattern
 
@@ -120,13 +119,14 @@ This application includes a comprehensive performance optimization system that c
 
 ### Optimization Toggle
 
-The project includes a `USE_OPTIMIZATIONS` constant in `src/constants.ts` that controls all React performance optimizations:
+The project uses environment variable `VITE_DISABLE_OPTIMIZATIONS` to control React performance optimizations. Optimized and non-optimized components are isolated in separate files for better control and testing:
 
-```typescript
-export const USE_OPTIMIZATIONS = true; // Set to false to disable optimizations
-```
+- **Optimized components**: Use React.memo, useMemo, and useCallback (e.g., `DataLoaderOpt.tsx`)
+- **Non-optimized components**: Standard React components without memoization
+- **Component selection**: Handled in `src/components/DataLoader/index.ts` based on environment variable
+- **Default behavior**: Optimizations are enabled by default
 
-When enabled, the following optimizations are applied:
+When optimizations are enabled, the following techniques are applied:
 
 - **React.memo** for component memoization
 - **useMemo** for expensive calculations
@@ -139,7 +139,9 @@ When enabled, the following optimizations are applied:
 - **Advanced Filtering**: Filter by year, region, and country name with real-time updates
 - **Multi-Column Sorting**: Sort data by any column with ascending/descending options
 - **Change Highlighting**: Visual indicators for data changes when switching between years
-- **Skeleton Loading**: Smooth loading experience with animated placeholders
+- **Web Worker Integration**: Non-blocking JSON file loading with real-time progress updates
+- **Error Boundaries**: Comprehensive error handling with RouterErrorFallback
+- **Responsive Loading**: Skeleton components with progress messages during data fetching
 - **Large Dataset Handling**: Efficient processing of 100MB+ JSON files
 
 ---
@@ -164,13 +166,13 @@ _Note: Performance data is approximate and may vary due to browser overhead, Dev
 
 #### Before Optimization
 
-| Action           | Render Time (ms) | Components Affected                                           |
-| ---------------- | ---------------- | ------------------------------------------------------------- |
-| Initial Load     | 45.9             | All components                                                |
-| Column Selection | 438.9            | DataLoader FiltersComponent DataTableComponent TableComponent |
-| Year Change      | 518              | DataLoader FiltersComponent DataTableComponent TableComponent |
-| Sorting          | 415              | DataLoader FiltersComponent DataTableComponent TableComponent |
-| Search           | 176.9            | DataLoader FiltersComponent DataTableComponent TableComponent |
+| Action                       | Render Time (ms) | Components Affected                |
+| ---------------------------- | ---------------- | ---------------------------------- |
+| Initial Load                 | 45.2             | All components                     |
+| Column Selection (5 columns) | 412.8            | DataLoader Filters DataTable Table |
+| Year Change                  | 498.3            | DataLoader Filters DataTable Table |
+| Sorting                      | 387.9            | DataLoader Filters DataTable Table |
+| Search                       | 189.7            | DataLoader Filters DataTable Table |
 
 **Screenshots:**
 
@@ -196,15 +198,16 @@ _Search_
 
 #### After Optimization
 
-| Action                  | Render Time (ms) | Components Affected                                           | Improvement |
-| ----------------------- | ---------------- | ------------------------------------------------------------- | ----------- |
-| Initial Load            | 45.9             | All components                                                | 0%          |
-| Column Selection        | 371.4            | DataLoader FiltersComponent DataTableComponent TableComponent | 15.4%       |
-| Year Change             | 469.4            | DataLoader FiltersComponent DataTableComponent TableComponent | 9.4%        |
-| Sorting (first sorting) | 491.2            | DataLoader FiltersComponent DataTableComponent TableComponent | -18.4%      |
-| Sorting (re-sorting)    | 127.1            | FiltersComponent TableComponent                               | 69.4%       |
-| Search (first search)   | 163.5            | DataLoader FiltersComponent DataTableComponent TableComponent | 7.6%        |
-| Search (re-search)      | 66.6             | DataLoader FiltersComponent                                   | 62.4%       |
+| Action                       | Render Time (ms) | Components Affected                         | Improvement |
+| ---------------------------- | ---------------- | ------------------------------------------- | ----------- |
+| Initial Load                 | 43.8             | All components                              | 3.1%        |
+| Column Selection (5 columns) | 201.3            | DataLoader DataTableOpt TableOpt            | 51.2%       |
+| Year Change (first change)   | 476.2            | DataLoader FiltersOpt DataTableOpt TableOpt | 4.4%        |
+| Year Change (re-change)      | 287.4            | FiltersOpt DataTableOpt TableOpt            | 42.3%       |
+| Sorting (first sorting)      | 398.7            | DataLoader DataTableOpt TableOpt            | -2.8%       |
+| Sorting (re-sorting)         | 156.3            | FiltersOpt DataTableOpt TableOpt            | 59.7%       |
+| Search (first search)        | 178.9            | DataLoader FiltersOpt DataTableOPt TableOpt | 5.7%        |
+| Search (re-search)           | 72.4             | DataLoader FiltersOpt                       | 61.8%       |
 
 **Screenshots:**
 
@@ -216,9 +219,13 @@ _Column Selection_
 
 ![Column Selection After](doc/after-optimization/column-selection.png)
 
-_Year Change_
+_Year Change (first change)_
 
-![Year Change After](doc/after-optimization/year-change.png)
+![Year Change (first change)](doc/after-optimization/year-change-1.png)
+
+_Year Change (re-change)_
+
+![Year Change (first change)](doc/after-optimization/year-change-2.png)
 
 _Sorting First_
 
@@ -258,15 +265,23 @@ _Search Re-search_
 
 ### Performance Features
 
-- **Lazy Loading**: Efficient data loading with React Suspense
+- **Web Worker Data Loading**: Non-blocking JSON parsing with real-time progress updates
+- **React Suspense**: Efficient lazy loading with fallback components
 - **Memoization**: Strategic use of React.memo, useMemo, and useCallback
+- **Error Boundaries**: Comprehensive error handling and recovery
 - **State Management**: Zustand for lightweight, efficient state handling
 
 ---
 
 ## Data Source
 
-The application processes CO2 emissions data from Our World in Data, containing comprehensive environmental statistics for countries worldwide. The dataset includes metrics such as:
+The application uses **Data on CO2 and Greenhouse Gas Emissions** by **Our World in Data**:
+
+- **Repository**: https://github.com/owid/co2-data
+- **Original data file**: https://nyc3.digitaloceanspaces.com/owid-public/data/co2/owid-co2-data.json
+- **File size**: 100MB+ JSON dataset
+
+The dataset contains comprehensive environmental statistics for countries worldwide, including:
 
 - CO2 emissions (total and per capita)
 - Population data
@@ -274,7 +289,7 @@ The application processes CO2 emissions data from Our World in Data, containing 
 - Energy consumption statistics
 - Historical trends across multiple years
 
-_Note: The actual data file (`owid-co2-data.json`) is large (100MB+) and requires optimization techniques for smooth user experience._
+_Note: The large dataset size requires web worker implementation and optimization techniques for smooth user experience._
 
 ---
 
@@ -284,19 +299,22 @@ _Note: The actual data file (`owid-co2-data.json`) is large (100MB+) and require
 
 - Column selection is managed through Zustand store
 - Filter states are handled locally within components
-- Performance optimization toggle affects entire application
+- Performance optimization controlled by environment variable
 
 ### Component Architecture
 
-- Modular component design with clear separation of concerns
-- CSS Modules for scoped styling
-- TypeScript interfaces for type safety
+- **Separated optimized/non-optimized components** for better testing and control
+- **Web worker integration** for non-blocking data operations
+- **Error boundaries** with RouterErrorFallback for robust error handling
+- **CSS Modules** for scoped styling
+- **TypeScript interfaces** for type safety
 
 ### Performance Considerations
 
-- Data processing is optimized for large datasets
-- Change detection only triggers on year modifications
-- Conditional optimizations based on `USE_OPTIMIZATIONS` constant
+- **Web worker** prevents UI blocking during large file processing
+- **Batched updates** for responsive column selection
+- **Change detection** only triggers on year modifications
+- **Component isolation** allows selective optimization testing
 
 ---
 
@@ -315,8 +333,9 @@ The performance optimization implementation demonstrates the effectiveness of Re
 **Subsequent Rendering Performance:**
 
 - Dramatic improvements in repeated operations:
-  - Re-sorting: **69.4% faster**
-  - Re-searching: **62.4% faster**
+  - Re-sorting: **59.7% faster**
+  - Re-searching: **61.8% faster**
+  - Re-year changes: **42.3% faster**
 - Memoized components skip unnecessary re-renders
 - Cached calculations eliminate redundant processing
 
@@ -328,7 +347,9 @@ The performance optimization implementation demonstrates the effectiveness of Re
 
 **useCallback:** Stabilizes function references, preventing child component re-renders caused by new function instances.
 
-**Strategic Implementation:** The `USE_OPTIMIZATIONS` constant allows for performance comparison and demonstrates that optimization benefits compound with user interaction frequency.
+**Strategic Implementation:** The environment-based optimization toggle with separated component files allows for precise performance comparison and demonstrates that optimization benefits compound with user interaction frequency.
+
+**Web Worker Integration:** Non-blocking data loading prevents UI freezing during large file processing, maintaining application responsiveness even with 100MB+ datasets.
 
 ### Real-World Impact
 

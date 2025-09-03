@@ -34,3 +34,5 @@ export interface FilterConfig {
   countrySearch: string;
   selectedRegion: string;
 }
+
+export type FlattenData = CountryData & { country: string; iso_code: string };

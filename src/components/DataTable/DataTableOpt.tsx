@@ -1,14 +1,20 @@
-import { useEffect, useRef, useState } from 'react';
-import { CHANGE_DISPLAY_TIME_MS } from '~/constants';
+import { memo, useEffect, useRef, useState } from 'react';
+import { CHANGE_DISPLAY_TIME_MS, SpecialColumns } from '~/constants';
 import { DataTableProps } from './@types';
-import { Table } from './Table';
+import { Table } from './TableOpt';
 import { FlattenData } from '../../types';
 import styles from './DataTable.module.css';
 
-export const DataTable = ({ data, columns, sortConfig, onSort, selectedYear }: DataTableProps) => {
+export const DataTable = memo(function DataTableOpt({
+  data,
+  columns,
+  sortConfig,
+  onSort,
+  selectedYear,
+}: DataTableProps) {
   const [changedCells, setChangedCells] = useState<Map<string, Set<string>>>(new Map());
-  const previousDataRef = useRef<Map<string, FlattenData>>(new Map());
   const previousYearRef = useRef<number | null>(null);
+  const previousDataRef = useRef<Map<string, FlattenData>>(new Map());
 
   useEffect(() => {
     const newChangedCells = new Map<string, Set<string>>();
@@ -21,8 +27,9 @@ export const DataTable = ({ data, columns, sortConfig, onSort, selectedYear }: D
         const changedColumns = new Set<string>();
 
         columns.forEach((column) => {
-          if (column.key === 'country' || column.key === 'iso_code') return;
-
+          if (column.key === SpecialColumns.Country || column.key === SpecialColumns.IsoCode) {
+            return;
+          }
           const currentValue = currentRow[column.key as keyof typeof currentRow];
           const previousValue = previousRow[column.key as keyof typeof previousRow];
 
@@ -62,4 +69,4 @@ export const DataTable = ({ data, columns, sortConfig, onSort, selectedYear }: D
       />
     </div>
   );
-};
+});
