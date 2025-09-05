@@ -1,4 +1,4 @@
-import { REQUIRED_COLUMNS } from '../../constants';
+import { REQUIRED_COLUMNS, REQUIRED_NAMES_COLUMNS } from '../../constants';
 import { TableColumn } from '../../types';
 import { Button } from '../Button/Button';
 import { Checkbox } from '../Checkbox/Checkbox';
@@ -20,12 +20,7 @@ export const ColumnSelector = ({
   };
 
   const handleDeselectAll = () => {
-    const required: string[] = [];
-    availableColumns.forEach((column) => {
-      if (REQUIRED_COLUMNS.includes(column.key))
-        required[REQUIRED_COLUMNS.indexOf(column.key)] = column.key;
-    });
-    setLocalSelectedColumns(required);
+    setLocalSelectedColumns(REQUIRED_NAMES_COLUMNS);
   };
 
   const onChange = (column: TableColumn) => {
@@ -64,7 +59,7 @@ export const ColumnSelector = ({
             label={column.label}
             checked={localSelectedColumns.includes(column.key)}
             onChange={() => onChange(column)}
-            disabled={REQUIRED_COLUMNS.includes(column.key)}
+            disabled={REQUIRED_NAMES_COLUMNS.includes(column.key)}
           />
         ))}
       </div>

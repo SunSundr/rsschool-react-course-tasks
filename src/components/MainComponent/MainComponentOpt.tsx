@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { DataLoader } from '../DataLoader';
 import { Fallback } from '../Fallback/Fallback';
-import { Filters } from '../Filters/Filters';
+import { Filters } from '../Filters/FiltersOpt';
 import styles from './MainComponent.module.css';
 
 const MainComponent = () => {

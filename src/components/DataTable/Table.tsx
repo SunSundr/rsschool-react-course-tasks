@@ -1,5 +1,8 @@
 import { useEffect, useState } from 'react';
 import { calculateMaxWidth } from '~/utils/calculateMaxWidth';
+import { classNames } from '~/utils/classNames';
+import { getSortIcon } from '~/utils/getSortIcon';
+import { unionStringKey } from '~/utils/helpers';
 import { TableProps } from './@types';
 import { Row } from './Row';
 import { MAX_ROWS } from '../../constants';
@@ -17,59 +20,56 @@ export const Table = ({ data, columns, sortConfig, onSort, changedCells }: Table
     setColumnWidths(widths);
   }, [data, columns]);
 
-  const getSortIcon = (columnKey: string) => {
-    if (sortConfig.key !== columnKey) return '';
-    return sortConfig.direction === 'asc' ? '↑' : '↓';
-  };
-
   const columnStyles = () => {
-    return Object.entries(columnWidths)
+    const stringStyles = Object.entries(columnWidths)
       .map(
         ([key, width]) => `
-      .${styles.table} th[data-column="${key}"],
-      .${styles.table} td[data-column="${key}"] {
-        width: ${width}px;
-        min-width: ${width}px;
-        max-width: ${width}px;
-      }
-    `,
+          .${styles.table} th[data-column="${key}"],
+          .${styles.table} td[data-column="${key}"] {
+            width: ${width}px;
+            min-width: ${width}px;
+            max-width: ${width}px;
+          }`,
       )
       .join('');
+    const wrapperStyle =
+      data.length > MAX_ROWS
+        ? `.${styles.tableWrapper} { height: calc(100vh - 235px); } 
+           .${styles.headerCell}:last-child { border-top-right-radius: unset; }`
+        : '';
+    return `${stringStyles} ${wrapperStyle}`;
   };
 
   return (
     <div className={styles.tableWrapper}>
-      <style>
-        {columnStyles()}{' '}
-        {data.length > MAX_ROWS
-          ? `.${styles.tableWrapper} { height: calc(100vh - 235px); } .${styles.headerCell}:last-child { border-top-right-radius: unset; }`
-          : ''}
-      </style>
+      <style>{columnStyles()}</style>
       <table className={styles.table}>
         <thead>
           <tr>
             {columns.map((column) => (
               <th
                 key={column.key}
-                className={`${styles.headerCell} ${sortConfig.key === column.key ? styles.withSort : ''}`}
+                className={classNames(styles.headerCell, {
+                  [styles.withSort]: sortConfig.key === column.key,
+                })}
                 onClick={() => column.sortable && onSort(column.key)}
                 data-column={column.key}
               >
                 {column.label}
                 {column.sortable && (
-                  <span className={styles.sortIcon}>{getSortIcon(column.key)}</span>
+                  <span className={styles.sortIcon}>{getSortIcon(sortConfig, column.key)}</span>
                 )}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {data.map((row, index) => {
-            const rowKey = `${row.country}-${row.iso_code}`;
+          {data.map((row) => {
+            const rowKey = unionStringKey(row.country, row.iso_code);
             const changedColumns = changedCells.get(rowKey) || new Set();
             return (
               <Row
-                key={`${row.country}-${row.year}-${index}`}
+                key={rowKey}
                 row={row}
                 columns={columns}
                 changedColumns={changedColumns}

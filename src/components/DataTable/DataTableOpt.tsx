@@ -1,8 +1,9 @@
 import { memo, useEffect, useRef, useState } from 'react';
-import { CHANGE_DISPLAY_TIME_MS, SpecialColumns } from '~/constants';
+import { DelayTime, SpecialColumns } from '~/constants';
+import { FlattenData } from '~/types';
+import { unionStringKey } from '~/utils/helpers';
 import { DataTableProps } from './@types';
 import { Table } from './TableOpt';
-import { FlattenData } from '../../types';
 import styles from './DataTable.module.css';
 
 export const DataTable = memo(function DataTableOpt({
@@ -18,43 +19,32 @@ export const DataTable = memo(function DataTableOpt({
 
   useEffect(() => {
     const newChangedCells = new Map<string, Set<string>>();
-
+    const dataMap = new Map();
     data.forEach((currentRow) => {
-      const rowKey = `${currentRow.country}-${currentRow.iso_code}`;
-      const previousRow = previousDataRef.current.get(rowKey);
+      const rowKey = unionStringKey(currentRow.country, currentRow.iso_code);
+      const previousRefRow = previousDataRef.current.get(rowKey);
 
-      if (previousRow) {
+      if (previousRefRow) {
         const changedColumns = new Set<string>();
 
         columns.forEach((column) => {
-          if (column.key === SpecialColumns.Country || column.key === SpecialColumns.IsoCode) {
-            return;
-          }
-          const currentValue = currentRow[column.key as keyof typeof currentRow];
-          const previousValue = previousRow[column.key as keyof typeof previousRow];
-
-          if (currentValue !== previousValue) {
-            changedColumns.add(column.key);
+          if (column.key !== SpecialColumns.Country && column.key !== SpecialColumns.IsoCode) {
+            const currentValue = currentRow[column.key];
+            const previousValue = previousRefRow[column.key];
+            if (currentValue !== previousValue) changedColumns.add(column.key);
           }
         });
 
-        if (changedColumns.size > 0) {
-          newChangedCells.set(rowKey, changedColumns);
-        }
+        if (changedColumns.size > 0) newChangedCells.set(rowKey, changedColumns);
       }
+      dataMap.set(rowKey, currentRow);
     });
 
     setChangedCells(newChangedCells);
-
-    const timer = setTimeout(() => setChangedCells(new Map()), CHANGE_DISPLAY_TIME_MS);
-
-    const dataMap = new Map();
-    data.forEach((row) => {
-      dataMap.set(`${row.country}-${row.iso_code}`, row);
-    });
     previousDataRef.current = dataMap;
     previousYearRef.current = selectedYear;
 
+    const timer = setTimeout(() => setChangedCells(new Map()), DelayTime.HighlightCells);
     return () => clearTimeout(timer);
   }, [selectedYear]);
 

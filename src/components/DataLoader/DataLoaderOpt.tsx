@@ -1,50 +1,47 @@
-import { use, useCallback, useMemo, useState } from 'react';
-import { BATCH_SIZE_UPDATE_COLUMNS, REQUIRED_COLUMNS } from '~/constants';
-import { getCountriesData } from '../../services/dataService';
-import { useColumnStore } from '../../store/columnStore';
-import { FilterConfig, SortConfig, TableColumn } from '../../types';
-import { Button } from '../Button/Button';
-import { ColumnSelector } from '../ColumnSelector/ColumnSelector';
+import { use, useCallback, useMemo, useRef, useState } from 'react';
+import {
+  REQUIRED_COLUMNS,
+  REQUIRED_NAMES_COLUMNS,
+  SortDirection,
+  SpecialColumns,
+} from '~/constants';
+import { getCountriesData } from '~/services/dataService';
+import { useAppStore } from '~/store/store';
+import { SortConfig } from '~/types';
+import { columnFrom, unionStringKey } from '~/utils/helpers';
 import { DataTable } from '../DataTable/DataTableOpt';
-import { Filters } from '../Filters/FiltersOpt';
-import { Modal } from '../Modal/Modal';
-import styles from './DataLoader.module.css';
 
 const data = getCountriesData();
 
 const DataLoader = () => {
-  const { maxYear, availableYears, availableRegions, availableColumns, sortedData } = use(data);
+  const sortedData = use(data);
+  const { filters, selectedColumns } = useAppStore();
 
-  const [columnSelectorModalOpen, setColumnSelectorModalOpen] = useState(false);
-  const [filters, setFilters] = useState<FilterConfig>({
-    selectedYear: null,
-    countrySearch: '',
-    selectedRegion: '',
-  });
-  const defaultYear = maxYear;
   const [sortConfig, setSortConfig] = useState<SortConfig>({
-    key: 'country',
-    direction: 'asc',
+    key: SpecialColumns.Country,
+    direction: SortDirection.Ascending,
   });
 
-  const { selectedColumns, addSelectedColumns, clearSelectedColumns } = useColumnStore();
-  const [localSelectedColumns, setLocalSelectedColumns] = useState(selectedColumns);
-  const [isUpdatingColumns, setIsUpdatingColumns] = useState(false);
+  const previousSortMarkRef = useRef<string>('');
 
   const filteredAndSortedData = useMemo(() => {
-    let filtered = sortedData[filters.selectedYear ?? defaultYear];
+    let filtered = sortedData[filters.selectedYear];
 
-    if (filters.selectedRegion) {
-      filtered = filtered.filter((item) => item.country === filters.selectedRegion);
-    }
+    const hasRegionFilter = filters.selectedRegion;
+    const hasSearchFilter = filters.countrySearch;
 
-    if (filters.countrySearch) {
-      filtered = filtered.filter((item) =>
-        item.country.toLowerCase().includes(filters.countrySearch.toLowerCase()),
+    if (hasRegionFilter || hasSearchFilter) {
+      const searchTerm = hasSearchFilter ? filters.countrySearch.toLowerCase() : '';
+      filtered = filtered.filter(
+        (item) =>
+          (!hasRegionFilter || item.country === filters.selectedRegion) &&
+          (!hasSearchFilter || item.country.toLowerCase().includes(searchTerm)),
       );
     }
 
-    if (sortConfig.key && sortConfig.direction) {
+    const currentSort = unionStringKey(sortConfig.key, sortConfig.direction);
+
+    if (currentSort !== previousSortMarkRef.current) {
       filtered.sort((a, b) => {
         const aVal = a[sortConfig.key as keyof typeof a];
         const bVal = b[sortConfig.key as keyof typeof b];
@@ -54,18 +51,21 @@ const DataLoader = () => {
         if (bVal === undefined) return -1;
 
         if (typeof aVal === 'string' && typeof bVal === 'string') {
-          return sortConfig.direction === 'asc'
+          return sortConfig.direction === SortDirection.Ascending
             ? aVal.localeCompare(bVal)
             : bVal.localeCompare(aVal);
         }
 
         if (typeof aVal === 'number' && typeof bVal === 'number') {
-          return sortConfig.direction === 'asc' ? aVal - bVal : bVal - aVal;
+          return sortConfig.direction === SortDirection.Ascending ? aVal - bVal : bVal - aVal;
         }
 
         return 0;
       });
+
+      previousSortMarkRef.current = currentSort;
     }
+
     return filtered;
   }, [
     filters.selectedYear,
@@ -75,100 +75,36 @@ const DataLoader = () => {
     sortConfig.direction,
   ]);
 
-  const displayColumns = useCallback(() => {
-    const required: TableColumn[] = [];
-    const rest: TableColumn[] = [];
-    availableColumns.forEach((column) => {
-      if (REQUIRED_COLUMNS.includes(column.key)) {
-        required[REQUIRED_COLUMNS.indexOf(column.key)] = column;
-      } else {
-        rest.push(column);
-      }
-    });
-    return [...required, ...rest.filter((col) => selectedColumns.includes(col.key))];
-  }, [selectedColumns, availableColumns]);
-
-  const handleFilterChange = useCallback((newFilters: FilterConfig) => {
-    setFilters(newFilters);
-  }, []);
+  const displayColumns = useMemo(
+    () => [
+      ...REQUIRED_COLUMNS,
+      ...selectedColumns
+        .filter((item) => !REQUIRED_NAMES_COLUMNS.includes(item))
+        .map((item) => columnFrom(item)),
+    ],
+    [selectedColumns],
+  );
 
   const handleSort = useCallback((key: string) => {
-    setSortConfig((prev) => ({
-      key,
-      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
-    }));
+    setSortConfig((prev) => {
+      if (prev.key !== key) return { key, direction: SortDirection.Ascending };
+      const newDirection =
+        prev.direction === SortDirection.Ascending
+          ? SortDirection.Descending
+          : SortDirection.Ascending;
+
+      return { key, direction: newDirection };
+    });
   }, []);
 
-  const modalClose = useCallback(() => {
-    setColumnSelectorModalOpen(false);
-    setIsUpdatingColumns(true);
-    clearSelectedColumns();
-
-    const updateColumnsInBatches = () => {
-      const batchSize = BATCH_SIZE_UPDATE_COLUMNS;
-      const newColumns = [...localSelectedColumns];
-      let currentIndex = 0;
-      const processBatch = () => {
-        const endIndex = Math.min(currentIndex + batchSize, newColumns.length);
-        const batch = newColumns.slice(currentIndex, endIndex);
-        currentIndex = endIndex;
-        addSelectedColumns(batch);
-        if (currentIndex < newColumns.length) {
-          setTimeout(processBatch, 10);
-        } else {
-          setTimeout(() => setIsUpdatingColumns(false), 200);
-        }
-      };
-      processBatch();
-    };
-
-    setTimeout(updateColumnsInBatches, 0);
-  }, [localSelectedColumns]);
-
   return (
-    <div className={styles.container}>
-      <div className={styles.content}>
-        <div className={styles.controls}>
-          <Filters
-            filters={filters}
-            availableYears={availableYears}
-            availableRegions={availableRegions}
-            onFilterChange={handleFilterChange}
-            disabled={isUpdatingColumns}
-          />
-          <Button
-            className={styles.controlButton}
-            onClick={() => setColumnSelectorModalOpen(true)}
-            size="small"
-            disabled={isUpdatingColumns}
-          >
-            Select Columns
-          </Button>
-        </div>
-
-        <DataTable
-          data={filteredAndSortedData}
-          columns={displayColumns()}
-          sortConfig={sortConfig}
-          onSort={handleSort}
-          selectedYear={filters.selectedYear}
-        />
-      </div>
-
-      {isUpdatingColumns && (
-        <div className={styles.loadingOverlay}>
-          <div className={styles.loadingMessage}>Updating Columns...</div>
-        </div>
-      )}
-
-      <Modal title="Select Columns" isOpen={columnSelectorModalOpen} onClose={modalClose}>
-        <ColumnSelector
-          availableColumns={availableColumns}
-          localSelectedColumns={localSelectedColumns}
-          setLocalSelectedColumns={setLocalSelectedColumns}
-        />
-      </Modal>
-    </div>
+    <DataTable
+      data={filteredAndSortedData}
+      columns={displayColumns}
+      sortConfig={sortConfig}
+      onSort={handleSort}
+      selectedYear={filters.selectedYear}
+    />
   );
 };
 

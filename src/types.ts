@@ -1,3 +1,5 @@
+import { SortDirection } from './constants';
+
 export interface CountryData {
   year?: number;
   population?: number;
@@ -22,17 +24,27 @@ export interface TableColumn {
   sortable: boolean;
 }
 
-export type SortDirection = 'asc' | 'desc' | null;
-
 export interface SortConfig {
   key: string;
-  direction: SortDirection;
+  direction: `${SortDirection}` | null;
 }
 
 export interface FilterConfig {
-  selectedYear: number | null;
+  selectedYear: number;
   countrySearch: string;
   selectedRegion: string;
 }
 
 export type FlattenData = CountryData & { country: string; iso_code: string };
+
+export interface Column {
+  key: string;
+  label: string;
+  sortable: boolean;
+}
+
+export interface SortedData {
+  [key: number]: FlattenData[];
+}
+
+export type FilterChangeType = 'year' | 'region' | 'search';

@@ -1,6 +1,8 @@
-import { memo, useEffect, useMemo, useState } from 'react';
-import { calculateMaxWidth } from '~/utils/calculateMaxWidth';
+import { memo, useMemo } from 'react';
+import { useColumnWidths } from '~/hooks/useColumnWidths';
+import { classNames } from '~/utils/classNames';
 import { getSortIcon } from '~/utils/getSortIcon';
+import { unionStringKey } from '~/utils/helpers';
 import { TableProps } from './@types';
 import { Row } from './RowOpt';
 import { MAX_ROWS } from '../../constants';
@@ -13,26 +15,17 @@ export const Table = memo(function TableOpt({
   onSort,
   changedCells,
 }: TableProps) {
-  const [columnWidths, setColumnWidths] = useState<Record<string, number>>({});
-
-  useEffect(() => {
-    if (data.length === 0) return;
-    const widths: Record<string, number> = {};
-    columns.forEach((column) => {
-      widths[column.key] = calculateMaxWidth(data, columns, column.key);
-    });
-    setColumnWidths(widths);
-  }, [data, columns]);
+  const columnWidths = useColumnWidths(data, columns);
 
   const tableContent = useMemo(() => {
     return (
       <tbody>
-        {data.map((row, index) => {
-          const rowKey = `${row.country}-${row.iso_code}`;
+        {data.map((row) => {
+          const rowKey = unionStringKey(row.country, row.iso_code);
           const changedColumns = changedCells.get(rowKey) || new Set();
           return (
             <Row
-              key={`${row.country}-${row.year}-${index}`}
+              key={rowKey}
               row={row}
               columns={columns}
               changedColumns={changedColumns}
@@ -42,38 +35,40 @@ export const Table = memo(function TableOpt({
         })}
       </tbody>
     );
-  }, [data, columns, changedCells, columnWidths]);
+  }, [data, columns, changedCells, columnWidths, sortConfig]);
 
   const columnStyles = useMemo(() => {
-    return Object.entries(columnWidths)
+    const stringStyles = Object.entries(columnWidths)
       .map(
         ([key, width]) => `
-      .${styles.table} th[data-column="${key}"],
-      .${styles.table} td[data-column="${key}"] {
-        width: ${width}px;
-        min-width: ${width}px;
-        max-width: ${width}px;
-      }
-    `,
+          .${styles.table} th[data-column="${key}"],
+          .${styles.table} td[data-column="${key}"] {
+            width: ${width}px;
+            min-width: ${width}px;
+            max-width: ${width}px;
+          }`,
       )
       .join('');
+    const wrapperStyle =
+      data.length > MAX_ROWS
+        ? `.${styles.tableWrapper} { height: calc(100vh - 235px); } 
+           .${styles.headerCell}:last-child { border-top-right-radius: unset; }`
+        : '';
+    return `${stringStyles} ${wrapperStyle}`;
   }, [columnWidths]);
 
   return (
     <div className={styles.tableWrapper}>
-      <style>
-        {columnStyles}{' '}
-        {data.length > MAX_ROWS
-          ? `.${styles.tableWrapper} { height: calc(100vh - 235px); } .${styles.headerCell}:last-child { border-top-right-radius: unset; }`
-          : ''}
-      </style>
       <table className={styles.table}>
+        <style>{columnStyles}</style>
         <thead>
           <tr>
             {columns.map((column) => (
               <th
                 key={column.key}
-                className={`${styles.headerCell} ${sortConfig.key === column.key ? styles.withSort : ''}`}
+                className={classNames(styles.headerCell, {
+                  [styles.withSort]: sortConfig.key === column.key,
+                })}
                 onClick={() => column.sortable && onSort(column.key)}
                 data-column={column.key}
               >

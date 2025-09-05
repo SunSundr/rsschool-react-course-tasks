@@ -24,15 +24,17 @@
   --hover-shadow: #3b4347;
   --disabled-button: #353535;
 
-  line-height: 1.2;
-  color-scheme: dark;
   --scrollbar-thumb: #6e6e6e;
   --scrollbar-track: #242424;
 
   --error-primary: #ff4444;
   --error-secondary: #ff6666;
+  --error-dark: #a82424;
+
   --warn-primary: #c46b3b;
   --warn-secondary: #eca883;
+  --warn-dark: #975c3b;
+
   --info-primary: #34995b;
   --info-secondary: #164e2c;
 
@@ -40,6 +42,10 @@
   --white: rgba(255, 255, 255, 0.8);
   --light-border: rgba(124, 124, 124, 0.377);
   --overlay: rgba(0, 0, 0, 0.5);
+
+  --font-weight-medium: 600;
+  line-height: 1.2;
+  color-scheme: dark;
 }
 
 @supports (scrollbar-color: auto) {

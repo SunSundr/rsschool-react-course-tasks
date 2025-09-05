@@ -1,5 +1,7 @@
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { DelayTime } from '~/constants';
+import { classNames } from '~/utils/classNames';
 import styles from './Modal.module.css';
 
 interface ModalProps {
@@ -41,11 +43,13 @@ export const Modal = ({ isOpen, onClose, children, title }: ModalProps) => {
       modalRef.current.addEventListener(
         'transitionend',
         async () => {
-          if (Date.now() - time < 600) {
-            await new Promise((resolve) => setTimeout(resolve, 600 - (Date.now() - time)));
+          if (Date.now() - time < DelayTime.Max) {
+            await new Promise((resolve) =>
+              setTimeout(resolve, DelayTime.Max - (Date.now() - time)),
+            );
           }
           setIsVisible(false);
-          setTimeout(() => previousFocusRef.current?.focus(), 0);
+          setTimeout(() => previousFocusRef.current?.focus(), DelayTime.Zero);
         },
         {
           once: true,
@@ -73,7 +77,7 @@ export const Modal = ({ isOpen, onClose, children, title }: ModalProps) => {
 
   return createPortal(
     <div
-      className={`${styles.modalBackdrop} ${isOpen ? styles.Open : ''}`}
+      className={classNames(styles.modalBackdrop, { [styles.Open]: isOpen })}
       onMouseDown={handleBackdropClick}
     >
       <div

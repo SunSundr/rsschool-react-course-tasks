@@ -1,4 +1,5 @@
 import { InputHTMLAttributes } from 'react';
+import { classNames } from '~/utils/classNames';
 import styles from './Checkbox.module.css';
 
 interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
@@ -9,32 +10,27 @@ interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'typ
 }
 
 export const Checkbox = ({
-  id,
   label,
-  className = '',
   error,
   disabled,
-  fixedHeight = false,
   fullWidth = true,
+  fixedHeight = false,
+  className = '',
   ...props
 }: CheckboxProps) => {
-  const checkboxId = id || label?.toLowerCase().replace(/\s+/g, '-');
   return (
     <div
-      className={`${styles.checkboxContainer} ${fullWidth ? styles.fullWidth : ''} ${className}`}
+      className={classNames(
+        styles.checkboxContainer,
+        {
+          [styles.fullWidth]: fullWidth,
+        },
+        className,
+      )}
     >
-      <label
-        htmlFor={checkboxId}
-        className={`${styles.checkboxLabel} ${disabled ? styles.disabled : ''}`}
-      >
+      <label className={classNames(styles.checkboxLabel, { [styles.disabled]: disabled })}>
         <div className={styles.checkboxWrapper}>
-          <input
-            id={checkboxId}
-            type="checkbox"
-            className={styles.checkboxInput}
-            disabled={disabled}
-            {...props}
-          />
+          <input type="checkbox" className={styles.checkboxInput} disabled={disabled} {...props} />
           <span className={styles.checkboxCustom}></span>
         </div>
         {label && <span className={styles.checkboxText}>{label}</span>}

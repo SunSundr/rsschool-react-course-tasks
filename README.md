@@ -123,7 +123,7 @@ The project uses environment variable `VITE_DISABLE_OPTIMIZATIONS` to control Re
 
 - **Optimized components**: Use React.memo, useMemo, and useCallback (e.g., `DataLoaderOpt.tsx`)
 - **Non-optimized components**: Standard React components without memoization
-- **Component selection**: Handled in `src/components/DataLoader/index.ts` based on environment variable
+- **Component selection**: Handled in `src/components/DataLoader/index.ts` and `src/components/MainComponent/index.ts` based on environment variable
 - **Default behavior**: Optimizations are enabled by default
 
 When optimizations are enabled, the following techniques are applied:
@@ -166,13 +166,13 @@ _Note: Performance data is approximate and may vary due to browser overhead, Dev
 
 #### Before Optimization
 
-| Action                       | Render Time (ms) | Components Affected                |
-| ---------------------------- | ---------------- | ---------------------------------- |
-| Initial Load                 | 45.2             | All components                     |
-| Column Selection (5 columns) | 412.8            | DataLoader Filters DataTable Table |
-| Year Change                  | 498.3            | DataLoader Filters DataTable Table |
-| Sorting                      | 387.9            | DataLoader Filters DataTable Table |
-| Search                       | 189.7            | DataLoader Filters DataTable Table |
+| Action                       | Render Time (ms) | Components Affected                                  |
+| ---------------------------- | ---------------- | ---------------------------------------------------- |
+| Initial Load                 | 44.2             | All components                                       |
+| Column Selection (5 columns) | 53.7             | Filters SelectFilterGroup                            |
+| Year Change                  | 388.9            | Filters SelectFilterGroup DataLoader DataTable Table |
+| Sorting                      | 362.8            | DataLoader DataTable Table                           |
+| Search                       | 144.2            | Filters SelectFilterGroup DataLoader DataTable Table |
 
 **Screenshots:**
 
@@ -198,16 +198,13 @@ _Search_
 
 #### After Optimization
 
-| Action                       | Render Time (ms) | Components Affected                         | Improvement |
-| ---------------------------- | ---------------- | ------------------------------------------- | ----------- |
-| Initial Load                 | 43.8             | All components                              | 3.1%        |
-| Column Selection (5 columns) | 201.3            | DataLoader DataTableOpt TableOpt            | 51.2%       |
-| Year Change (first change)   | 476.2            | DataLoader FiltersOpt DataTableOpt TableOpt | 4.4%        |
-| Year Change (re-change)      | 287.4            | FiltersOpt DataTableOpt TableOpt            | 42.3%       |
-| Sorting (first sorting)      | 398.7            | DataLoader DataTableOpt TableOpt            | -2.8%       |
-| Sorting (re-sorting)         | 156.3            | FiltersOpt DataTableOpt TableOpt            | 59.7%       |
-| Search (first search)        | 178.9            | DataLoader FiltersOpt DataTableOPt TableOpt | 5.7%        |
-| Search (re-search)           | 72.4             | DataLoader FiltersOpt                       | 61.8%       |
+| Action                       | Render Time (ms) | Components Affected                                  | Improvement |
+| ---------------------------- | ---------------- | ---------------------------------------------------- | ----------- |
+| Initial Load                 | 45.0             | All components                                       | -1.8%       |
+| Column Selection (5 columns) | 41.3             | Filters SelectFilterGroup                            | +23.1%      |
+| Year Change                  | 371.0            | Filters SelectFilterGroup DataLoader DataTable Table | +4.6%       |
+| Sorting                      | 30.3             | DataLoader DataTable Table                           | +91.6%      |
+| Search                       | 50.9             | Filters SelectFilterGroup DataLoader DataTable Table | +64.7%      |
 
 **Screenshots:**
 
@@ -219,29 +216,17 @@ _Column Selection_
 
 ![Column Selection After](doc/after-optimization/column-selection.png)
 
-_Year Change (first change)_
+_Year Change_
 
-![Year Change (first change)](doc/after-optimization/year-change-1.png)
+![Year Change (first change)](doc/after-optimization/year-change.png)
 
-_Year Change (re-change)_
+_Sorting_
 
-![Year Change (first change)](doc/after-optimization/year-change-2.png)
+![Sorting First After](doc/after-optimization/sorting.png)
 
-_Sorting First_
+_Search_
 
-![Sorting First After](doc/after-optimization/sorting-1.png)
-
-_Sorting Re-sorting_
-
-![Sorting Re-sorting After](doc/after-optimization/sorting-2.png)
-
-_Search First_
-
-![Search First After](doc/after-optimization/search-1.png)
-
-_Search Re-search_
-
-![Search Re-search After](doc/after-optimization/search-2.png)
+![Search First After](doc/after-optimization/search.png)
 
 ## Application Features
 
@@ -332,10 +317,11 @@ The performance optimization implementation demonstrates the effectiveness of Re
 
 **Subsequent Rendering Performance:**
 
-- Dramatic improvements in repeated operations:
-  - Re-sorting: **59.7% faster**
-  - Re-searching: **61.8% faster**
-  - Re-year changes: **42.3% faster**
+- Significant improvements in user interactions:
+  - Sorting operations: **91.6% faster** (362.8ms → 30.3ms)
+  - Search functionality: **64.7% faster** (144.2ms → 50.9ms)
+  - Column selection: **23.1% faster** (53.7ms → 41.3ms)
+  - Year changes: **4.6% faster** (388.9ms → 371.0ms)
 - Memoized components skip unnecessary re-renders
 - Cached calculations eliminate redundant processing
 
@@ -353,6 +339,8 @@ The performance optimization implementation demonstrates the effectiveness of Re
 
 ### Real-World Impact
 
-While initial operations may be slightly slower due to memoization overhead, the application becomes significantly more responsive during typical user workflows involving repeated filtering, sorting, and searching. This trade-off proves beneficial for interactive applications where users perform multiple operations on the same dataset.
+While initial load shows minimal overhead (-1.8%), the application demonstrates substantial performance gains in user interactions. The most dramatic improvements occur in sorting (91.6% faster) and search operations (64.7% faster), which are the most frequent user actions when exploring large datasets.
 
-The optimization strategy successfully transforms a potentially sluggish large-dataset application into a responsive user experience, with performance gains becoming more pronounced as users interact with the interface.
+The optimization strategy successfully transforms data-intensive operations from sluggish experiences into responsive interactions. Column selection improvements (23.1% faster) enhance the user experience when customizing data views, while year filtering shows modest but consistent gains (4.6% faster).
+
+These optimizations prove particularly valuable for applications handling large datasets, where the performance benefits compound with user interaction frequency, creating a noticeably smoother and more responsive user experience.

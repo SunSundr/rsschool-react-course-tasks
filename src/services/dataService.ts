@@ -1,15 +1,16 @@
-import { BATCH_SIZE_CALC, SpecialColumns } from '~/constants';
+import { BATCH_SIZE_CALC, DelayTime, SpecialColumns } from '~/constants';
 import { progressStore } from '~/store/progressStore';
+import { useAppStore } from '~/store/store';
 import { formatLabel } from '~/utils/labelFormatter';
 import { fetchAndParseWorker } from '~/workers/worker-client';
-import { CountriesData, FlattenData } from '../types';
+import { Column, CountriesData, SortedData } from '../types';
 
 interface ProcessedData {
   maxYear: number;
   availableYears: number[];
   availableRegions: string[];
-  availableColumns: { key: string; label: string; sortable: boolean }[];
-  sortedData: { [key: number]: FlattenData[] };
+  availableColumns: Column[];
+  sortedData: SortedData;
 }
 
 export const fetchCountriesData = async (): Promise<CountriesData> => {
@@ -20,7 +21,7 @@ export const fetchCountriesData = async (): Promise<CountriesData> => {
   }
 };
 
-export const processDataInBatches = async (data: CountriesData): Promise<ProcessedData> => {
+export const processDataInBatches = async (data: CountriesData): Promise<SortedData> => {
   const result: ProcessedData = {
     maxYear: 0,
     availableYears: [],
@@ -63,7 +64,7 @@ export const processDataInBatches = async (data: CountriesData): Promise<Process
     });
 
     if (i + BATCH_SIZE_CALC < countries.length) {
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, DelayTime.Min));
       progressStore.setState({
         message: `Data processing: ${Math.round((i / countries.length) * 100)}%`,
       });
@@ -80,11 +81,24 @@ export const processDataInBatches = async (data: CountriesData): Promise<Process
     }))
     .sort((a, b) => a.label.localeCompare(b.label));
 
+  const { setAvailableYears, setAvailableRegions, setFilters, setAvailableColumns } =
+    useAppStore.getState();
+
+  setAvailableYears(result.availableYears);
+  setAvailableRegions(result.availableRegions);
+  setFilters({
+    selectedYear: result.maxYear,
+    countrySearch: '',
+    selectedRegion: '',
+  });
+  setAvailableColumns(result.availableColumns);
+
   progressStore.setState({ message: 'Complete!' });
-  return result;
+
+  return result.sortedData;
 };
 
-export const getCountriesData = async (): Promise<ProcessedData> => {
+export const getCountriesData = async (): Promise<SortedData> => {
   const data = await fetchCountriesData();
   progressStore.setState({ message: 'Sorting the received data...' });
   return await processDataInBatches(data);
