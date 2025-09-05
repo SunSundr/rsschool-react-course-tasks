@@ -1,0 +1,126 @@
+.modalBackdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: var(--background-paper);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px var(--box-shadow-color);
+  width: min(800px, 90vw);
+  transition:
+    transform 0.6s ease-in-out,
+    opacity 0.7s ease;
+  transform: translateY(-100vh);
+  opacity: 0;
+}
+
+.modalOpen {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.modalPreClose {
+  transform: translateY(100vh);
+}
+
+@supports (outline: none) {
+  .modalContent {
+    outline: none;
+  }
+}
+
+@supports (user-select: none) {
+  .modalContent {
+    user-select: none;
+  }
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background-color: var(--primary-dark);
+  border-radius: 8px 8px 0 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.modalHeader h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  text-transform: uppercase;
+  color: var(--text-primary);
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.6rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  line-height: 2.3rem;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  margin: -0.5rem;
+}
+
+.modalClose:hover {
+  color: var(--text-primary);
+  background-color: var(--primary-shadow);
+}
+
+.modalBody {
+  margin-top: 10px;
+  padding: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .modalContent {
+    width: 95vw;
+    height: auto;
+    margin: auto;
+  }
+
+  .modalBackdrop {
+    margin: auto;
+    padding: 16px 14px 36px 24px;
+    width: 100%;
+    height: 100%;
+    bottom: auto;
+    overflow-y: auto;
+  }
+
+  .modalBackdrop.Open {
+    background-color: var(--background-default);
+  }
+
+  .modalBody {
+    padding: 1rem;
+    padding-bottom: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .modalContent {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .modalBackdrop {
+    padding: 0;
+  }
+}

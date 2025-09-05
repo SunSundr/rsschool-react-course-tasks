@@ -1,0 +1,116 @@
+.checkboxContainer {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.checkboxContainer.fullWidth {
+  width: 100%;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.checkboxLabel:hover {
+  color: var(--text-primary);
+}
+
+.checkboxLabel.disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
+}
+
+.checkboxWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.checkboxInput {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.checkboxCustom {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-light);
+  border-radius: 4px;
+  background-color: transparent;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkboxInput:checked ~ .checkboxCustom {
+  background-color: var(--primary-main);
+  border-color: var(--primary-main);
+}
+
+.checkboxInput:checked ~ .checkboxCustom::after {
+  content: '';
+  width: 6px;
+  height: 12px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  position: relative;
+  top: -1px;
+}
+
+.checkboxInput:focus ~ .checkboxCustom {
+  border-color: var(--primary-main);
+  transform: scale(105%);
+}
+
+.checkboxInput:disabled ~ .checkboxCustom {
+  background-color: var(--background-elevated);
+  border-color: var(--border-dark);
+  opacity: 0.6;
+}
+
+.checkboxInput:checked:disabled ~ .checkboxCustom {
+  background-color: var(--primary-light);
+  border-color: var(--primary-light);
+}
+
+.checkboxInput:checked:disabled ~ .checkboxCustom::after {
+  border-color: var(--text-disabled);
+}
+
+.checkboxText {
+  font-size: 1rem;
+  line-height: 1.2;
+}
+
+@supports (user-select: none) {
+  .checkboxText {
+    user-select: none;
+  }
+}
+
+.checkboxLabel:hover .checkboxCustom {
+  border-color: var(--primary-main);
+}
+
+.checkboxLabel.disabled .checkboxText {
+  color: var(--text-disabled);
+}
+
+.checkboxError {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.875rem;
+  color: var(--error-primary);
+  min-height: 1.25rem;
+  margin-left: 32px;
+}

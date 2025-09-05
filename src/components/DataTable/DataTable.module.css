@@ -1,0 +1,251 @@
+.tableWrapper {
+  width: 100%;
+  overflow: auto;
+  position: relative;
+  border-radius: 12px;
+  background-color: var(--background-paper);
+  box-shadow: 0 2px 8px var(--box-shadow-color);
+  cursor: default;
+}
+
+.table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 0;
+  table-layout: auto;
+}
+
+.headerCell,
+.cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.headerCell {
+  background-color: var(--primary-main);
+  color: var(--text-primary);
+  padding: 16px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border-light);
+  cursor: pointer;
+  transition: background-color 0.4s ease;
+  position: relative;
+}
+
+.headerCell:first-child {
+  border-top-left-radius: 12px;
+  left: 0;
+  z-index: 11;
+}
+
+/* Year disable hover */
+.headerCell:nth-child(3) {
+  pointer-events: none;
+}
+
+.headerCell:last-child {
+  border-top-right-radius: 12px;
+}
+
+.disabled {
+  pointer-events: none;
+}
+
+@supports (user-select: none) {
+  .headerCell {
+    user-select: none;
+  }
+}
+
+.headerCell:hover {
+  background-color: var(--primary-light);
+}
+
+.headerCell.withSort {
+  background-color: var(--secondary-dark);
+}
+
+.headerCell.withSort:hover {
+  background-color: var(--secondary-light);
+}
+
+.sortIcon {
+  margin-left: 8px;
+  font-size: 18px;
+  position: absolute;
+  top: 14px;
+  right: 12px;
+}
+
+tbody {
+  background-color: var(--background-paper);
+}
+
+.row {
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.row:last-child {
+  border-bottom: none;
+}
+
+.row:last-child .cell:first-child {
+  border-bottom-left-radius: 12px;
+  position: sticky;
+  left: 0;
+  background-color: inherit;
+  z-index: 1;
+}
+
+.row:last-child .cell:last-child {
+  border-bottom-right-radius: 12px;
+}
+
+.row:hover {
+  background-color: var(--background-elevated);
+}
+
+.row:nth-child(even) {
+  background-color: var(--background-default);
+}
+
+.row:nth-child(even):hover {
+  background-color: var(--background-elevated);
+}
+
+.cell {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-primary);
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+}
+
+.row:last-child .cell {
+  border-bottom: none;
+}
+
+.changedCell {
+  background-color: var(--info-secondary);
+  color: var(--info-primary);
+  animation: highlightFade 3s ease-out;
+  position: relative;
+}
+
+.changedCell::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 1px;
+  background-color: var(--info-primary);
+  border-radius: 2px;
+}
+
+@keyframes highlightFade {
+  0% {
+    background-color: var(--info-secondary);
+    box-shadow: 0 0 8px var(--info-primary);
+  }
+  70% {
+    background-color: var(--info-secondary);
+  }
+  100% {
+    background-color: inherit;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .headerCell {
+    padding: 12px 8px;
+    font-size: 12px;
+  }
+
+  .cell {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .sortIcon {
+    right: 4px;
+    font-size: 12px;
+  }
+
+  .tableWrapper {
+    height: calc(100vh - 150px);
+  }
+}
+
+.skeletonHeader {
+  background: linear-gradient(
+    90deg,
+    var(--primary-dark) 0%,
+    var(--primary-main) 50%,
+    var(--primary-dark) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite;
+  color: transparent;
+}
+
+.skeletonCellInner {
+  width: 80%;
+  height: 20px;
+  background: linear-gradient(
+    90deg,
+    var(--background-default) 0%,
+    var(--info-secondary) 50%,
+    var(--background-default) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 2s infinite;
+  border-radius: 4px;
+  margin: 2px 0;
+  position: absolute;
+  top: 10px;
+}
+
+.skeletonCell {
+  height: 41.8px;
+  padding: 12px 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.row .skeletonCell {
+  pointer-events: none;
+}
+
+@keyframes skeletonShimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.row:nth-child(2n) .skeletonCellInner {
+  animation-delay: 0.1s;
+}
+
+.row:nth-child(3n) .skeletonCellInner {
+  animation-delay: 0.2s;
+}
+
+.row:nth-child(4n) .skeletonCellInner {
+  animation-delay: 0.3s;
+}
