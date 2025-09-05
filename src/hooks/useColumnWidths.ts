@@ -37,5 +37,5 @@ export const useColumnWidths = (data: CountryData[], columns: TableColumn[]) => 
     });
 
     return widths;
-  }, [data, columns]);
+  }, [columns]);
 };

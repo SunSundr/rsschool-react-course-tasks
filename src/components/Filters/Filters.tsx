@@ -100,8 +100,8 @@ export const Filters = () => {
             <input
               className={styles.input}
               type="text"
-              placeholder="Enter country name..."
-              value={filters.countrySearch}
+              placeholder="Enter country name...2"
+              defaultValue={filters.countrySearch}
               onChange={(e) => handleChange(e, 'search')}
               disabled={disabled}
             />

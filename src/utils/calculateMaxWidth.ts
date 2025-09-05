@@ -8,7 +8,7 @@ export const calculateMaxWidth = (
   columns: TableColumn[],
   columnKey: string,
 ): number => {
-  const cacheKey = `${columnKey}_${data.length}_${columns.map((c) => c.key).join('_')}`;
+  const cacheKey = columns.map((c) => c.key).join('-');
 
   if (widthCache.has(cacheKey)) return widthCache.get(cacheKey)!;
 

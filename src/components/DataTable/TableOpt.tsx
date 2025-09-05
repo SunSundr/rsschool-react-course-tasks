@@ -38,7 +38,7 @@ export const Table = memo(function TableOpt({
   }, [data, columns, changedCells, columnWidths, sortConfig]);
 
   const columnStyles = useMemo(() => {
-    const stringStyles = Object.entries(columnWidths)
+    return Object.entries(columnWidths)
       .map(
         ([key, width]) => `
           .${styles.table} th[data-column="${key}"],
@@ -49,18 +49,22 @@ export const Table = memo(function TableOpt({
           }`,
       )
       .join('');
-    const wrapperStyle =
-      data.length > MAX_ROWS
-        ? `.${styles.tableWrapper} { height: calc(100vh - 235px); } 
-           .${styles.headerCell}:last-child { border-top-right-radius: unset; }`
-        : '';
-    return `${stringStyles} ${wrapperStyle}`;
   }, [columnWidths]);
+
+  const tableStyles = useMemo(() => {
+    return data.length > MAX_ROWS
+      ? `.${styles.tableWrapper} { height: calc(100vh - 235px); } 
+         .${styles.headerCell}:last-child { border-top-right-radius: unset; }`
+      : '';
+  }, [columnWidths, data]);
 
   return (
     <div className={styles.tableWrapper}>
       <table className={styles.table}>
-        <style>{columnStyles}</style>
+        <style>
+          {columnStyles}
+          {tableStyles}
+        </style>
         <thead>
           <tr>
             {columns.map((column) => (

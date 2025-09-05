@@ -120,8 +120,8 @@
 }
 
 .controlButton {
-  min-height: 42px;
-  margin-top: 5px;
+  height: 42px;
+  margin-top: 6px;
 }
 
 .loadingOverlay {
